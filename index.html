@@ -8,11 +8,39 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-    <div class="nav-container">
-        <div class="nav-header">
-            <h2>CivicServe Portal</h2>
-            <p class="nav-subtitle">Administrative Navigation</p>
+    <!-- Top Header Bar -->
+    <div class="top-header">
+        <div class="header-left">
+            <button class="menu-toggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            <a href="#" class="logo">CivicServe</a>
         </div>
+        
+        <div class="search-bar">
+            <input type="text" class="search-input" placeholder="Search Programs, Projects, Contacts, or Knowledge Base...">
+        </div>
+        
+        <div class="header-right">
+            <div class="header-icons">
+                <i class="fas fa-question-circle header-icon"></i>
+                <i class="fas fa-bell header-icon"></i>
+                <i class="fas fa-cog header-icon"></i>
+            </div>
+            <div class="user-info">
+                <div class="user-avatar">CW</div>
+                <span class="user-name">Chris Woods</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- App Container -->
+    <div class="app-container">
+        <div class="nav-container">
+            <div class="nav-header">
+                <div class="progress-logo">P</div>
+                <span class="progress-text">PROGRESS</span>
+            </div>
         
         <nav class="left-navigation">
             <!-- Dashboard -->
@@ -245,40 +273,40 @@
                 </div>
             </div>
         </nav>
-        
-        <div class="nav-footer">
-            <p>CivicServe Platform Navigation Demo</p>
-            <p class="demo-note">Static HTML representation of the dynamic React navigation</p>
-        </div>
-    </div>
-
-    <div class="main-content">
-        <h1>CivicServe Portal Navigation Demo</h1>
-        <p>This is a static HTML representation of the CivicServe Portal's left navigation menu.</p>
-        
-        <div class="info-section">
-            <h2>Navigation Features</h2>
-            <ul>
-                <li><strong>Hierarchical Structure:</strong> Main sections with expandable sub-menus</li>
-                <li><strong>Icon Integration:</strong> FontAwesome icons for visual clarity</li>
-                <li><strong>Dynamic Content:</strong> In the actual app, items are permission-controlled and feature-flagged</li>
-                <li><strong>Program Types:</strong> Dynamically loaded based on active programs</li>
-                <li><strong>Analytics:</strong> Comprehensive reporting and dashboard sections</li>
-                <li><strong>Tools:</strong> Administrative utilities and management features</li>
-            </ul>
+            
+            <div class="nav-footer">
+                <p>CivicServe Platform Navigation Demo</p>
+                <p class="demo-note">Static HTML representation</p>
+            </div>
         </div>
 
-        <div class="technical-info">
-            <h2>Technical Notes</h2>
-            <p>The actual navigation in the CivicServe Portal includes:</p>
-            <ul>
-                <li>Feature flags for conditional display</li>
-                <li>Permission-based access control</li>
-                <li>Dynamic data loading from APIs</li>
-                <li>Localization support</li>
-                <li>Real-time program type filtering</li>
-                <li>User role-based menu customization</li>
-            </ul>
+        <div class="main-content">
+            <h1>CivicServe Portal Navigation Demo</h1>
+            <p>This is a static HTML representation of the CivicServe Portal's left navigation menu with updated structure.</p>
+            
+            <div class="info-section">
+                <h2>Navigation Features</h2>
+                <ul>
+                    <li><strong>Data Management:</strong> Core data, updates, and new data collection tools</li>
+                    <li><strong>Advanced Tools:</strong> CRM, BRE, Workforce, and Marketing capabilities</li>
+                    <li><strong>Comprehensive Reports:</strong> Analytics and compliance reporting</li>
+                    <li><strong>System Integrations:</strong> Property, permitting, and financial systems</li>
+                    <li><strong>Interactive Links:</strong> Each navigation item opens in a new tab</li>
+                </ul>
+            </div>
+
+            <div class="technical-info">
+                <h2>Technical Notes</h2>
+                <p>The actual navigation in the CivicServe Portal includes:</p>
+                <ul>
+                    <li>Feature flags for conditional display</li>
+                    <li>Permission-based access control</li>
+                    <li>Dynamic data loading from APIs</li>
+                    <li>Localization support</li>
+                    <li>Real-time program type filtering</li>
+                    <li>User role-based menu customization</li>
+                </ul>
+            </div>
         </div>
     </div>
 
