@@ -13,7 +13,10 @@ function initializeNavigation() {
     const expandableItems = document.querySelectorAll('.expandable');
     
     expandableItems.forEach(item => {
-        item.addEventListener('click', function() {
+        item.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
             const parent = this.closest('.nav-section') || this.closest('.nav-subsection');
             
             if (parent) {
@@ -38,7 +41,7 @@ function initializeNavigation() {
     navItems.forEach(item => {
         item.addEventListener('click', function(e) {
             // Don't trigger if it's an expandable item (handled separately)
-            if (!this.classList.contains('expandable')) {
+            if (!this.classList.contains('expandable') && !this.hasAttribute('onclick')) {
                 // Remove active state from all items
                 navItems.forEach(navItem => navItem.classList.remove('active'));
                 
