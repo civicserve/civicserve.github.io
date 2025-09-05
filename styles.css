@@ -7,12 +7,14 @@
 }
 
 body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
     background-color: #f5f7fa;
     color: #333;
     display: flex;
     flex-direction: column;
     min-height: 100vh;
+    font-size: 14px;
+    line-height: 1.4;
 }
 
 /* Top Header Bar */
@@ -132,7 +134,7 @@ body {
 }
 
 .nav-container {
-    width: 240px;
+    width: 220px;
     background-color: #003760;
     display: flex;
     flex-direction: column;
@@ -143,22 +145,23 @@ body {
 }
 
 .nav-header {
-    padding: 1rem;
+    padding: 12px 16px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     display: flex;
     align-items: center;
-    gap: 0.75rem;
+    gap: 8px;
+    min-height: 48px;
 }
 
 .progress-logo {
-    width: 24px;
-    height: 24px;
+    width: 20px;
+    height: 20px;
     background-color: #17a2b8;
-    border-radius: 0.25rem;
+    border-radius: 2px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 0.75rem;
+    font-size: 10px;
     font-weight: bold;
     color: white;
 }
@@ -166,7 +169,8 @@ body {
 .progress-text {
     color: #17a2b8;
     font-weight: 600;
-    font-size: 0.875rem;
+    font-size: 12px;
+    letter-spacing: 0.5px;
 }
 
 .left-navigation {
@@ -178,7 +182,7 @@ body {
 .nav-item {
     display: flex;
     align-items: center;
-    padding: 0.75rem 1rem;
+    padding: 10px 16px;
     cursor: pointer;
     transition: all 0.2s ease;
     border: none;
@@ -186,31 +190,35 @@ body {
     width: 100%;
     text-align: left;
     color: white;
-    font-size: 0.875rem;
+    font-size: 13px;
+    font-weight: 400;
     border-left: 3px solid transparent;
+    min-height: 36px;
 }
 
 .nav-item:hover {
-    background-color: rgba(255, 255, 255, 0.1);
+    background-color: rgba(255, 255, 255, 0.08);
     color: white;
 }
 
 .nav-item.active {
-    background-color: rgba(255, 255, 255, 0.15);
-    border-left: 3px solid #17a2b8;
+    background-color: rgba(255, 255, 255, 0.12);
+    border-left: 3px solid #ffffff;
     color: white;
+    font-weight: 500;
 }
 
 .main-item {
-    font-weight: 500;
-    padding: 0.875rem 1rem;
+    font-weight: 400;
+    padding: 10px 16px;
 }
 
 .main-item i {
-    margin-right: 0.75rem;
+    margin-right: 10px;
     width: 16px;
-    font-size: 0.875rem;
+    font-size: 14px;
     color: white;
+    text-align: center;
 }
 
 .main-item:hover i {
@@ -222,8 +230,8 @@ body {
 }
 
 .expand-icon {
-    font-size: 0.75rem;
-    color: white;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.7);
     transition: transform 0.2s ease;
     margin-left: auto;
 }
@@ -242,16 +250,18 @@ body {
 }
 
 .sub-item {
-    padding-left: 3rem;
-    font-size: 0.8125rem;
-    color: white;
+    padding-left: 42px;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.9);
     font-weight: 400;
-    padding-top: 0.625rem;
-    padding-bottom: 0.625rem;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    padding-right: 16px;
+    min-height: 32px;
 }
 
 .sub-item:hover {
-    background-color: rgba(255, 255, 255, 0.1);
+    background-color: rgba(255, 255, 255, 0.08);
     color: white;
 }
 
@@ -298,10 +308,10 @@ body {
 }
 
 .main-content {
-    margin-left: 240px;
+    margin-left: 220px;
     padding: 2rem;
     flex: 1;
-    max-width: calc(100% - 240px);
+    max-width: calc(100% - 220px);
     background-color: #f5f7fa;
 }
 
