@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CivicServe Dashboard Demo</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 2rem; min-height: 100vh; }
+        .demo-container { max-width: 800px; margin: 0 auto; text-align: center; }
+        h1 { font-size: 3rem; margin-bottom: 1rem; }
+        .subtitle { font-size: 1.25rem; margin-bottom: 2rem; opacity: 0.9; }
+        .demo-content { background: rgba(255, 255, 255, 0.1); padding: 2rem; border-radius: 1rem; margin-bottom: 2rem; }
+        .metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 2rem; }
+        .metric-card { background: rgba(255, 255, 255, 0.2); padding: 1.5rem; border-radius: 0.5rem; }
+        .metric-value { font-size: 2rem; font-weight: bold; margin-bottom: 0.5rem; }
+        .close-btn { background: rgba(255, 255, 255, 0.2); border: none; color: white; padding: 0.75rem 1.5rem; border-radius: 0.5rem; cursor: pointer; margin-top: 1rem; }
+        .close-btn:hover { background: rgba(255, 255, 255, 0.3); }
+    </style>
+</head>
+<body>
+    <div class="demo-container">
+        <h1><i class="fas fa-tachometer-alt"></i> Dashboard</h1>
+        <p class="subtitle">Municipal Management Overview</p>
+        
+        <div class="demo-content">
+            <h2>Executive Dashboard</h2>
+            <p>This is a demo page representing the CivicServe Dashboard functionality.</p>
+            
+            <div class="metrics">
+                <div class="metric-card">
+                    <div class="metric-value">247</div>
+                    <div>Active Projects</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">1,832</div>
+                    <div>Business Contacts</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">$2.3M</div>
+                    <div>Funds Distributed</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">94%</div>
+                    <div>Compliance Rate</div>
+                </div>
+            </div>
+        </div>
+        
+        <button class="close-btn" onclick="window.close()">
+            <i class="fas fa-times"></i> Close Demo
+        </button>
+    </div>
+</body>
+</html>

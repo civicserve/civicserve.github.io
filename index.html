@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CivicServe Portal Navigation Demo</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="nav-container">
+        <div class="nav-header">
+            <h2>CivicServe Portal</h2>
+            <p class="nav-subtitle">Administrative Navigation</p>
+        </div>
+        
+        <nav class="left-navigation">
+            <!-- Dashboard -->
+            <div class="nav-item main-item" onclick="window.open('demo-dashboard.html', '_blank')">
+                <i class="fas fa-th"></i>
+                <span>Dashboard</span>
+                <i class="fas fa-external-link-alt external-icon"></i>
+            </div>
+
+            <!-- Data -->
+            <div class="nav-section">
+                <div class="nav-item main-item expandable">
+                    <i class="fas fa-database"></i>
+                    <span>Data</span>
+                    <i class="fas fa-chevron-down expand-icon"></i>
+                </div>
+                <div class="sub-nav">
+                    <!-- Core Data -->
+                    <div class="nav-subsection">
+                        <div class="nav-item sub-item expandable">
+                            <span>Core Data</span>
+                            <i class="fas fa-chevron-down expand-icon"></i>
+                        </div>
+                        <div class="sub-sub-nav">
+                            <div class="nav-item sub-sub-item" onclick="window.open('demo-local-business.html', '_blank')">
+                                <span>Local Business</span>
+                                <i class="fas fa-external-link-alt external-icon"></i>
+                            </div>
+                            <div class="nav-item sub-sub-item" onclick="window.open('demo-national-business.html', '_blank')">
+                                <span>National Business</span>
+                                <i class="fas fa-external-link-alt external-icon"></i>
+                            </div>
+                            <div class="nav-item sub-sub-item" onclick="window.open('demo-parcel-data.html', '_blank')">
+                                <span>Parcel Data (GIS)</span>
+                                <i class="fas fa-external-link-alt external-icon"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Updates to Data -->
+                    <div class="nav-subsection">
+                        <div class="nav-item sub-item expandable">
+                            <span>Updates to Data</span>
+                            <i class="fas fa-chevron-down expand-icon"></i>
+                        </div>
+                        <div class="sub-sub-nav">
+                            <div class="nav-item sub-sub-item" onclick="window.open('demo-alerts.html', '_blank')">
+                                <span>Alerts</span>
+                                <i class="fas fa-external-link-alt external-icon"></i>
+                            </div>
+                            <div class="nav-item sub-sub-item highlighted" onclick="window.open('demo-trends.html', '_blank')">
+                                <span>Trends</span>
+                                <i class="fas fa-external-link-alt external-icon"></i>
+                            </div>
+                            <div class="nav-item sub-sub-item highlighted" onclick="window.open('demo-predictions.html', '_blank')">
+                                <span>Predictions</span>
+                                <i class="fas fa-external-link-alt external-icon"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- New Data Collection -->
+                    <div class="nav-subsection">
+                        <div class="nav-item sub-item expandable">
+                            <span>New Data Collection</span>
+                            <i class="fas fa-chevron-down expand-icon"></i>
+                        </div>
+                        <div class="sub-sub-nav">
+                            <div class="nav-item sub-sub-item" onclick="window.open('demo-portal.html', '_blank')">
+                                <span>Portal</span>
+                                <i class="fas fa-external-link-alt external-icon"></i>
+                            </div>
+                            <div class="nav-item sub-sub-item" onclick="window.open('demo-collection-engine.html', '_blank')">
+                                <span>Collection Engine</span>
+                                <i class="fas fa-external-link-alt external-icon"></i>
+                            </div>
+                            <div class="nav-item sub-sub-item" onclick="window.open('demo-outside-agencies.html', '_blank')">
+                                <span>Outside Agencies</span>
+                                <i class="fas fa-external-link-alt external-icon"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tools -->
+            <div class="nav-section">
+                <div class="nav-item main-item expandable">
+                    <i class="fas fa-tools"></i>
+                    <span>Tools</span>
+                    <i class="fas fa-chevron-down expand-icon"></i>
+                </div>
+                <div class="sub-nav">
+                    <!-- Core Tools -->
+                    <div class="nav-subsection">
+                        <div class="nav-item sub-item expandable">
+                            <span>Core Tools</span>
+                            <i class="fas fa-chevron-down expand-icon"></i>
+                        </div>
+                        <div class="sub-sub-nav">
+                            <div class="nav-item sub-sub-item" onclick="window.open('demo-crm.html', '_blank')">
+                                <span>CRM (Business Connections)</span>
+                                <i class="fas fa-external-link-alt external-icon"></i>
+                            </div>
+                            <div class="nav-item sub-sub-item" onclick="window.open('demo-leads.html', '_blank')">
+                                <span>Leads (Potential Projects)</span>
+                                <i class="fas fa-external-link-alt external-icon"></i>
+                            </div>
+                            <div class="nav-item sub-sub-item" onclick="window.open('demo-survey.html', '_blank')">
+                                <span>Survey (Business Responses)</span>
+                                <i class="fas fa-external-link-alt external-icon"></i>
+                            </div>
+                            <div class="nav-item sub-sub-item highlighted" onclick="window.open('demo-marketing.html', '_blank')">
+                                <span>Marketing</span>
+                                <i class="fas fa-external-link-alt external-icon"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Advanced Tools -->
+                    <div class="nav-subsection">
+                        <div class="nav-item sub-item expandable">
+                            <span>Advanced Tools</span>
+                            <i class="fas fa-chevron-down expand-icon"></i>
+                        </div>
+                        <div class="sub-sub-nav">
+                            <div class="nav-item sub-sub-item" onclick="window.open('demo-properties.html', '_blank')">
+                                <span>Properties</span>
+                                <i class="fas fa-external-link-alt external-icon"></i>
+                            </div>
+                            <div class="nav-item sub-sub-item" onclick="window.open('demo-incentives.html', '_blank')">
+                                <span>Incentives</span>
+                                <i class="fas fa-external-link-alt external-icon"></i>
+                            </div>
+                            <div class="nav-item sub-sub-item highlighted" onclick="window.open('demo-bre.html', '_blank')">
+                                <span>BRE</span>
+                                <i class="fas fa-external-link-alt external-icon"></i>
+                            </div>
+                            <div class="nav-item sub-sub-item highlighted" onclick="window.open('demo-workforce.html', '_blank')">
+                                <span>Workforce</span>
+                                <i class="fas fa-external-link-alt external-icon"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reports -->
+            <div class="nav-section">
+                <div class="nav-item main-item expandable">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Reports</span>
+                    <i class="fas fa-chevron-down expand-icon"></i>
+                </div>
+                <div class="sub-nav">
+                    <!-- Core Reports -->
+                    <div class="nav-subsection">
+                        <div class="nav-item sub-item expandable">
+                            <span>Core Reports</span>
+                            <i class="fas fa-chevron-down expand-icon"></i>
+                        </div>
+                        <div class="sub-sub-nav">
+                            <div class="nav-item sub-sub-item" onclick="window.open('demo-analytic-reports.html', '_blank')">
+                                <span>Analytic Reports</span>
+                                <i class="fas fa-external-link-alt external-icon"></i>
+                            </div>
+                            <div class="nav-item sub-sub-item" onclick="window.open('demo-compliance-reports.html', '_blank')">
+                                <span>Compliance Reports</span>
+                                <i class="fas fa-external-link-alt external-icon"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Advanced Reports -->
+                    <div class="nav-subsection">
+                        <div class="nav-item sub-item expandable">
+                            <span>Advanced Reports</span>
+                            <i class="fas fa-chevron-down expand-icon"></i>
+                        </div>
+                        <div class="sub-sub-nav">
+                            <div class="nav-item sub-sub-item" onclick="window.open('demo-executive-summary.html', '_blank')">
+                                <span>Executive Summary</span>
+                                <i class="fas fa-external-link-alt external-icon"></i>
+                            </div>
+                            <div class="nav-item sub-sub-item" onclick="window.open('demo-goals-progress.html', '_blank')">
+                                <span>Goals Progress</span>
+                                <i class="fas fa-external-link-alt external-icon"></i>
+                            </div>
+                            <div class="nav-item sub-sub-item" onclick="window.open('demo-timelines.html', '_blank')">
+                                <span>Timelines (Projects, Programs)</span>
+                                <i class="fas fa-external-link-alt external-icon"></i>
+                            </div>
+                            <div class="nav-item sub-sub-item" onclick="window.open('demo-survey-reports.html', '_blank')">
+                                <span>Survey</span>
+                                <i class="fas fa-external-link-alt external-icon"></i>
+                            </div>
+                            <div class="nav-item sub-sub-item" onclick="window.open('demo-business-metrics.html', '_blank')">
+                                <span>Business Metrics (Jobs, Salaries, etc.)</span>
+                                <i class="fas fa-external-link-alt external-icon"></i>
+                            </div>
+                            <div class="nav-item sub-sub-item" onclick="window.open('demo-custom-reports.html', '_blank')">
+                                <span>Custom Reports (engine)</span>
+                                <i class="fas fa-external-link-alt external-icon"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Other Applications/Integrations -->
+            <div class="nav-section">
+                <div class="nav-item main-item expandable">
+                    <i class="fas fa-plug"></i>
+                    <span>Other Applications/Integrations</span>
+                    <i class="fas fa-chevron-down expand-icon"></i>
+                </div>
+                <div class="sub-nav">
+                    <div class="nav-item sub-item" onclick="window.open('demo-property-systems.html', '_blank')">
+                        <span>Property Systems</span>
+                        <i class="fas fa-external-link-alt external-icon"></i>
+                    </div>
+                    <div class="nav-item sub-item" onclick="window.open('demo-permitting-systems.html', '_blank')">
+                        <span>Permitting Systems</span>
+                        <i class="fas fa-external-link-alt external-icon"></i>
+                    </div>
+                    <div class="nav-item sub-item" onclick="window.open('demo-financial-systems.html', '_blank')">
+                        <span>Financial Systems</span>
+                        <i class="fas fa-external-link-alt external-icon"></i>
+                    </div>
+                    <div class="nav-item sub-item" onclick="window.open('demo-marketing-systems.html', '_blank')">
+                        <span>Marketing Systems</span>
+                        <i class="fas fa-external-link-alt external-icon"></i>
+                    </div>
+                </div>
+            </div>
+        </nav>
+        
+        <div class="nav-footer">
+            <p>CivicServe Platform Navigation Demo</p>
+            <p class="demo-note">Static HTML representation of the dynamic React navigation</p>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <h1>CivicServe Portal Navigation Demo</h1>
+        <p>This is a static HTML representation of the CivicServe Portal's left navigation menu.</p>
+        
+        <div class="info-section">
+            <h2>Navigation Features</h2>
+            <ul>
+                <li><strong>Hierarchical Structure:</strong> Main sections with expandable sub-menus</li>
+                <li><strong>Icon Integration:</strong> FontAwesome icons for visual clarity</li>
+                <li><strong>Dynamic Content:</strong> In the actual app, items are permission-controlled and feature-flagged</li>
+                <li><strong>Program Types:</strong> Dynamically loaded based on active programs</li>
+                <li><strong>Analytics:</strong> Comprehensive reporting and dashboard sections</li>
+                <li><strong>Tools:</strong> Administrative utilities and management features</li>
+            </ul>
+        </div>
+
+        <div class="technical-info">
+            <h2>Technical Notes</h2>
+            <p>The actual navigation in the CivicServe Portal includes:</p>
+            <ul>
+                <li>Feature flags for conditional display</li>
+                <li>Permission-based access control</li>
+                <li>Dynamic data loading from APIs</li>
+                <li>Localization support</li>
+                <li>Real-time program type filtering</li>
+                <li>User role-based menu customization</li>
+            </ul>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
