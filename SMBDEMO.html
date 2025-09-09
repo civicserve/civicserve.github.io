@@ -197,27 +197,6 @@
     color: #4CAF50;
   }
 
-  /* Navigation menu styles */
-  .sub-menu {
-    display: none !important;
-  }
-  
-  .sub-menu.show {
-    display: block !important;
-  }
-  
-  .menu-item {
-    cursor: pointer;
-  }
-  
-  .menu-item .action-icon {
-    transition: transform 0.3s ease;
-  }
-  
-  .menu-item.expanded .action-icon {
-    transform: rotate(180deg);
-  }
-
   /* Style for the item being dragged */
   .goal-btn.dragging-item {
     opacity: 0.5;
@@ -661,7 +640,7 @@
                 </div>
                 <ul class="side-nav-list">
                   <li>
-                      <a class="menu-item" >
+                      <a class="menu-item ">
                           <svg aria-hidden="true" focusable="false" data-prefix="fal" data-icon="chart-bar" class="svg-inline--fa fa-chart-bar menu-icon" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
                               <path fill="currentColor" d="M24 32c13.3 0 24 10.7 24 24V456c0 13.3 10.7 24 24 24H488c13.3 0 24 10.7 24 24s-10.7 24-24 24H72c-39.8 0-72-32.2-72-72V56C0 42.7 10.7 32 24 32zM128 136c0-13.3 10.7-24 24-24s24 10.7 24 24V424c0 13.3-10.7 24-24 24s-24-10.7-24-24V136zm96-88c0-13.3 10.7-24 24-24s24 10.7 24 24V424c0 13.3-10.7 24-24 24s-24-10.7-24-24V48zM320 200c0-13.3 10.7-24 24-24s24 10.7 24 24V424c0 13.3-10.7 24-24 24s-24-10.7-24-24V200zm96-88c0-13.3 10.7-24 24-24s24 10.7 24 24V424c0 13.3-10.7 24-24 24s-24-10.7-24-24V112z"></path>
                           </svg>
@@ -670,18 +649,15 @@
                               <path fill="currentColor" d="M239 401c9.4 9.4 24.6 9.4 33.9 0L465 209c9.4-9.4 9.4-24.6 0-33.9s-24.6-9.4-33.9 0l-175 175L81 175c-9.4-9.4-24.6-9.4-33.9 0s-9.4 24.6 0 33.9L239 401z"></path>
                           </svg>
                       </a>
-                      <ul class="sub-menu">
+                      <ul class="sub-menu sub-menu-show">
                           <li>
                               <a class="menu-item ">
                                   <div class="menu-label">Core Data</div>
-                          <svg aria-hidden="true" focusable="false" data-prefix="far" data-icon="chevron-down" class="svg-inline--fa fa-chevron-down fa-xs action-icon" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-                              <path fill="currentColor" d="M239 401c9.4 9.4 24.6 9.4 33.9 0L465 209c9.4-9.4 9.4-24.6 0-33.9s-24.6-9.4-33.9 0l-175 175L81 175c-9.4-9.4-24.6-9.4-33.9 0s-9.4 24.6 0 33.9L239 401z"></path>
-                          </svg>
                                   <svg aria-hidden="true" focusable="false" data-prefix="far" data-icon="chevron-down" class="svg-inline--fa fa-chevron-down fa-xs action-icon" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
                                       <path fill="currentColor" d="M239 401c9.4 9.4 24.6 9.4 33.9 0L465 209c9.4-9.4 9.4-24.6 0-33.9s-24.6-9.4-33.9 0l-175 175L81 175c-9.4-9.4-24.6-9.4-33.9 0s-9.4 24.6 0 33.9L239 401z"></path>
                                   </svg>
                               </a>
-                              <ul class="sub-menu">
+                              <ul class="sub-menu sub-menu-show">
                                   <li>
                                       <a class="menu-item " href="https://smbdemo.civicserve.com/admin/contacts/businesses" target="_blank">
                                           <div class="menu-label">Local Business</div>
@@ -706,19 +682,19 @@
                                       <path fill="currentColor" d="M239 401c9.4 9.4 24.6 9.4 33.9 0L465 209c9.4-9.4 9.4-24.6 0-33.9s-24.6-9.4-33.9 0l-175 175L81 175c-9.4-9.4-24.6-9.4-33.9 0s-9.4 24.6 0 33.9L239 401z"></path>
                                   </svg>
                               </a>
-                              <ul class="sub-menu">
+                              <ul class="sub-menu sub-menu-show">
                                   <li>
-                                      <a class="menu-item " href="https://civicserve.github.io/ChangeCommandCenter.html">
+                                      <a class="menu-item " href="https://civicserve.github.io/ChangeCommandCenter.html" target="_blank">
                                           <div class="menu-label">Alerts</div>
                                       </a>
                                   </li>
                                   <li>
-                                      <a class="menu-item " href="/admin/data/updates/trends">
+                                      <a class="menu-item " href="https://smbdemo.civicserve.com/admin/data/updates/trends">
                                           <div class="menu-label">Trends</div>
                                       </a>
                                   </li>
                                   <li>
-                                      <a class="menu-item " href="/admin/data/updates/predictions">
+                                      <a class="menu-item " href="https://smbdemo.civicserve.com/admin/data/updates/predictions">
                                           <div class="menu-label">Predictions</div>
                                       </a>
                                   </li>
@@ -731,14 +707,14 @@
                                       <path fill="currentColor" d="M239 401c9.4 9.4 24.6 9.4 33.9 0L465 209c9.4-9.4 9.4-24.6 0-33.9s-24.6-9.4-33.9 0l-175 175L81 175c-9.4-9.4-24.6-9.4-33.9 0s-9.4 24.6 0 33.9L239 401z"></path>
                                   </svg>
                               </a>
-                              <ul class="sub-menu">
+                              <ul class="sub-menu sub-menu-show">
                                   <li>
                                       <a class="menu-item " href="https://smbdemo.civicserve.com/admin/contacts/businesses" target="_blank">
                                           <div class="menu-label">Portal</div>
                                       </a>
                                   </li>
                                   <li>
-                                      <a class="menu-item " href="/admin/data/new-collection/collection-engine">
+                                      <a class="menu-item " href="https://smbdemo.civicserve.com/admin/data/new-collection/collection-engine">
                                           <div class="menu-label">Collection Engine</div>
                                       </a>
                                   </li>
@@ -752,7 +728,7 @@
                       </ul>
                   </li>
                   <li>
-                      <a class="menu-item" >
+                      <a class="menu-item ">
                           <svg aria-hidden="true" focusable="false" data-prefix="fal" data-icon="screwdriver-wrench" class="svg-inline--fa fa-screwdriver-wrench menu-icon" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
                               <path fill="currentColor" d="M64.7 34.6L160 107.9V160H107.9L34.6 64.7 64.7 34.6zM192 169.3c0-.4 0-.9 0-1.3V104c0-7.5-3.5-14.5-9.4-19L78.6 5C69.1-2.4 55.6-1.5 47 7L7 47c-8.5 8.5-9.4 22-2.1 31.6l80 104c4.5 5.9 11.6 9.4 19 9.4h64c.4 0 .9 0 1.3 0L271.2 293.9c-19.5 30-16.2 70.5 10.1 96.8l112 112c12.5 12.5 32.8 12.5 45.3 0l64-64c12.5-12.5 12.5-32.8 0-45.3l-112-112c-26.3-26.3-66.8-29.7-96.8-10.1L192 169.3zM304 304c17.7-17.7 46.3-17.7 64 0L480 416l-64 64L304 368c-17.7-17.7-17.7-46.3 0-64zM104 424a16 16 0 1 0 -32 0 16 16 0 1 0 32 0zM23.2 376.8C8.3 391.7 0 411.8 0 432.8C0 476.5 35.5 512 79.2 512c21 0 41.1-8.3 56-23.2L238.5 385.5c-5.7-11.2-9.3-23.1-10.9-35.3L112.1 465.7c-8.7 8.7-20.6 13.6-32.9 13.6c-25.7 0-46.6-20.8-46.6-46.6c0-12.3 4.9-24.2 13.6-32.9L189.1 257l-23.1-23.1L23.2 376.8zM479.4 160c0 44.8-23.1 84.1-58 106.8l23.5 23.5c40.7-29 67.2-76.6 67.2-130.3c0-24.8-5.7-48.3-15.7-69.3c-4.4-9.2-16.5-10.5-23.7-3.3l-67.9 67.9c-3 3-7.1 4.7-11.3 4.7H368c-8.8 0-16-7.2-16-16V118.6c0-4.2 1.7-8.3 4.7-11.3l67.9-67.9c7.2-7.2 5.9-19.3-3.3-23.7C400.3 5.7 376.8 0 352 0C296.1 0 246.9 28.6 218.3 72.1l26 20C266.8 56.3 306.7 32.6 352 32.6c10.3 0 20.2 1.2 29.7 3.5L333.6 84.2c-9.1 9.1-14.2 21.5-14.2 34.4V144c0 26.9 21.8 48.6 48.6 48.6h25.4c12.9 0 25.3-5.1 34.4-14.2l48.1-48.1c2.3 9.5 3.5 19.5 3.5 29.7z"></path>
                           </svg>
@@ -761,7 +737,7 @@
                               <path fill="currentColor" d="M239 401c9.4 9.4 24.6 9.4 33.9 0L465 209c9.4-9.4 9.4-24.6 0-33.9s-24.6-9.4-33.9 0l-175 175L81 175c-9.4-9.4-24.6-9.4-33.9 0s-9.4 24.6 0 33.9L239 401z"></path>
                           </svg>
                       </a>
-                      <ul class="sub-menu">
+                      <ul class="sub-menu sub-menu-show">
                           <li>
                               <a class="menu-item ">
                                   <div class="menu-label">Core Tools</div>
@@ -769,7 +745,7 @@
                                       <path fill="currentColor" d="M239 401c9.4 9.4 24.6 9.4 33.9 0L465 209c9.4-9.4 9.4-24.6 0-33.9s-24.6-9.4-33.9 0l-175 175L81 175c-9.4-9.4-24.6-9.4-33.9 0s-9.4 24.6 0 33.9L239 401z"></path>
                                   </svg>
                               </a>
-                              <ul class="sub-menu">
+                              <ul class="sub-menu sub-menu-show">
                                   <li>
                                       <a class="menu-item " href="https://smbdemo.civicserve.com/admin/contacts/all" target="_blank">
                                           <div class="menu-label">CRM (Business Connections)</div>
@@ -786,7 +762,7 @@
                                       </a>
                                   </li>
                                   <li>
-                                      <a class="menu-item " href="https://smbdemo.civicserve.com/admin/contacts/marketing/campaigns" target="_blank">
+                                      <a class="menu-item " href="https://smbdemo.civicserve.com/admin/tools/core/marketing">
                                           <div class="menu-label">Marketing</div>
                                       </a>
                                   </li>
@@ -799,24 +775,24 @@
                                       <path fill="currentColor" d="M239 401c9.4 9.4 24.6 9.4 33.9 0L465 209c9.4-9.4 9.4-24.6 0-33.9s-24.6-9.4-33.9 0l-175 175L81 175c-9.4-9.4-24.6-9.4-33.9 0s-9.4 24.6 0 33.9L239 401z"></path>
                                   </svg>
                               </a>
-                              <ul class="sub-menu">
+                              <ul class="sub-menu sub-menu-show">
                                   <li>
                                       <a class="menu-item " href="https://smbdemo.civicserve.com/admin/programs/non-incentives/available-properties/listings" target="_blank">
                                           <div class="menu-label">Properties</div>
                                       </a>
                                   </li>
                                   <li>
-                                      <a class="menu-item " href="https://smbdemo.civicserve.com/admin/programs/incentives" target="_blank">
+                                      <a class="menu-item " href="https://smbdemo.civicserve.com/admin/programs/incentives/1" target="_blank">
                                           <div class="menu-label">Incentives</div>
                                       </a>
                                   </li>
                                   <li>
-                                      <a class="menu-item " href="https://smbdemo.civicserve.com/admin/contacts/bre" target="_blank">
+                                      <a class="menu-item " href="https://smbdemo.civicserve.com/admin/tools/advanced/bre">
                                           <div class="menu-label">BRE</div>
                                       </a>
                                   </li>
                                   <li>
-                                      <a class="menu-item " href="https://smbdemo.civicserve.com/admin/contacts/workforce" target="_blank">
+                                      <a class="menu-item " href="https://smbdemo.civicserve.com/admin/tools/advanced/workforce">
                                           <div class="menu-label">Workforce</div>
                                       </a>
                                   </li>
@@ -825,7 +801,7 @@
                       </ul>
                   </li>
                   <li>
-                      <a class="menu-item active" >
+                      <a class="menu-item active">
                           <svg aria-hidden="true" focusable="false" data-prefix="far" data-icon="chart-pie-simple" class="svg-inline--fa fa-chart-pie-simple menu-icon" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
                               <path fill="currentColor" d="M495.4 240c9 0 16.6-7 16.6-16C512 100.3 411.7 0 288 0c-9 0-16 7.6-16 16.6V240H495.4zM176 288c0 26.5 21.5 48 48 48H421.1C394.7 410.6 323.6 464 240 464C134 464 48 378 48 272c0-83.6 53.4-154.7 128-181.1V288zM224 66.7c0-18.5-15.7-33.3-33.8-29.5C81.5 60.1 0 156.5 0 272C0 404.6 107.5 512 240 512c115.5 0 211.9-81.5 234.8-190.2c3.8-18.1-11-33.8-29.5-33.8H272 224V240 66.7z"></path>
                           </svg>
@@ -834,7 +810,7 @@
                               <path fill="currentColor" d="M239 401c9.4 9.4 24.6 9.4 33.9 0L465 209c9.4-9.4 9.4-24.6 0-33.9s-24.6-9.4-33.9 0l-175 175L81 175c-9.4-9.4-24.6-9.4-33.9 0s-9.4 24.6 0 33.9L239 401z"></path>
                           </svg>
                       </a>
-                      <ul class="sub-menu">
+                      <ul class="sub-menu sub-menu-show">
                           <li>
                               <a class="menu-item ">
                                   <div class="menu-label">Core Reports</div>
@@ -842,14 +818,14 @@
                                       <path fill="currentColor" d="M239 401c9.4 9.4 24.6 9.4 33.9 0L465 209c9.4-9.4 9.4-24.6 0-33.9s-24.6-9.4-33.9 0l-175 175L81 175c-9.4-9.4-24.6-9.4-33.9 0s-9.4 24.6 0 33.9L239 401z"></path>
                                   </svg>
                               </a>
-                              <ul class="sub-menu">
+                              <ul class="sub-menu sub-menu-show">
                                   <li>
-                                      <a class="menu-item " href="/admin/reports/core/analytic">
+                                      <a class="menu-item " href="https://smbdemo.civicserve.com/admin/analytics/reports/intelligence" target="_blank">
                                           <div class="menu-label">Analytic Reports</div>
                                       </a>
                                   </li>
                                   <li>
-                                      <a class="menu-item " href="/admin/reports/core/compliance">
+                                      <a class="menu-item " href="https://smbdemo.civicserve.com/admin/analytics/reports/compliance" target="_blank">
                                           <div class="menu-label">Compliance Reports</div>
                                       </a>
                                   </li>
@@ -862,34 +838,34 @@
                                       <path fill="currentColor" d="M239 401c9.4 9.4 24.6 9.4 33.9 0L465 209c9.4-9.4 9.4-24.6 0-33.9s-24.6-9.4-33.9 0l-175 175L81 175c-9.4-9.4-24.6-9.4-33.9 0s-9.4 24.6 0 33.9L239 401z"></path>
                                   </svg>
                               </a>
-                              <ul class="sub-menu">
+                              <ul class="sub-menu sub-menu-show">
                                   <li>
-                                      <a class="menu-item " href="/admin/reports/advanced/executive-summary">
+                                      <a class="menu-item " href="https://smbdemo.civicserve.com/admin/reports/advanced/executive-summary">
                                           <div class="menu-label">Executive Summary</div>
                                       </a>
                                   </li>
                                   <li>
-                                      <a class="menu-item " href="/admin/reports/advanced/goals-progress">
+                                      <a class="menu-item " href="https://smbdemo.civicserve.com/admin/reports/advanced/goals-progress">
                                           <div class="menu-label">Goals Progress</div>
                                       </a>
                                   </li>
                                   <li>
-                                      <a class="menu-item " href="/admin/reports/advanced/timelines">
+                                      <a class="menu-item " href="https://smbdemo.civicserve.com/admin/reports/advanced/timelines">
                                           <div class="menu-label">Timelines (Projects, Programs)</div>
                                       </a>
                                   </li>
                                   <li>
-                                      <a class="menu-item " href="/admin/reports/advanced/survey">
+                                      <a class="menu-item " href="https://smbdemo.civicserve.com/admin/reports/advanced/survey">
                                           <div class="menu-label">Survey</div>
                                       </a>
                                   </li>
                                   <li>
-                                      <a class="menu-item " href="/admin/reports/advanced/business-metrics">
+                                      <a class="menu-item " href="https://smbdemo.civicserve.com/admin/reports/advanced/business-metrics">
                                           <div class="menu-label">Business Metrics (Jobs, Salaries, etc.)</div>
                                       </a>
                                   </li>
                                   <li>
-                                      <a class="menu-item " href="/admin/reports/advanced/custom-reports">
+                                      <a class="menu-item " href="https://smbdemo.civicserve.com/admin/reports/advanced/custom-reports">
                                           <div class="menu-label">Custom Reports (engine)</div>
                                       </a>
                                   </li>
@@ -897,41 +873,11 @@
                           </li>
                       </ul>
                   </li>
-                  <li>
-                      <a class="menu-item ">
-                          <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="plug" class="svg-inline--fa fa-plug menu-icon" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512">
-                              <path fill="currentColor" d="M96 0C78.3 0 64 14.3 64 32v96h64V32c0-17.7-14.3-32-32-32zM288 0c-17.7 0-32 14.3-32 32v96h64V32c0-17.7-14.3-32-32-32zM32 160c-17.7 0-32 14.3-32 32s14.3 32 32 32v32c0 77.4 55 142 128 156.8V448c0 17.7 14.3 32 32 32s32-14.3 32-32V412.8C297 398 352 333.4 352 256V224c17.7 0 32-14.3 32-32s-14.3-32-32-32H32z"></path>
-                          </svg>
-                          <div class="menu-label">Other Applications/Integrations</div>
-                          <svg aria-hidden="true" focusable="false" data-prefix="far" data-icon="chevron-down" class="svg-inline--fa fa-chevron-down fa-xs action-icon" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-                              <path fill="currentColor" d="M239 401c9.4 9.4 24.6 9.4 33.9 0L465 209c9.4-9.4 9.4-24.6 0-33.9s-24.6-9.4-33.9 0l-175 175L81 175c-9.4-9.4-24.6-9.4-33.9 0s-9.4 24.6 0 33.9L239 401z"></path>
-                          </svg>
-                      </a>
-                      <ul class="sub-menu">
-                          <li>
-                              <a class="menu-item " href="https://smbdemo.civicserve.com/admin/integrations/property-systems" target="_blank">
-                                  <div class="menu-label">Property Systems</div>
-                              </a>
-                          </li>
-                          <li>
-                              <a class="menu-item " href="https://smbdemo.civicserve.com/admin/integrations/permitting-systems" target="_blank">
-                                  <div class="menu-label">Permitting Systems</div>
-                              </a>
-                          </li>
-                          <li>
-                              <a class="menu-item " href="https://smbdemo.civicserve.com/admin/integrations/marketing-systems" target="_blank">
-                                  <div class="menu-label">Marketing Systems</div>
-                              </a>
-                          </li>
-                          <li>
-                              <a class="menu-item " href="https://smbdemo.civicserve.com/admin/integrations/financial-systems" target="_blank">
-                                  <div class="menu-label">Financial Systems</div>
-                              </a>
-                          </li>
-                      </ul>
-                  </li>
                   <div class="switch-wrapper">
                       <div>
+                          <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="sun" class="svg-inline--fa fa-sun " role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                              <path fill="currentColor" d="M361.5 1.2c5 2.1 8.6 6.6 9.6 11.9L391 121l107.9 19.8c5.3 1 9.8 4.6 11.9 9.6s1.5 10.7-1.6 15.2L446.9 256l62.3 90.3c3.1 4.5 3.7 10.2 1.6 15.2s-6.6 8.6-11.9 9.6L391 391 371.1 498.9c-1 5.3-4.6 9.8-9.6 11.9s-10.7 1.5-15.2-1.6L256 446.9l-90.3 62.3c-4.5 3.1-10.2 3.7-15.2 1.6s-8.6-6.6-9.6-11.9L121 391 13.1 371.1c-5.3-1-9.8-4.6-11.9-9.6s-1.5-10.7 1.6-15.2L65.1 256 2.8 165.7c-3.1-4.5-3.7-10.2-1.6-15.2s6.6-8.6 11.9-9.6L121 121 140.9 13.1c1-5.3 4.6-9.8 9.6-11.9s10.7-1.5 15.2 1.6L256 65.1 346.3 2.8c4.5-3.1 10.2-3.7 15.2-1.6zM160 256a96 96 0 1 1 192 0 96 96 0 1 1 -192 0zm224 0a128 128 0 1 0 -256 0 128 128 0 1 0 256 0z"></path>
+                          </svg>
                         <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="sun" class="svg-inline--fa fa-sun " role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
                             <path fill="currentColor" d="M361.5 1.2c5 2.1 8.6 6.6 9.6 11.9L391 121l107.9 19.8c5.3 1 9.8 4.6 11.9 9.6s1.5 10.7-1.6 15.2L446.9 256l62.3 90.3c3.1 4.5 3.7 10.2 1.6 15.2s-6.6 8.6-11.9 9.6L391 391 371.1 498.9c-1 5.3-4.6 9.8-9.6 11.9s-10.7 1.5-15.2-1.6L256 446.9l-90.3 62.3c-4.5 3.1-10.2 3.7-15.2 1.6s-8.6-6.6-9.6-11.9L121 391 13.1 371.1c-5.3-1-9.8-4.6-11.9-9.6s-1.5-10.7 1.6-15.2L65.1 256 2.8 165.7c-3.1-4.5-3.7-10.2-1.6-15.2s6.6-8.6 11.9-9.6L121 121 140.9 13.1c1-5.3 4.6-9.8 9.6-11.9s10.7-1.5 15.2 1.6L256 65.1 346.3 2.8c4.5-3.1 10.2-3.7 15.2-1.6zM160 256a96 96 0 1 1 192 0 96 96 0 1 1 -192 0zm224 0a128 128 0 1 0 -256 0 128 128 0 1 0 256 0z"></path>
                         </svg>
@@ -1928,7 +1874,38 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Update the metrics cards with data for the selected time period
         updateMetricsCards(currentTimePeriod);
+
       });
+    });
+  }
+
+  // Initialize Navigation Menu
+  function initNavigationMenu() {
+    // Handle main menu items with sub-menus
+    document.querySelectorAll('.menu-item').forEach(menuItem => {
+      const subMenu = menuItem.parentElement.querySelector('.sub-menu');
+      if (subMenu) {
+        menuItem.addEventListener('click', function(e) {
+          e.preventDefault();
+          
+          // Toggle the sub-menu visibility
+          if (subMenu.style.display === 'none' || subMenu.style.display === '') {
+            subMenu.style.display = 'block';
+            // Rotate chevron down
+            const chevron = menuItem.querySelector('.action-icon');
+            if (chevron) {
+              chevron.style.transform = 'rotate(180deg)';
+            }
+          } else {
+            subMenu.style.display = 'none';
+            // Rotate chevron back
+            const chevron = menuItem.querySelector('.action-icon');
+            if (chevron) {
+              chevron.style.transform = 'rotate(0deg)';
+            }
+          }
+        });
+      }
     });
   }
 
@@ -1937,29 +1914,7 @@ document.addEventListener('DOMContentLoaded', function() {
   initIndicatorCharts();
   initTimePeriodSelector();
   initInlineDateRangeSelector();
-});
-
-// Final, working navigation script
-document.addEventListener('DOMContentLoaded', function() {
-  const menuItems = document.querySelectorAll('.side-nav .menu-item');
-
-  menuItems.forEach(function(menuItem) {
-    const subMenu = menuItem.nextElementSibling;
-    const hasSubMenu = subMenu && subMenu.classList.contains('sub-menu');
-    const hasChevron = menuItem.querySelector('.action-icon');
-
-    if (hasSubMenu && hasChevron) {
-      menuItem.addEventListener('click', function(event) {
-        event.preventDefault();
-        
-        // Toggle the 'show' class on the submenu
-        subMenu.classList.toggle('show');
-        
-        // Toggle the 'expanded' class on the menu item for the chevron rotation
-        menuItem.classList.toggle('expanded');
-      });
-    }
-  });
+  initNavigationMenu();
 });
   </script>
 </body>
