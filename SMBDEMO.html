@@ -1943,6 +1943,34 @@ document.addEventListener('DOMContentLoaded', function() {
   initTimePeriodSelector();
   initInlineDateRangeSelector();
   initNavigationMenu();
+  
+  // Additional direct navigation menu setup to ensure it works
+  setTimeout(() => {
+    document.querySelectorAll('.menu-item').forEach(menuItem => {
+      const chevron = menuItem.querySelector('.action-icon');
+      if (chevron) {
+        const subMenu = menuItem.nextElementSibling;
+        if (subMenu && subMenu.classList.contains('sub-menu')) {
+          // Ensure submenu is hidden initially
+          subMenu.style.display = 'none';
+          
+          // Remove any existing click handlers and add new one
+          menuItem.onclick = function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            if (subMenu.style.display === 'none' || subMenu.style.display === '') {
+              subMenu.style.display = 'block';
+              chevron.style.transform = 'rotate(180deg)';
+            } else {
+              subMenu.style.display = 'none';
+              chevron.style.transform = 'rotate(0deg)';
+            }
+          };
+        }
+      }
+    });
+  }, 100);
 });
   </script>
 </body>
