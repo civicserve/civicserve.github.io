@@ -197,6 +197,27 @@
     color: #4CAF50;
   }
 
+  /* Navigation menu styles */
+  .sub-menu {
+    display: none !important;
+  }
+  
+  .sub-menu.show {
+    display: block !important;
+  }
+  
+  .menu-item {
+    cursor: pointer;
+  }
+  
+  .menu-item .action-icon {
+    transition: transform 0.3s ease;
+  }
+  
+  .menu-item.expanded .action-icon {
+    transform: rotate(180deg);
+  }
+
   /* Style for the item being dragged */
   .goal-btn.dragging-item {
     opacity: 0.5;
@@ -1908,31 +1929,28 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
-  // Initialize Navigation Menu
-  function initNavigationMenu() {
-    // Handle menu items with chevron icons (indicating they have submenus)
-    document.querySelectorAll('.menu-item').forEach(menuItem => {
+  // Simple Navigation Menu Setup
+  function setupNavigation() {
+    const menuItems = document.querySelectorAll('.menu-item');
+    
+    menuItems.forEach(function(menuItem) {
       const chevron = menuItem.querySelector('.action-icon');
-      const subMenu = menuItem.nextElementSibling;
-      
-      // Only add click handler if menu item has a chevron and a submenu
-      if (chevron && subMenu && subMenu.classList.contains('sub-menu')) {
-        // Set initial collapsed state
-        subMenu.style.display = 'none';
-        
-        menuItem.addEventListener('click', function(e) {
-          e.preventDefault();
-          e.stopPropagation();
+      if (chevron) {
+        const subMenu = menuItem.nextElementSibling;
+        if (subMenu && subMenu.classList.contains('sub-menu')) {
           
-          // Toggle the sub-menu visibility
-          if (subMenu.style.display === 'none' || subMenu.style.display === '') {
-            subMenu.style.display = 'block';
-            chevron.style.transform = 'rotate(180deg)';
-          } else {
-            subMenu.style.display = 'none';
-            chevron.style.transform = 'rotate(0deg)';
-          }
-        });
+          menuItem.onclick = function(e) {
+            e.preventDefault();
+            
+            if (subMenu.classList.contains('show')) {
+              subMenu.classList.remove('show');
+              menuItem.classList.remove('expanded');
+            } else {
+              subMenu.classList.add('show');
+              menuItem.classList.add('expanded');
+            }
+          };
+        }
       }
     });
   }
@@ -1942,35 +1960,7 @@ document.addEventListener('DOMContentLoaded', function() {
   initIndicatorCharts();
   initTimePeriodSelector();
   initInlineDateRangeSelector();
-  initNavigationMenu();
-  
-  // Additional direct navigation menu setup to ensure it works
-  setTimeout(() => {
-    document.querySelectorAll('.menu-item').forEach(menuItem => {
-      const chevron = menuItem.querySelector('.action-icon');
-      if (chevron) {
-        const subMenu = menuItem.nextElementSibling;
-        if (subMenu && subMenu.classList.contains('sub-menu')) {
-          // Ensure submenu is hidden initially
-          subMenu.style.display = 'none';
-          
-          // Remove any existing click handlers and add new one
-          menuItem.onclick = function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            
-            if (subMenu.style.display === 'none' || subMenu.style.display === '') {
-              subMenu.style.display = 'block';
-              chevron.style.transform = 'rotate(180deg)';
-            } else {
-              subMenu.style.display = 'none';
-              chevron.style.transform = 'rotate(0deg)';
-            }
-          };
-        }
-      }
-    });
-  }, 100);
+  setupNavigation();
 });
   </script>
 </body>
