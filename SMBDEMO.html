@@ -1904,7 +1904,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Update the metrics cards with data for the selected time period
         updateMetricsCards(currentTimePeriod);
-
       });
     });
   }
@@ -1915,11 +1914,14 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('.menu-item').forEach(menuItem => {
       const subMenu = menuItem.parentElement.querySelector('.sub-menu');
       if (subMenu) {
+        // Set initial collapsed state
+        subMenu.style.display = 'none';
+        
         menuItem.addEventListener('click', function(e) {
           e.preventDefault();
           
           // Toggle the sub-menu visibility
-          if (subMenu.style.display === 'none' || subMenu.style.display === '') {
+          if (subMenu.style.display === 'none') {
             subMenu.style.display = 'block';
             // Rotate chevron down
             const chevron = menuItem.querySelector('.action-icon');
