@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Business Contact Update Workflow</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Inter font from Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* General Body Styles for the overall page */
+        body {
+            font-family: 'Inter', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333333;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Styles for the Email Section */
+        #email-section {
+            max-width: 600px;
+            margin: 40px auto; /* Centering the email container */
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        #email-section h2 {
+            color: #2c3e50;
+            margin-top: 0;
+        }
+        #email-section ul {
+            list-style: none;
+            padding: 0;
+            margin-bottom: 20px;
+        }
+        #email-section ul li {
+            margin-bottom: 10px;
+            padding-left: 20px;
+            position: relative;
+        }
+        #email-section ul li::before {
+            content: '•';
+            color: #3498db;
+            font-size: 1.2em;
+            position: absolute;
+            left: 0;
+            top: 0;
+        }
+        #email-section strong {
+            font-weight: bold;
+        }
+        #email-section .important-note {
+            background-color: #ecf0f1;
+            padding: 15px;
+            border-left: 5px solid #3498db;
+            margin-bottom: 20px;
+            border-radius: 4px;
+        }
+        #email-section .button {
+            display: inline-block;
+            background-color: #3498db;
+            color: #ffffff !important;
+            padding: 12px 25px;
+            text-align: center;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+        #email-section .button:hover {
+            background-color: #2980b9;
+        }
+        #email-section .footer {
+            margin-top: 30px;
+            font-size: 0.9em;
+            color: #7f8c8d;
+            border-top: 1px solid #eeeeee;
+            padding-top: 20px;
+        }
+
+        /* Styles for the Command Center Section (Tailwind-based) */
+        #command-center-section {
+            background-color: #f8fafc; /* Tailwind slate-50 */
+            padding: 20px; /* Reduced padding for overall page */
+            min-height: 100vh; /* Ensure it takes full viewport height */
+        }
+        #command-center-section .max-w-6xl {
+            margin: 0 auto; /* Centering the content */
+        }
+
+        /* Common styles for both sections or interactive elements */
+        .hidden-section {
+            display: none;
+        }
+        .modal { /* Used for message-box */
+            transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+            opacity: 0;
+            transform: scale(0.95);
+            visibility: hidden;
+        }
+        .modal.open {
+            opacity: 1;
+            transform: scale(1);
+            visibility: visible;
+        }
+        .collapsible-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+        .collapsible-content.expanded {
+            max-height: 1000px; /* Large enough to accommodate content */
+            transition: max-height 0.5s ease-in;
+        }
+        .arrow-icon {
+            transition: transform 0.3s ease;
+        }
+        .arrow-icon.rotated {
+            transform: rotate(180deg);
+        }
+        .dropdown-menu {
+            opacity: 0;
+            transform: translateY(-10px);
+            visibility: hidden;
+            transition: opacity 0.2s ease-out, transform 0.2s ease-out;
+        }
+        .dropdown-menu.show {
+            opacity: 1;
+            transform: translateY(0);
+            visibility: visible;
+        }
+        .inline-custom-input {
+            width: 100%;
+            padding: 0.5rem 0.75rem;
+            border: 1px solid #d1d5db; /* gray-300 */
+            border-radius: 0.5rem; /* rounded-lg */
+            outline: none;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            font-weight: bold;
+        }
+        .inline-custom-input:focus {
+            border-color: #3b82f6; /* blue-500 */
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5); /* ring-2 focus:ring-blue-500 */
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Email Section -->
+    <div id="email-section">
+        <h2>Subject: Important Update: Your Business Contacts Have Been Refreshed!</h2>
+
+        <p>Hi [Customer Name],</p>
+
+        <p>We wanted to let you know that your business contact data has recently been updated in your CRM. These updates help ensure you have the most accurate and current information for your contacts.</p>
+
+        <p>Here's a quick summary of the recent changes:</p>
+        <ul>
+            <li><strong>Date of Update:</strong> [Date of Update, e.g., August 15, 2025]</li>
+            <li><strong>Source of Updates:</strong> [Source, e.g., Google, Yelp, DatabaseUSA]</li>
+            <li><strong>Records Updated:</strong> [Number of records, e.g., 125 records]</li>
+            <li><strong>Impact:</strong> [Percentage, e.g., 5]% of your total contacts have received updates.</li>
+        </ul>
+
+        <div class="important-note">
+            <p><strong>Please note:</strong> Any data you've personally entered or customized will <strong>never</strong> be overwritten by our system updates. We're focused on updating the default values for businesses in our database, making sure you always have the latest and greatest intelligence available.</p>
+        </div>
+
+        <p>While these changes have been automatically implemented, we want to give you full control. You can easily review the specific details of these updates and reverse any changes you don't wish to keep. You also have the option to enter your own custom values for any field.</p>
+
+        <p><strong>Ready to review your changes?</strong></p>
+        <p>Simply click the link below to access your dedicated Update Command Center:</p>
+
+        <p>
+            <a href="javascript:void(0);" onclick="showCommandCenter();" class="button">Go to Update Command Center</a>
+        </p>
+
+        <p>In the command center, you'll be able to:</p>
+        <ul>
+            <li>See which fields were updated, including their old and new values.</li>
+            <li>Undo specific changes or revert all changes from this update.</li>
+            <li>Input custom values for any field.</li>
+        </ul>
+
+        <div class="footer">
+            <p>If you have any questions or need assistance, please don't hesitate to contact our support team.</p>
+            <p>Best regards,</p>
+            <p>The [Your Company Name] Team</p>
+        </div>
+    </div>
+
+    <!-- Command Center Section (Initially hidden) -->
+    <div id="command-center-section" class="hidden-section p-4 sm:p-6 lg:p-8">
+        <div class="max-w-6xl mx-auto bg-white shadow-xl rounded-2xl p-6 sm:p-8 lg:p-10 relative">
+            <h1 class="text-3xl sm:text-4xl font-bold text-gray-900 mb-6 text-center">
+                Business Contact Update Command Center
+            </h1>
+            <p class="text-gray-600 text-center mb-8">
+                Review and manage recent updates to your business contacts.
+            </p>
+
+            <!-- Manage Updates Button with Dropdown -->
+            <div class="absolute top-6 right-6 z-10">
+                <button class="bg-gray-800 hover:bg-gray-700 text-white text-sm font-semibold py-1.5 px-3 rounded-xl shadow-md transition duration-300 ease-in-out"
+                        onclick="toggleDropdown('manage-updates-dropdown')">
+                    Manage Updates
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline-block ml-1 -mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                </button>
+                <div id="manage-updates-dropdown" class="dropdown-menu absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
+                    <div class="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
+                        <a href="javascript:void(0);" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900" role="menuitem"
+                           onclick="undoAllCurrentUpdates();">Un-do all updates</a>
+                        <a href="javascript:void(0);" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900" role="menuitem"
+                           onclick="rejectAllFutureUpdates();">Reject all future updates</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Summary Section -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10 text-center mt-16 sm:mt-20">
+                <div class="bg-blue-50 p-4 rounded-xl shadow-sm">
+                    <p class="text-sm text-blue-600 font-medium">Last Update On</p>
+                    <p class="text-lg font-semibold text-blue-800" id="summary-date">August 15, 2025</p>
+                </div>
+                <div class="bg-blue-50 p-4 rounded-xl shadow-sm">
+                    <p class="text-sm text-blue-600 font-medium">Contacts Updated</p>
+                    <p class="text-lg font-semibold text-blue-800" id="summary-records">125 (5%)</p>
+                </div>
+                <div class="bg-blue-50 p-4 rounded-xl shadow-sm">
+                    <p class="text-sm text-blue-600 font-medium">Update Source</p>
+                    <p class="text-lg font-semibold text-blue-800" id="summary-source">Google, Yelp</p>
+                </div>
+            </div>
+
+            <!-- Message Box -->
+            <div id="message-box" class="hidden fixed inset-0 bg-gray-600 bg-opacity-75 flex items-center justify-center p-4 z-50">
+                <div class="bg-white rounded-xl shadow-lg p-6 max-w-sm w-full text-center">
+                    <p id="message-text" class="text-lg font-semibold text-gray-800 mb-4"></p>
+                    <button class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-5 rounded-lg transition duration-300 ease-in-out"
+                            onclick="closeMessageBox()">
+                        OK
+                    </button>
+                </div>
+            </div>
+
+            <!-- Updated Records List -->
+            <h2 class="text-2xl font-semibold text-gray-800 mb-6 border-b pb-3">Details of Changes</h2>
+            <div id="records-container" class="space-y-8">
+                <!-- Records will be dynamically loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Mock Data for demonstration
+        const mockUpdates = [
+            {
+                id: 'contact-1',
+                businessName: 'Acme Innovations Inc.',
+                source: 'Google',
+                lastUpdateDate: 'August 15, 2025',
+                changes: [
+                    { field: 'Business Name', oldValue: 'Acme Innovations', newValue: 'Acme Innovations Inc.', isUserEntered: false },
+                    { field: 'Physical Address', oldValue: '123 Main St', newValue: '123 Main St, Suite 100', isUserEntered: false },
+                    { field: 'Hours of Operation', oldValue: '9-5 M-F', newValue: '8-6 M-F', isUserEntered: false }
+                ]
+            },
+            {
+                id: 'contact-2',
+                businessName: 'Globex Corporation',
+                source: 'Yelp',
+                lastUpdateDate: 'August 10, 2025',
+                changes: [
+                    { field: 'Number of Employees', oldValue: '500', newValue: '550', isUserEntered: false },
+                    { field: 'Total Revenue', oldValue: '$100M', newValue: '$110M', isUserEntered: true } // User-entered field
+                ]
+            },
+            {
+                id: 'contact-3',
+                businessName: 'Pied Piper Inc.',
+                source: 'DatabaseUSA',
+                lastUpdateDate: 'July 28, 2025',
+                changes: [
+                    { field: 'Business Name', oldValue: 'Pied Piper', newValue: 'Pied Piper Inc.', isUserEntered: false },
+                    { field: 'Physical Address', oldValue: '1 Silicon Way', newValue: '1 Silicon Way, Palo Alto', isUserEntered: true } // User-entered field
+                ]
+            },
+            {
+                id: 'contact-4',
+                businessName: 'Initech Solutions',
+                source: 'Google',
+                lastUpdateDate: 'August 14, 2025',
+                changes: [
+                    { field: 'Business Name', oldValue: 'Initech', newValue: 'Initech Solutions', isUserEntered: false },
+                    { field: 'Phone Number', oldValue: '555-1234', newValue: '555-9876', isUserEntered: false }
+                ]
+            },
+            {
+                id: 'contact-5',
+                businessName: 'Bluth Company',
+                source: 'Yelp',
+                lastUpdateDate: 'August 05, 2025',
+                changes: [
+                    { field: 'Total Revenue', oldValue: '$5M', newValue: '$6.2M', isUserEntered: false },
+                    { field: 'Website', oldValue: 'bluth.com', newValue: 'bluthco.com', isUserEntered: false }
+                ]
+            },
+            {
+                id: 'contact-6',
+                businessName: 'Vandelay Industries',
+                source: 'DatabaseUSA',
+                lastUpdateDate: 'July 20, 2025',
+                changes: [
+                    { field: 'Physical Address', oldValue: '129 W 81st St', newValue: '130 W 81st St, Suite 2B', isUserEntered: true }, // User-entered
+                    { field: 'Number of Employees', oldValue: '10', newValue: '12', isUserEntered: false }
+                ]
+            }
+        ];
+
+        /**
+         * Toggles the visibility of a dropdown menu.
+         * @param {string} dropdownId - The ID of the dropdown element.
+         */
+        function toggleDropdown(dropdownId) {
+            const dropdown = document.getElementById(dropdownId);
+            dropdown.classList.toggle('show');
+        }
+
+        // Close dropdown when clicking outside
+        window.onclick = function(event) {
+            // Check if the click is outside any dropdown button AND not inside an open dropdown menu
+            if (!event.target.matches('.bg-gray-800') && !event.target.closest('.dropdown-menu')) {
+                const dropdowns = document.getElementsByClassName('dropdown-menu');
+                for (let i = 0; i < dropdowns.length; i++) {
+                    const openDropdown = dropdowns[i];
+                    if (openDropdown.classList.contains('show')) {
+                        openDropdown.classList.remove('show');
+                    }
+                }
+            }
+        }
+
+        /**
+         * Displays a message box with the given text.
+         * @param {string} message - The message to display.
+         */
+        function openMessageBox(message) {
+            document.getElementById('message-text').textContent = message;
+            document.getElementById('message-box').classList.remove('hidden');
+        }
+
+        /**
+         * Closes the currently open message box.
+         */
+        function closeMessageBox() {
+            document.getElementById('message-box').classList.add('hidden');
+        }
+
+        /**
+         * Toggles the expansion state of a record card.
+         * @param {string} recordId - The ID of the record to toggle.
+         */
+        function toggleRecord(recordId) {
+            const content = document.getElementById(`collapsible-${recordId}`);
+            const arrow = document.getElementById(`arrow-${recordId}`);
+            if (content.classList.contains('expanded')) {
+                content.classList.remove('expanded');
+                content.style.maxHeight = '0';
+                arrow.classList.remove('rotated');
+            } else {
+                content.classList.add('expanded');
+                content.style.maxHeight = content.scrollHeight + 'px'; // Set to scrollHeight to allow dynamic content
+                arrow.classList.add('rotated');
+            }
+        }
+
+        /**
+         * Handles the change event for a field's radio button, updating display and inline input visibility.
+         * @param {string} recordId - The ID of the record.
+         * @param {string} fieldName - The name of the field.
+         * @param {string} selection - The selected option ('new', 'old', 'custom').
+         * @param {string} fieldUniqueId - The unique ID for the field's elements.
+         * @param {string} originalOldValue - The original old value of the field.
+         * @param {string} originalNewValue - The original new value suggested by the system.
+         * @param {boolean} isUserEntered - True if the field was user-entered, false otherwise.
+         */
+        function handleRadioChange(recordId, fieldName, selection, fieldUniqueId, originalOldValue, originalNewValue, isUserEntered) {
+            const oldValueSpan = document.getElementById(`old-value-display-${fieldUniqueId}`);
+            const newValueSpan = document.getElementById(`new-value-display-${fieldUniqueId}`);
+            const inlineInput = document.getElementById(`inline-custom-input-${fieldUniqueId}`);
+
+            // Reset bolding and visibility for all options first
+            oldValueSpan.classList.remove('font-bold');
+            newValueSpan.classList.remove('font-bold');
+            newValueSpan.classList.remove('hidden'); // Ensure new value display is visible by default for value setting
+            inlineInput.classList.add('hidden'); // Hide custom input by default
+
+            // Update the internal mock data's currentSelection
+            const record = mockUpdates.find(r => r.id === recordId);
+            const change = record.changes.find(c => c.field === fieldName);
+            if (change) {
+                change.currentSelection = selection;
+            }
+
+            if (selection === 'new') {
+                newValueSpan.classList.add('font-bold');
+                newValueSpan.textContent = originalNewValue;
+            } else if (selection === 'old') {
+                oldValueSpan.classList.add('font-bold');
+                // For the "Updated:" column, we still display the system's 'newValue', but not bolded
+                // unless it was a user-entered field, in which case the old value is the 'kept' value.
+                newValueSpan.textContent = originalNewValue;
+            } else if (selection === 'custom') {
+                newValueSpan.classList.add('hidden'); // Hide the new value span
+                inlineInput.classList.remove('hidden'); // Show the input field
+                inlineInput.focus();
+                // If there's a stored custom value, populate it
+                inlineInput.value = change.customValue || '';
+                inlineInput.classList.add('font-bold'); // Bold the input content directly
+            }
+        }
+
+        /**
+         * Reverts all changes in the current batch for all displayed businesses.
+         * For mock, this sets all fields back to their 'old' value and updates UI.
+         */
+        function undoAllCurrentUpdates() {
+            openMessageBox('All changes for this update batch have been undone.');
+            console.log('Un-do all updates (current batch) clicked.');
+
+            mockUpdates.forEach(record => {
+                record.changes.forEach(change => {
+                    const fieldUniqueId = `${record.id}-${change.field.replace(/\s/g, '-')}`;
+                    
+                    // Force currentSelection to 'old' for undo all
+                    change.currentSelection = 'old';
+
+                    const radioOld = document.getElementById(`radio-${fieldUniqueId}-old`);
+                    if (radioOld) {
+                        radioOld.checked = true;
+                        // Manually call handleRadioChange to update UI and set bolding
+                        handleRadioChange(
+                            record.id,
+                            change.field,
+                            'old', // Force selection to 'old'
+                            fieldUniqueId,
+                            change.oldValue,
+                            change.newValue,
+                            change.isUserEntered
+                        );
+                    }
+                });
+            });
+            toggleDropdown('manage-updates-dropdown'); // Close dropdown
+        }
+
+        /**
+         * Sets a preference to reject all future automatic updates.
+         */
+        function rejectAllFutureUpdates() {
+            openMessageBox('Your preference to reject all future automatic updates has been saved.');
+            console.log('Reject all future updates clicked.');
+            toggleDropdown('manage-updates-dropdown'); // Close dropdown
+        }
+
+        /**
+         * Saves all selected changes for a specific record based on radio button choices.
+         * @param {string} recordId - The ID of the record to save changes for.
+         */
+        function saveRecordChanges(recordId) {
+            const record = mockUpdates.find(r => r.id === recordId);
+            if (!record) {
+                openMessageBox('Error: Record not found for saving changes.');
+                return;
+            }
+
+            console.log(`Saving changes for record: ${record.businessName} (${record.id})`);
+            record.changes.forEach(change => {
+                const fieldUniqueId = `${record.id}-${change.field.replace(/\s/g, '-')}`;
+                let finalValue = '';
+
+                if (change.currentSelection === 'new') {
+                    finalValue = change.newValue;
+                    console.log(`Field: ${change.field}, Action: Keep New Value, Value: ${finalValue}`);
+                } else if (change.currentSelection === 'old') {
+                    finalValue = change.oldValue;
+                    console.log(`Field: ${change.field}, Action: Revert to Old Value, Value: ${finalValue}`);
+                } else if (change.currentSelection === 'custom') {
+                    // Get value from inline input
+                    const inlineInput = document.getElementById(`inline-custom-input-${fieldUniqueId}`);
+                    finalValue = inlineInput ? inlineInput.value.trim() : (change.customValue || '');
+                    change.customValue = finalValue; // Update stored custom value
+                    console.log(`Field: ${change.field}, Action: Custom Value, Value: ${finalValue}`);
+                }
+                // Here you would send this 'finalValue' for 'change.field' for 'record.id' to your backend
+            });
+            openMessageBox(`Changes for ${record.businessName} have been saved!`);
+        }
+
+        /**
+         * Shows the Command Center section and hides the Email section.
+         * Also initializes the Command Center's records.
+         */
+        function showCommandCenter() {
+            document.getElementById('email-section').classList.add('hidden-section');
+            document.getElementById('command-center-section').classList.remove('hidden-section');
+            loadRecords(); // Load records only when command center is shown
+        }
+
+        /**
+         * Populates the records container with mock data.
+         */
+        function loadRecords() {
+            const container = document.getElementById('records-container');
+            container.innerHTML = ''; // Clear previous content
+
+            mockUpdates.forEach(record => {
+                const recordDiv = document.createElement('div');
+                recordDiv.id = `record-${record.id}`;
+                recordDiv.className = 'bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden';
+
+                const updatedFieldsCount = record.changes.length;
+                const updatedFieldNames = record.changes.map(change => change.field).join(', ');
+
+                const generateFieldId = (fieldName) => `${record.id}-${fieldName.replace(/\s/g, '-')}`;
+
+                recordDiv.innerHTML = `
+                    <!-- Collapsible Header -->
+                    <div class="flex justify-between items-center p-6 cursor-pointer bg-blue-50 hover:bg-blue-100 transition duration-200"
+                         onclick="toggleRecord('${record.id}')">
+                        <div class="flex flex-col items-start">
+                            <h3 class="text-xl font-semibold text-blue-800">${record.businessName}</h3>
+                            <div class="flex items-center text-sm text-blue-600 mt-1">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10v11h18V10M3 10l9-7 9 7M3 10h18" />
+                                </svg>
+                                Source: <span class="font-medium text-blue-700 ml-1">${record.source}</span>
+                                <span class="ml-4">Update Date: <span class="font-medium text-blue-700">${record.lastUpdateDate}</span></span>
+                            </div>
+                            <p class="text-sm text-blue-700 mt-2">
+                                <span class="font-semibold">${updatedFieldsCount} field${updatedFieldsCount !== 1 ? 's' : ''} updated:</span> ${updatedFieldNames}
+                            </p>
+                        </div>
+                        <svg id="arrow-${record.id}" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-4 text-blue-400 arrow-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </div>
+
+                    <!-- Collapsible Content -->
+                    <div id="collapsible-${record.id}" class="collapsible-content">
+                        <div class="p-6 pt-4 space-y-4">
+                            ${record.changes.map(change => {
+                                const fieldUniqueId = generateFieldId(change.field);
+                                // Determine initial checked state based on isUserEntered or explicit currentSelection
+                                const defaultSelection = change.isUserEntered ? 'old' : 'new';
+                                // Initialize change.currentSelection if not already set
+                                if (!change.currentSelection) {
+                                    change.currentSelection = defaultSelection;
+                                }
+
+                                return `
+                                <div class="grid grid-cols-1 md:grid-cols-5 gap-y-2 md:gap-x-4 items-center p-3 bg-white rounded-lg border border-gray-100">
+                                    <div class="col-span-1 md:col-span-1">
+                                        <p class="text-sm font-medium text-gray-700">${change.field}</p>
+                                    </div>
+                                    <div class="col-span-1 md:col-span-1 text-sm text-gray-600">
+                                        <span class="font-medium">Old:</span> 
+                                        <span id="old-value-display-${fieldUniqueId}" class="${change.currentSelection === 'old' ? 'font-bold' : ''}">
+                                            ${change.oldValue}
+                                        </span>
+                                        ${change.isUserEntered ? '<span class="text-red-500 text-xs ml-1">(User Entered)</span>' : ''}
+                                    </div>
+                                    <div class="col-span-1 md:col-span-1 text-sm text-gray-800">
+                                        <span class="font-medium">Updated:</span> 
+                                        <span id="new-value-display-${fieldUniqueId}" class="${change.currentSelection === 'custom' ? 'hidden' : (change.currentSelection === 'new' ? 'font-bold' : '')}">
+                                            ${change.newValue}
+                                        </span>
+                                        <input type="text" id="inline-custom-input-${fieldUniqueId}" 
+                                            class="inline-custom-input ${change.currentSelection !== 'custom' ? 'hidden' : ''}" 
+                                            value="${change.customValue || ''}" placeholder="Enter custom value">
+                                    </div>
+                                    <div class="col-span-full md:col-span-2 flex flex-wrap gap-2 items-center justify-end">
+                                        <label class="inline-flex items-center">
+                                            <input type="radio" class="form-radio text-green-600 h-4 w-4" name="action-${fieldUniqueId}" id="radio-${fieldUniqueId}-new" value="new"
+                                                ${change.currentSelection === 'new' ? 'checked' : ''}
+                                                onchange="handleRadioChange('${record.id}', '${change.field}', 'new', '${fieldUniqueId}', '${change.oldValue}', '${change.newValue}', ${change.isUserEntered})">
+                                            <span class="ml-2 text-sm text-gray-700">Keep New Value</span>
+                                        </label>
+                                        <label class="inline-flex items-center">
+                                            <input type="radio" class="form-radio text-blue-600 h-4 w-4" name="action-${fieldUniqueId}" id="radio-${fieldUniqueId}-old" value="old"
+                                                ${change.currentSelection === 'old' ? 'checked' : ''}
+                                                onchange="handleRadioChange('${record.id}', '${change.field}', 'old', '${fieldUniqueId}', '${change.oldValue}', '${change.newValue}', ${change.isUserEntered})">
+                                            <span class="ml-2 text-sm text-gray-700">Revert to Previous Value</span>
+                                        </label>
+                                        <label class="inline-flex items-center">
+                                            <input type="radio" class="form-radio text-purple-600 h-4 w-4" name="action-${fieldUniqueId}" id="radio-${fieldUniqueId}-custom" value="custom"
+                                                ${change.currentSelection === 'custom' ? 'checked' : ''}
+                                                onchange="handleRadioChange('${record.id}', '${change.field}', 'custom', '${fieldUniqueId}', '${change.oldValue}', '${change.newValue}', ${change.isUserEntered})">
+                                            <span class="ml-2 text-sm text-gray-700">Input Custom Value</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            `;
+                            }).join('')}
+                            <div class="flex justify-end mt-6">
+                                <button class="bg-gray-700 hover:bg-gray-800 text-white font-semibold py-2 px-5 rounded-lg transition duration-300"
+                                        onclick="saveRecordChanges('${record.id}')">
+                                    Save Changes for This Record
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(recordDiv);
+            });
+        }
+
+        // Initialize the page on load: email is visible, command center is hidden
+        document.addEventListener('DOMContentLoaded', function() {
+            // No initial loadRecords call here, as showCommandCenter will handle it.
+        });
+    </script>
+</body>
+</html>
