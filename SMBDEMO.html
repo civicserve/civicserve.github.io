@@ -708,7 +708,7 @@
                               </a>
                               <ul class="sub-menu">
                                   <li>
-                                      <a class="menu-item " href="/admin/data/updates/alerts">
+                                      <a class="menu-item " href="https://civicserve.github.io/ChangeCommandCenter.html">
                                           <div class="menu-label">Alerts</div>
                                       </a>
                                   </li>
@@ -1941,17 +1941,28 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Toggle submenu function - global scope
 function toggleSubmenu(element) {
+  event.preventDefault();
   const subMenu = element.nextElementSibling;
   if (subMenu && subMenu.classList.contains('sub-menu')) {
-    if (subMenu.classList.contains('show')) {
-      subMenu.classList.remove('show');
-      element.classList.remove('expanded');
+    if (subMenu.style.display === 'block') {
+      subMenu.style.display = 'none';
+      const chevron = element.querySelector('.action-icon');
+      if (chevron) chevron.style.transform = 'rotate(0deg)';
     } else {
-      subMenu.classList.add('show');
-      element.classList.add('expanded');
+      subMenu.style.display = 'block';
+      const chevron = element.querySelector('.action-icon');
+      if (chevron) chevron.style.transform = 'rotate(180deg)';
     }
   }
 }
+
+// Initialize navigation on page load
+document.addEventListener('DOMContentLoaded', function() {
+  // Set all submenus to hidden initially
+  document.querySelectorAll('.sub-menu').forEach(menu => {
+    menu.style.display = 'none';
+  });
+});
   </script>
 </body>
 </html>
