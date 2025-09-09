@@ -2037,11 +2037,42 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
+  // Initialize Navigation Menu
+  function initNavigationMenu() {
+    // Handle main menu items with sub-menus
+    document.querySelectorAll('.menu-item').forEach(menuItem => {
+      const subMenu = menuItem.parentElement.querySelector('.sub-menu');
+      if (subMenu) {
+        menuItem.addEventListener('click', function(e) {
+          e.preventDefault();
+          
+          // Toggle the sub-menu visibility
+          if (subMenu.style.display === 'none' || subMenu.style.display === '') {
+            subMenu.style.display = 'block';
+            // Rotate chevron down
+            const chevron = menuItem.querySelector('.action-icon');
+            if (chevron) {
+              chevron.style.transform = 'rotate(180deg)';
+            }
+          } else {
+            subMenu.style.display = 'none';
+            // Rotate chevron back
+            const chevron = menuItem.querySelector('.action-icon');
+            if (chevron) {
+              chevron.style.transform = 'rotate(0deg)';
+            }
+          }
+        });
+      }
+    });
+  }
+
   // Initialize all components
   initCombinedAgencyChart();
   initIndicatorCharts();
   initTimePeriodSelector();
   initInlineDateRangeSelector();
+  initNavigationMenu();
 });
   </script>
 </body>
