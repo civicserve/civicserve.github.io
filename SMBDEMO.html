@@ -1910,31 +1910,27 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Initialize Navigation Menu
   function initNavigationMenu() {
-    // Handle main menu items with sub-menus
+    // Handle menu items with chevron icons (indicating they have submenus)
     document.querySelectorAll('.menu-item').forEach(menuItem => {
-      const subMenu = menuItem.parentElement.querySelector('.sub-menu');
-      if (subMenu) {
+      const chevron = menuItem.querySelector('.action-icon');
+      const subMenu = menuItem.nextElementSibling;
+      
+      // Only add click handler if menu item has a chevron and a submenu
+      if (chevron && subMenu && subMenu.classList.contains('sub-menu')) {
         // Set initial collapsed state
         subMenu.style.display = 'none';
         
         menuItem.addEventListener('click', function(e) {
           e.preventDefault();
+          e.stopPropagation();
           
           // Toggle the sub-menu visibility
-          if (subMenu.style.display === 'none') {
+          if (subMenu.style.display === 'none' || subMenu.style.display === '') {
             subMenu.style.display = 'block';
-            // Rotate chevron down
-            const chevron = menuItem.querySelector('.action-icon');
-            if (chevron) {
-              chevron.style.transform = 'rotate(180deg)';
-            }
+            chevron.style.transform = 'rotate(180deg)';
           } else {
             subMenu.style.display = 'none';
-            // Rotate chevron back
-            const chevron = menuItem.querySelector('.action-icon');
-            if (chevron) {
-              chevron.style.transform = 'rotate(0deg)';
-            }
+            chevron.style.transform = 'rotate(0deg)';
           }
         });
       }
