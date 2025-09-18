@@ -42,8 +42,14 @@
         body {
             font-family: 'Mulish', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background-color: var(--c-background);
-            padding: 20px;
+            padding: 0;
+            margin: 0;
             min-height: 100vh;
+        }
+        
+        /* Main content padding */
+        .content-wrapper .container-fluid {
+            padding: 20px;
         }
         
         h2, h3, h4, h5, h6 {
@@ -82,6 +88,12 @@
         .header-content-wrapper {
             background-color: rgb(var(--c-primary));
             color: white;
+            height: var(--dim-header-height);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1001;
         }
         
         .header-wrapper {
@@ -89,6 +101,7 @@
             justify-content: space-between;
             align-items: center;
             padding: 0.5rem 1rem;
+            height: 100%;
         }
         
         .header-left-wrapper {
@@ -101,6 +114,26 @@
             display: flex;
             align-items: center;
             gap: 1rem;
+        }
+        
+        .header-left-wrapper img {
+            height: 30px;
+        }
+        
+        /* Header button and icon styling */
+        .header-right svg, .header-left-wrapper svg {
+            width: 20px;
+            height: 20px;
+            color: white;
+            cursor: pointer;
+        }
+        
+        .header-right .btn-link {
+            color: white;
+        }
+        
+        .header-right .btn-link:hover, .side-nav-toggle-btn:hover {
+            opacity: 0.8;
         }
         
         /* Panel styling */
@@ -295,11 +328,16 @@
         
         /* Map container */
         #map {
-            height: calc(100vh - 300px);
+            height: calc(100vh - 350px);
             min-height: 500px;
             width: 100%;
             border-radius: 5px;
             box-shadow: rgb(0 0 0 / 5%) 0px 4px 12px;
+        }
+        
+        /* Map container panel */
+        .map-container {
+            margin-top: 20px;
         }
         
         /* Map popup styling */
@@ -435,6 +473,21 @@
         @media (max-width: 1049px) {
             .grid-container-agency {
                 grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            }
+        }
+        
+        /* Additional responsive styles for the header and navigation */
+        @media (max-width: 992px) {
+            .content-wrapper {
+                margin-left: 0;
+            }
+            
+            .side-nav {
+                transform: translateX(-100%);
+            }
+            
+            .search-wrapper {
+                display: none;
             }
         }
         
@@ -601,18 +654,359 @@
             margin: 0 5px;
             color: #666;
         }
+        
+        /* Side Navigation Styles */
+        .side-nav {
+            position: fixed;
+            top: var(--dim-header-height);
+            left: 0;
+            width: 240px;
+            height: calc(100vh - var(--dim-header-height));
+            background-color: #003760;
+            color: white;
+            z-index: 1000;
+            overflow-y: auto;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .side-nav-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .side-nav-list li {
+            position: relative;
+        }
+        
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            color: white;
+            text-decoration: none;
+            transition: background-color 0.2s ease;
+            cursor: pointer;
+        }
+        
+        .menu-item:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .menu-item.active {
+            background-color: rgba(255, 255, 255, 0.2);
+            border-left: 4px solid rgb(var(--c-primary));
+        }
+        
+        .sub-menu .menu-item.active {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-left: 2px solid rgb(var(--c-primary));
+        }
+        
+        .menu-icon {
+            margin-right: 10px;
+            width: 20px;
+            height: 20px;
+        }
+        
+        .menu-label {
+            flex-grow: 1;
+        }
+        
+        .action-icon {
+            transition: transform 0.2s ease;
+        }
+        
+        .sub-menu {
+            list-style: none;
+            padding-left: 20px;
+            display: none;
+        }
+        
+        .sub-menu-show {
+            display: block;
+        }
+        
+        .side-nav-toggle-btn {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+        }
+        
+        .content-wrapper {
+            margin-left: 240px;
+            margin-top: var(--dim-header-height);
+            transition: margin-left 0.3s ease;
+            min-height: calc(100vh - var(--dim-header-height));
+        }
+        
+        .content-wrapper.no-nav {
+            margin-left: 0;
+        }
+        
+        .overlay-effect {
+            display: none;
+            position: fixed;
+            top: var(--dim-header-height);
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+        
+        /* User details styling */
+        .user-details-wrapper {
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 4px;
+            transition: background-color 0.2s ease;
+        }
+        
+        .user-details-wrapper:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .name-initial-container {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background-color: #4CAF50;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+        
+        .user-details {
+            margin-left: 10px;
+        }
+        
+        .user-name {
+            font-weight: bold;
+            font-size: 0.9rem;
+            line-height: 1.2;
+        }
+        
+        .user-role {
+            font-size: 0.75rem;
+            opacity: 0.8;
+            line-height: 1.2;
+        }
+        
+        /* Search styling */
+        .search-wrapper {
+            display: flex;
+            flex-grow: 1;
+            max-width: 600px;
+            margin: 0 20px;
+        }
+        
+        .search-input {
+            position: relative;
+            flex-grow: 1;
+        }
+        
+        .search-icon {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6b7280;
+            z-index: 1;
+        }
+        
+        .search-input input {
+            padding-left: 35px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border: none;
+        }
+        
+        .search-input input:focus {
+            background-color: white;
+            box-shadow: 0 0 0 0.2rem rgba(var(--c-primary), 0.25);
+        }
+        
+        .select-dropdown {
+            width: 100px;
+        }
+        
+        .select-dropdown select {
+            height: 100%;
+            border: none;
+            background-color: rgba(255, 255, 255, 0.9);
+        }
+        
+        .select-dropdown select:focus {
+            background-color: white;
+            box-shadow: 0 0 0 0.2rem rgba(var(--c-primary), 0.25);
+        }
+        
+        /* Loading indicator styles */
+        .linear-activity {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            z-index: 1002;
+            background-color: rgba(var(--c-primary), 0.2);
+            overflow: hidden;
+        }
+        
+        .linear-activity .indeterminate {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .linear-activity .indeterminate:before {
+            content: '';
+            position: absolute;
+            height: 100%;
+            background-color: rgb(var(--c-primary));
+            animation: indeterminate 1.5s infinite ease-in-out;
+            width: 30%;
+        }
+        
+        @keyframes indeterminate {
+            0% { left: -30%; }
+            100% { left: 100%; }
+        }
     </style>
 </head>
 <body>
-    <div class="container-fluid">
-        <div class="row justify-content-center">
-            <div class="col-12 col-xl-10">
-                <!-- Page Header -->
-                <div class="page-header">
-                    <div class="page-header-left">
-                        <h3 class="heading-3">Interactive Data Map</h3>
+    <!-- Header from SMBDEMO.html -->
+    <div id="root">
+        <div class="container-fluid p-0 dx-viewport" data-theme="light">
+            <div id="loader" class="linear-activity" style="display: none;">
+                <div class="indeterminate"></div>
+            </div>
+            <div class="header-content-wrapper">
+                <div>
+                    <div class="header-wrapper">
+                        <div class="align-self-center header-left-wrapper">
+                            <button class="btn side-nav-toggle-btn px-0">
+                                <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="bars" class="svg-inline--fa fa-bars " role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+                                    <path fill="currentColor" d="M0 96C0 78.3 14.3 64 32 64H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32C14.3 128 0 113.7 0 96zM0 256c0-17.7 14.3-32 32-32H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32-14.3-32-32zM448 416c0 17.7-14.3 32-32 32H32c-17.7 0-32-14.3-32-32s14.3-32 32-32H416c17.7 0 32 14.3 32 32z"></path>
+                                </svg>
+                            </button>
+                            <a href="#"><img src="https://dmitri.github.io/projects/civicserve/cs-dashboard/src/cs-logo-white.png"></a>
+                        </div>
+                        <form class="search-wrapper">
+                            <div class="search-input">
+                                <div class="search-icon">
+                                    <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="magnifying-glass" class="svg-inline--fa fa-magnifying-glass " role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                                        <path fill="currentColor" d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z"></path>
+                                    </svg>
+                                </div>
+                                <input type="text" class="form-control" placeholder="Search Programs, Projects, or Contacts">
+                            </div>
+                            <div class="select-dropdown">
+                                <select class="form-select">
+                                    <option>All</option>
+                                    <option>Programs</option>
+                                    <option>Projects</option>
+                                    <option>Contacts</option>
+                                </select>
+                            </div>
+                        </form>
+                        <div class="header-right align-self-center">
+                            <div class="header-support-wrapper">
+                                <button class="btn btn-link">
+                                    <svg aria-hidden="true" focusable="false" data-prefix="far" data-icon="circle-question" class="svg-inline--fa fa-circle-question " role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                                        <path fill="currentColor" d="M464 256A208 208 0 1 0 48 256a208 208 0 1 0 416 0zM0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256zm169.8-90.7c7.9-22.3 29.1-37.3 52.8-37.3h58.3c34.9 0 63.1 28.3 63.1 63.1c0 22.6-12.1 43.5-31.7 54.8L280 264.4c-.2 13-10.9 23.6-24 23.6c-13.3 0-24-10.7-24-24V250.5c0-8.6 4.6-16.5 12.1-20.8l44.3-25.4c4.7-2.7 7.6-7.7 7.6-13.1c0-8.4-6.8-15.1-15.1-15.1H222.6c-3.4 0-6.4 2.1-7.5 5.3l-.4 1.2c-4.4 12.5-18.2 19-30.6 14.6s-19-18.2-14.6-30.6l.4-1.2zM224 352a32 32 0 1 1 64 0 32 32 0 1 1 -64 0z"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                            <div class="d-flex">
+                                <svg aria-hidden="true" focusable="false" data-prefix="far" data-icon="list-check" class="svg-inline--fa fa-list-check " role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" id="tasks">
+                                    <path fill="currentColor" d="M153.8 72.1c8.9-9.9 8.1-25-1.8-33.9s-25-8.1-33.9 1.8L63.1 101.1 41 79C31.6 69.7 16.4 69.7 7 79s-9.4 24.6 0 33.9l40 40c4.7 4.7 11 7.2 17.6 7s12.8-3 17.2-7.9l72-80zm0 160c8.9-9.9 8.1-25-1.8-33.9s-25-8.1-33.9 1.8L63.1 261.1 41 239c-9.4-9.4-24.6-9.4-33.9 0s-9.4 24.6 0 33.9l40 40c4.7 4.7 11 7.2 17.6 7s12.8-3 17.2-7.9l72-80zM216 120H488c13.3 0 24-10.7 24-24s-10.7-24-24-24H216c-13.3 0-24 10.7-24 24s10.7 24 24 24zM192 256c0 13.3 10.7 24 24 24H488c13.3 0 24-10.7 24-24s-10.7-24-24-24H216c-13.3 0-24 10.7-24 24zM160 416c0 13.3 10.7 24 24 24H488c13.3 0 24-10.7 24-24s-10.7-24-24-24H184c-13.3 0-24 10.7-24 24zm-64 0a32 32 0 1 0 -64 0 32 32 0 1 0 64 0z"></path>
+                                </svg>
+                            </div>
+                            <div class="user-details-wrapper">
+                                <div class="user-details-container d-flex align-items-center">
+                                    <div class="name-initial-container">
+                                        <div id="name">GG</div>
+                                    </div>
+                                    <div class="user-details">
+                                        <div class="user-name">Gary Gov</div>
+                                        <div class="user-role">Admin</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
+            </div>
+            <div class="content-wrapper">
+                <div class="overlay-effect"></div>
+                <!-- Side Navigation from SMBDEMO.html -->
+                <nav class="side-nav">
+                    <ul class="side-nav-list">
+                        <li>
+                            <a class="menu-item">
+                                <svg aria-hidden="true" focusable="false" data-prefix="fal" data-icon="chart-bar" class="svg-inline--fa fa-chart-bar menu-icon" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                                    <path fill="currentColor" d="M24 32c13.3 0 24 10.7 24 24V456c0 13.3 10.7 24 24 24H488c13.3 0 24 10.7 24 24s-10.7 24-24 24H72c-39.8 0-72-32.2-72-72V56C0 42.7 10.7 32 24 32zM128 136c0-13.3 10.7-24 24-24s24 10.7 24 24V424c0 13.3-10.7 24-24 24s-24-10.7-24-24V136zm96-88c0-13.3 10.7-24 24-24s24 10.7 24 24V424c0 13.3-10.7 24-24 24s-24-10.7-24-24V48zM320 200c0-13.3 10.7-24 24-24s24 10.7 24 24V424c0 13.3-10.7 24-24 24s-24-10.7-24-24V200zm96-88c0-13.3 10.7-24 24-24s24 10.7 24 24V424c0 13.3-10.7 24-24 24s-24-10.7-24-24V112z"></path>
+                                </svg>
+                                <div class="menu-label">Data</div>
+                                <svg aria-hidden="true" focusable="false" data-prefix="far" data-icon="chevron-down" class="svg-inline--fa fa-chevron-down fa-xs action-icon" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                                    <path fill="currentColor" d="M239 401c9.4 9.4 24.6 9.4 33.9 0L465 209c9.4-9.4 9.4-24.6 0-33.9s-24.6-9.4-33.9 0l-175 175L81 175c-9.4-9.4-24.6-9.4-33.9 0s-9.4 24.6 0 33.9L239 401z"></path>
+                                </svg>
+                            </a>
+                            <ul class="sub-menu">
+                                <li>
+                                    <a class="menu-item" href="#">
+                                        <div class="menu-label">Local Business</div>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="menu-item" href="#">
+                                        <div class="menu-label">National Business</div>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="menu-item" href="#">
+                                        <div class="menu-label">Parcel Data (GIS)</div>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li>
+                            <a class="menu-item active">
+                                <svg aria-hidden="true" focusable="false" data-prefix="fal" data-icon="map-location-dot" class="svg-inline--fa fa-map-location-dot menu-icon" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512">
+                                    <path fill="currentColor" d="M408 120c0-13.3-10.7-24-24-24s-24 10.7-24 24c0 13.3 10.7 24 24 24s24-10.7 24-24zM384 72c26.5 0 48 21.5 48 48c0 26.5-21.5 48-48 48s-48-21.5-48-48c0-26.5 21.5-48 48-48zM288 0c-26.5 0-48 21.5-48 48V367.4L45.2 491.2c-5.1 3.2-8.7 8.3-10.1 14.1S33.5 518 37.8 522.3c4.3 4.3 10.4 6.7 16.2 5.3s10.9-5 14.1-10.1L192 393.7V464c0 26.5 21.5 48 48 48H528c26.5 0 48-21.5 48-48V48c0-26.5-21.5-48-48-48H288zM544 464c0 8.8-7.2 16-16 16H240c-8.8 0-16-7.2-16-16V48c0-8.8 7.2-16 16-16H528c8.8 0 16 7.2 16 16V464zM240 384H96V48c0-8.8 7.2-16 16-16H240V384zM64 48V384c0 17.7 14.3 32 32 32H240v48H96c-8.8 0-16-7.2-16-16V403.2L37.8 441.4c-1.4 .9-2.7 2-3.8 3.2V48c0-26.5 21.5-48 48-48H240c-26.5 0-48 21.5-48 48H112c-26.5 0-48 21.5-48 48z"></path>
+                                </svg>
+                                <div class="menu-label">Maps</div>
+                                <svg aria-hidden="true" focusable="false" data-prefix="far" data-icon="chevron-down" class="svg-inline--fa fa-chevron-down fa-xs action-icon" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                                    <path fill="currentColor" d="M239 401c9.4 9.4 24.6 9.4 33.9 0L465 209c9.4-9.4 9.4-24.6 0-33.9s-24.6-9.4-33.9 0l-175 175L81 175c-9.4-9.4-24.6-9.4-33.9 0s-9.4 24.6 0 33.9L239 401z"></path>
+                                </svg>
+                            </a>
+                            <ul class="sub-menu sub-menu-show">
+                                <li>
+                                    <a class="menu-item active" href="#">
+                                        <div class="menu-label">Interactive Map</div>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </nav>
+                
+                <!-- Main Content -->
+                <div class="container-fluid">
+                    <div class="row justify-content-center">
+                        <div class="col-12 col-xl-10">
+                            <!-- Page Header -->
+                            <div class="page-header">
+                                <div class="page-header-left">
+                                    <h3 class="heading-3">Interactive Data Map</h3>
+                                </div>
+                            </div>
                 
                 <!-- Main Panel -->
                 <div class="panel">
@@ -792,6 +1186,9 @@
                 <div class="panel map-container">
                     <div id="map"></div>
                 </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -960,7 +1357,14 @@
         const uniquePropertyStatuses = getUniqueValues(mapData, 'status', 'properties');
 
         // --- Map Initialization ---
-        const map = L.map('map').setView([35.072, -80.826], 13);
+        const map = L.map('map', {
+            zoomControl: false // We'll add zoom control in a better position
+        }).setView([35.072, -80.826], 13);
+        
+        // Add zoom control to the bottom right
+        L.control.zoom({
+            position: 'bottomright'
+        }).addTo(map);
 
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             maxZoom: 19,
@@ -1464,6 +1868,98 @@
         
         // Add a message to confirm styles have been updated
         console.log('Styles updated: SMBDEMO.html styles applied to map.html while preserving functionality');
+        
+        // Side navigation toggle functionality
+        // Show loading indicator when page is loading
+        document.getElementById('loader').style.display = 'block';
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            // Hide loading indicator when page is loaded
+            setTimeout(function() {
+                document.getElementById('loader').style.display = 'none';
+            }, 500);
+            
+            // Side navigation toggle
+            const sideNavToggleBtn = document.querySelector('.side-nav-toggle-btn');
+            const contentWrapper = document.querySelector('.content-wrapper');
+            const sideNav = document.querySelector('.side-nav');
+            const overlayEffect = document.querySelector('.overlay-effect');
+            
+            if (sideNavToggleBtn) {
+                sideNavToggleBtn.addEventListener('click', function() {
+                    if (sideNav.style.transform === 'translateX(-100%)') {
+                        // Show side nav
+                        sideNav.style.transform = 'translateX(0)';
+                        overlayEffect.style.display = 'block';
+                        contentWrapper.classList.remove('no-nav');
+                        setTimeout(function() {
+                            map.invalidateSize(); // Refresh map size after transition
+                        }, 300);
+                    } else {
+                        // Hide side nav
+                        sideNav.style.transform = 'translateX(-100%)';
+                        overlayEffect.style.display = 'none';
+                        contentWrapper.classList.add('no-nav');
+                        setTimeout(function() {
+                            map.invalidateSize(); // Refresh map size after transition
+                        }, 300);
+                    }
+                });
+            }
+            
+            // Close side nav when clicking overlay
+            if (overlayEffect) {
+                overlayEffect.addEventListener('click', function() {
+                    sideNav.style.transform = 'translateX(-100%)';
+                    overlayEffect.style.display = 'none';
+                    contentWrapper.classList.add('no-nav');
+                    setTimeout(function() {
+                        map.invalidateSize(); // Refresh map size after transition
+                    }, 300);
+                });
+            }
+            
+            // Toggle sub-menus
+            const menuItems = document.querySelectorAll('.menu-item');
+            menuItems.forEach(item => {
+                const subMenu = item.nextElementSibling;
+                if (subMenu && subMenu.classList.contains('sub-menu')) {
+                    item.addEventListener('click', function(e) {
+                        // Don't toggle if clicking on a link
+                        if (e.target.tagName === 'A') return;
+                        
+                        subMenu.classList.toggle('sub-menu-show');
+                        const actionIcon = item.querySelector('.action-icon');
+                        if (actionIcon) {
+                            actionIcon.style.transform = subMenu.classList.contains('sub-menu-show') ? 'rotate(180deg)' : 'rotate(0)';
+                        }
+                    });
+                }
+            });
+            
+            // Initialize side nav state (hidden on mobile)
+            if (window.innerWidth < 992) {
+                sideNav.style.transform = 'translateX(-100%)';
+                contentWrapper.classList.add('no-nav');
+            }
+            
+            // Handle window resize
+            window.addEventListener('resize', function() {
+                if (window.innerWidth < 992) {
+                    sideNav.style.transform = 'translateX(-100%)';
+                    contentWrapper.classList.add('no-nav');
+                    overlayEffect.style.display = 'none';
+                } else {
+                    sideNav.style.transform = '';
+                    contentWrapper.classList.remove('no-nav');
+                }
+                
+                // Refresh map size after resize
+                setTimeout(function() {
+                    map.invalidateSize();
+                }, 100);
+            });
+        });
     </script>
 </body>
 </html>
