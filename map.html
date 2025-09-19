@@ -20,13 +20,13 @@
     <link href="https://fonts.googleapis.com/css2?family=Mulish:ital,wght@0,200..1000;1,200..1000&display=swap" rel="stylesheet">
     <style>
         :root {
-            --c-primary: 8, 158, 154; /* Teal color in RGB from SMBDEMO */
-            --c-landing-primary: 8, 158, 154;
-            --c-landing-light20-primary-color: #0abeb9;
-            --c-landing-light30-primary-color: #0acdc8;
-            --c-landing-light35-primary-color: #0bd5d0;
-            --c-landing-light40-primary-color: #0bddd8;
-            --c-landing-darken10-primary-color: #078e8b;
+            --c-primary: 0, 55, 96; /* Blue color in RGB matching header #003760 */
+            --c-landing-primary: 0, 55, 96;
+            --c-landing-light20-primary-color: #1a4a7a;
+            --c-landing-light30-primary-color: #2d5d8d;
+            --c-landing-light35-primary-color: #3a6a9a;
+            --c-landing-light40-primary-color: #4777a7;
+            --c-landing-darken10-primary-color: #002040;
             --c-landing-secondary: #ffa800;
             --c-primary-contrast: #003760;
             --c-font-primary: #333333;
@@ -86,7 +86,7 @@
         
         /* Header styles from SMBDEMO */
         .header-content-wrapper {
-            background-color: rgb(var(--c-primary));
+            background-color: #003760; /* Updated to match SMBDEMO.html */
             color: white;
             height: var(--dim-header-height);
             position: fixed;
@@ -279,6 +279,10 @@
             gap: 8px;
         }
         
+        .custom-checkbox input[type="checkbox"] {
+            display: none;
+        }
+        
         .checkbox-indicator {
             width: 18px;
             height: 18px;
@@ -328,7 +332,7 @@
         
         /* Map container */
         #map {
-            height: calc(100vh - 350px);
+            height: calc(100vh - 300px);
             min-height: 500px;
             width: 100%;
             border-radius: 5px;
@@ -338,6 +342,7 @@
         /* Map container panel */
         .map-container {
             margin-top: 20px;
+            margin-bottom: 20px;
         }
         
         /* Map popup styling */
@@ -662,8 +667,8 @@
             left: 0;
             width: 240px;
             height: calc(100vh - var(--dim-header-height));
-            background-color: #003760;
-            color: white;
+            background-color: white;
+            color: #333;
             z-index: 1000;
             overflow-y: auto;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -683,31 +688,59 @@
         .menu-item {
             display: flex;
             align-items: center;
-            padding: 12px 15px;
-            color: white;
+            padding: 10px 15px;
+            color: #333;
             text-decoration: none;
             transition: background-color 0.2s ease;
             cursor: pointer;
+            border-left: 4px solid transparent;
+            font-size: 13px;
+            line-height: 1.4;
         }
         
         .menu-item:hover {
-            background-color: rgba(255, 255, 255, 0.1);
+            background-color: rgba(0, 0, 0, 0.05);
         }
         
         .menu-item.active {
-            background-color: rgba(255, 255, 255, 0.2);
-            border-left: 4px solid rgb(var(--c-primary));
+            background-color: #003760;
+            color: white;
+            border-left: 4px solid #003760;
+            font-weight: 500;
         }
         
         .sub-menu .menu-item.active {
-            background-color: rgba(255, 255, 255, 0.1);
-            border-left: 2px solid rgb(var(--c-primary));
+            background-color: #003760;
+            color: white;
+            border-left: 4px solid #003760;
+            padding-left: 45px;
+            font-weight: 500;
+        }
+        
+        .sub-menu .menu-item {
+            padding-left: 45px;
+            padding-top: 8px;
+            padding-bottom: 8px;
+            font-size: 12px;
+        }
+        
+        /* Nested sub-menu styling */
+        .sub-menu .sub-menu .menu-item {
+            padding-left: 60px;
+            font-size: 11px;
+        }
+        
+        .sub-menu .sub-menu .menu-item.active {
+            padding-left: 60px;
+            background-color: #003760;
+            color: white;
         }
         
         .menu-icon {
-            margin-right: 10px;
-            width: 20px;
-            height: 20px;
+            margin-right: 12px;
+            width: 16px;
+            height: 16px;
+            flex-shrink: 0;
         }
         
         .menu-label {
@@ -716,12 +749,17 @@
         
         .action-icon {
             transition: transform 0.2s ease;
+            width: 12px !important;
+            height: 12px !important;
+            margin-left: auto;
         }
         
         .sub-menu {
             list-style: none;
-            padding-left: 20px;
+            padding-left: 0;
+            margin: 0;
             display: none;
+            background-color: rgba(0, 0, 0, 0.02);
         }
         
         .sub-menu-show {
@@ -733,6 +771,13 @@
             border: none;
             color: white;
             cursor: pointer;
+            padding: 8px;
+            margin-right: 5px;
+        }
+        
+        .side-nav-toggle-btn svg {
+            width: 24px;
+            height: 24px;
         }
         
         .content-wrapper {
@@ -740,6 +785,7 @@
             margin-top: var(--dim-header-height);
             transition: margin-left 0.3s ease;
             min-height: calc(100vh - var(--dim-header-height));
+            background-color: var(--c-background);
         }
         
         .content-wrapper.no-nav {
@@ -954,27 +1000,64 @@
                                     <path fill="currentColor" d="M24 32c13.3 0 24 10.7 24 24V456c0 13.3 10.7 24 24 24H488c13.3 0 24 10.7 24 24s-10.7 24-24 24H72c-39.8 0-72-32.2-72-72V56C0 42.7 10.7 32 24 32zM128 136c0-13.3 10.7-24 24-24s24 10.7 24 24V424c0 13.3-10.7 24-24 24s-24-10.7-24-24V136zm96-88c0-13.3 10.7-24 24-24s24 10.7 24 24V424c0 13.3-10.7 24-24 24s-24-10.7-24-24V48zM320 200c0-13.3 10.7-24 24-24s24 10.7 24 24V424c0 13.3-10.7 24-24 24s-24-10.7-24-24V200zm96-88c0-13.3 10.7-24 24-24s24 10.7 24 24V424c0 13.3-10.7 24-24 24s-24-10.7-24-24V112z"></path>
                                 </svg>
                                 <div class="menu-label">Data</div>
-                                <svg aria-hidden="true" focusable="false" data-prefix="far" data-icon="chevron-down" class="svg-inline--fa fa-chevron-down fa-xs action-icon" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                                <svg aria-hidden="true" focusable="false" data-prefix="far" data-icon="chevron-down" class="svg-inline--fa fa-chevron-down action-icon" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
                                     <path fill="currentColor" d="M239 401c9.4 9.4 24.6 9.4 33.9 0L465 209c9.4-9.4 9.4-24.6 0-33.9s-24.6-9.4-33.9 0l-175 175L81 175c-9.4-9.4-24.6-9.4-33.9 0s-9.4 24.6 0 33.9L239 401z"></path>
                                 </svg>
                             </a>
-                            <ul class="sub-menu">
+                            <ul class="sub-menu sub-menu-show">
                                 <li>
-                                    <a class="menu-item" href="#">
-                                        <div class="menu-label">Local Business</div>
+                                    <a class="menu-item">
+                                        <div class="menu-label">Core Data</div>
+                                        <svg aria-hidden="true" focusable="false" data-prefix="far" data-icon="chevron-down" class="svg-inline--fa fa-chevron-down action-icon" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                                            <path fill="currentColor" d="M239 401c9.4 9.4 24.6 9.4 33.9 0L465 209c9.4-9.4 9.4-24.6 0-33.9s-24.6-9.4-33.9 0l-175 175L81 175c-9.4-9.4-24.6-9.4-33.9 0s-9.4 24.6 0 33.9L239 401z"></path>
+                                        </svg>
+                                    </a>
+                                    <ul class="sub-menu sub-menu-show">
+                                        <li>
+                                            <a class="menu-item" href="#">
+                                                <div class="menu-label">Local Business</div>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="menu-item" href="#">
+                                                <div class="menu-label">National Business</div>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="menu-item" href="#">
+                                                <div class="menu-label">Parcel Data (GIS)</div>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <a class="menu-item">
+                                        <div class="menu-label">Updates to Data</div>
+                                        <svg aria-hidden="true" focusable="false" data-prefix="far" data-icon="chevron-down" class="svg-inline--fa fa-chevron-down action-icon" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                                            <path fill="currentColor" d="M239 401c9.4 9.4 24.6 9.4 33.9 0L465 209c9.4-9.4 9.4-24.6 0-33.9s-24.6-9.4-33.9 0l-175 175L81 175c-9.4-9.4-24.6-9.4-33.9 0s-9.4 24.6 0 33.9L239 401z"></path>
+                                        </svg>
                                     </a>
                                 </li>
                                 <li>
-                                    <a class="menu-item" href="#">
-                                        <div class="menu-label">National Business</div>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a class="menu-item" href="#">
-                                        <div class="menu-label">Parcel Data (GIS)</div>
+                                    <a class="menu-item">
+                                        <div class="menu-label">New Data Collection</div>
+                                        <svg aria-hidden="true" focusable="false" data-prefix="far" data-icon="chevron-down" class="svg-inline--fa fa-chevron-down action-icon" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                                            <path fill="currentColor" d="M239 401c9.4 9.4 24.6 9.4 33.9 0L465 209c9.4-9.4 9.4-24.6 0-33.9s-24.6-9.4-33.9 0l-175 175L81 175c-9.4-9.4-24.6-9.4-33.9 0s-9.4 24.6 0 33.9L239 401z"></path>
+                                        </svg>
                                     </a>
                                 </li>
                             </ul>
+                        </li>
+                        <li>
+                            <a class="menu-item">
+                                <svg aria-hidden="true" focusable="false" data-prefix="fal" data-icon="screwdriver-wrench" class="svg-inline--fa fa-screwdriver-wrench menu-icon" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                                    <path fill="currentColor" d="M64.7 34.6L160 107.9V160H107.9L34.6 64.7 64.7 34.6zM192 169.3c0-.4 0-.9 0-1.3V104c0-7.5-3.5-14.5-9.4-19L78.6 5C69.1-2.4 55.6-1.5 47 7L7 47c-8.5 8.5-9.4 22-2.1 31.6l80 104c4.5 5.9 11.6 9.4 19 9.4h64c.4 0 .9 0 1.3 0L271.2 293.9c-19.5 30-16.2 70.5 10.1 96.8l112 112c12.5 12.5 32.8 12.5 45.3 0l64-64c12.5-12.5 12.5-32.8 0-45.3l-112-112c-26.3-26.3-66.8-29.7-96.8-10.1L192 169.3zM304 304c17.7-17.7 46.3-17.7 64 0L480 416l-64 64L304 368c-17.7-17.7-17.7-46.3 0-64zM104 424a16 16 0 1 0 -32 0 16 16 0 1 0 32 0zM23.2 376.8C8.3 391.7 0 411.8 0 432.8C0 476.5 35.5 512 79.2 512c21 0 41.1-8.3 56-23.2L238.5 385.5c-5.7-11.2-9.3-23.1-10.9-35.3L112.1 465.7c-8.7 8.7-20.6 13.6-32.9 13.6c-25.7 0-46.6-20.8-46.6-46.6c0-12.3 4.9-24.2 13.6-32.9L189.1 257l-23.1-23.1L23.2 376.8zM479.4 160c0 44.8-23.1 84.1-58 106.8l23.5 23.5c40.7-29 67.2-76.6 67.2-130.3c0-24.8-5.7-48.3-15.7-69.3c-4.4-9.2-16.5-10.5-23.7-3.3l-67.9 67.9c-3 3-7.1 4.7-11.3 4.7H368c-8.8 0-16-7.2-16-16V118.6c0-4.2 1.7-8.3 4.7-11.3l67.9-67.9c7.2-7.2 5.9-19.3-3.3-23.7C400.3 5.7 376.8 0 352 0C296.1 0 246.9 28.6 218.3 72.1l26 20C266.8 56.3 306.7 32.6 352 32.6c10.3 0 20.2 1.2 29.7 3.5L333.6 84.2c-9.1 9.1-14.2 21.5-14.2 34.4V144c0 26.9 21.8 48.6 48.6 48.6h25.4c12.9 0 25.3-5.1 34.4-14.2l48.1-48.1c2.3 9.5 3.5 19.5 3.5 29.7z"></path>
+                                </svg>
+                                <div class="menu-label">Tools</div>
+                                <svg aria-hidden="true" focusable="false" data-prefix="far" data-icon="chevron-down" class="svg-inline--fa fa-chevron-down action-icon" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                                    <path fill="currentColor" d="M239 401c9.4 9.4 24.6 9.4 33.9 0L465 209c9.4-9.4 9.4-24.6 0-33.9s-24.6-9.4-33.9 0l-175 175L81 175c-9.4-9.4-24.6-9.4-33.9 0s-9.4 24.6 0 33.9L239 401z"></path>
+                                </svg>
+                            </a>
                         </li>
                         <li>
                             <a class="menu-item active">
@@ -982,7 +1065,7 @@
                                     <path fill="currentColor" d="M408 120c0-13.3-10.7-24-24-24s-24 10.7-24 24c0 13.3 10.7 24 24 24s24-10.7 24-24zM384 72c26.5 0 48 21.5 48 48c0 26.5-21.5 48-48 48s-48-21.5-48-48c0-26.5 21.5-48 48-48zM288 0c-26.5 0-48 21.5-48 48V367.4L45.2 491.2c-5.1 3.2-8.7 8.3-10.1 14.1S33.5 518 37.8 522.3c4.3 4.3 10.4 6.7 16.2 5.3s10.9-5 14.1-10.1L192 393.7V464c0 26.5 21.5 48 48 48H528c26.5 0 48-21.5 48-48V48c0-26.5-21.5-48-48-48H288zM544 464c0 8.8-7.2 16-16 16H240c-8.8 0-16-7.2-16-16V48c0-8.8 7.2-16 16-16H528c8.8 0 16 7.2 16 16V464zM240 384H96V48c0-8.8 7.2-16 16-16H240V384zM64 48V384c0 17.7 14.3 32 32 32H240v48H96c-8.8 0-16-7.2-16-16V403.2L37.8 441.4c-1.4 .9-2.7 2-3.8 3.2V48c0-26.5 21.5-48 48-48H240c-26.5 0-48 21.5-48 48H112c-26.5 0-48 21.5-48 48z"></path>
                                 </svg>
                                 <div class="menu-label">Maps</div>
-                                <svg aria-hidden="true" focusable="false" data-prefix="far" data-icon="chevron-down" class="svg-inline--fa fa-chevron-down fa-xs action-icon" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                                <svg aria-hidden="true" focusable="false" data-prefix="far" data-icon="chevron-down" class="svg-inline--fa fa-chevron-down action-icon" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
                                     <path fill="currentColor" d="M239 401c9.4 9.4 24.6 9.4 33.9 0L465 209c9.4-9.4 9.4-24.6 0-33.9s-24.6-9.4-33.9 0l-175 175L81 175c-9.4-9.4-24.6-9.4-33.9 0s-9.4 24.6 0 33.9L239 401z"></path>
                                 </svg>
                             </a>
@@ -999,8 +1082,8 @@
                 
                 <!-- Main Content -->
                 <div class="container-fluid">
-                    <div class="row justify-content-center">
-                        <div class="col-12 col-xl-10">
+                    <div class="row">
+                        <div class="col-12">
                             <!-- Page Header -->
                             <div class="page-header">
                                 <div class="page-header-left">
@@ -1937,11 +2020,28 @@
                 }
             });
             
-            // Initialize side nav state (hidden on mobile)
+            // Initialize side nav state (hidden on mobile, visible on desktop)
             if (window.innerWidth < 992) {
                 sideNav.style.transform = 'translateX(-100%)';
                 contentWrapper.classList.add('no-nav');
+            } else {
+                sideNav.style.transform = 'translateX(0)';
+                contentWrapper.classList.remove('no-nav');
             }
+            
+            // Initialize submenu state (expand active menu)
+            document.querySelectorAll('.menu-item.active').forEach(item => {
+                const parentLi = item.closest('li');
+                if (parentLi && parentLi.parentElement.classList.contains('sub-menu')) {
+                    const parentMenu = parentLi.parentElement.previousElementSibling;
+                    if (parentMenu && parentMenu.classList.contains('menu-item')) {
+                        const subMenu = parentMenu.nextElementSibling;
+                        if (subMenu) {
+                            subMenu.classList.add('sub-menu-show');
+                        }
+                    }
+                }
+            });
             
             // Handle window resize
             window.addEventListener('resize', function() {
