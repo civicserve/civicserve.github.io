@@ -672,9 +672,9 @@
                             
                             <!-- Tab Navigation -->
                             <div class="tab-navigation">
-                                <button onclick="showTab('hub', this)" class="tab-button active">Information Request Hub</button>
-                                <button onclick="showTab('contextual', this)" class="tab-button">Contextual View (Business Page)</button>
-                                <button onclick="showTab('external', this)" class="tab-button">External Recipient View</button>
+                                <button data-tab="hub" class="tab-button active">Information Request Hub</button>
+                                <button data-tab="contextual" class="tab-button">Contextual View (Business Page)</button>
+                                <button data-tab="external" class="tab-button">External Recipient View</button>
                             </div>
 
                             <!-- Information Request Hub -->
@@ -1295,9 +1295,8 @@
             // Find and activate the correct button
             let targetButton = clickedButton;
             if (!targetButton) {
-                // Try different selectors to find the button
-                targetButton = document.querySelector(`button[onclick*="showTab('${tabName}',"]`) || 
-                              document.querySelector(`button[onclick*="showTab('${tabName}')"]`);
+                // Find button by data-tab attribute
+                targetButton = document.querySelector(`button[data-tab="${tabName}"]`);
             }
             
             if (targetButton) {
@@ -1305,14 +1304,6 @@
                 console.log('Activated button for:', tabName);
             } else {
                 console.error('Could not find button for:', tabName);
-                // As a fallback, try to find by text content
-                const buttons = document.querySelectorAll('.tab-button');
-                buttons.forEach(btn => {
-                    if (btn.onclick && btn.onclick.toString().includes(`showTab('${tabName}'`)) {
-                        btn.classList.add('active');
-                        console.log('Found button by onclick function for:', tabName);
-                    }
-                });
             }
             
             lucide.createIcons();
@@ -1419,15 +1410,10 @@
             tabButtons.forEach(button => {
                 button.addEventListener('click', function(e) {
                     e.preventDefault();
-                    const onclick = this.getAttribute('onclick');
-                    if (onclick) {
-                        // Extract tab name from onclick attribute
-                        const match = onclick.match(/showTab\('([^']+)'/);
-                        if (match) {
-                            const tabName = match[1];
-                            console.log('Button clicked for tab:', tabName);
-                            showTab(tabName, this);
-                        }
+                    const tabName = this.getAttribute('data-tab');
+                    if (tabName) {
+                        console.log('Button clicked for tab:', tabName);
+                        showTab(tabName, this);
                     }
                 });
             });
