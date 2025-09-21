@@ -1,0 +1,1418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Request Hub - CivicServe</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Mulish Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Mulish:ital,wght@0,200..1000;1,200..1000&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --c-primary: 0, 55, 96; /* Blue color in RGB matching header #003760 */
+            --c-landing-primary: 0, 55, 96;
+            --c-landing-light20-primary-color: #1a4a7a;
+            --c-landing-light30-primary-color: #2d5d8d;
+            --c-landing-light35-primary-color: #3a6a9a;
+            --c-landing-light40-primary-color: #4777a7;
+            --c-landing-darken10-primary-color: #002040;
+            --c-landing-secondary: #ffa800;
+            --c-primary-contrast: #003760;
+            --c-font-primary: #333333;
+            --c-font-secondary: #6b7280;
+            --c-card-background: #ffffff;
+            --c-background: #f8f9fa;
+            --c-success: #9CB1C1;
+            --c-danger: #F44336;
+            --c-warning: #f0ad4e;
+            --dim-header-height: 60px;
+        }
+        
+        body {
+            font-family: 'Mulish', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--c-background);
+            padding: 0;
+            margin: 0;
+            min-height: 100vh;
+            color: var(--c-font-primary);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        /* Header styles */
+        .header-content-wrapper {
+            background-color: #003760;
+            color: white;
+            height: var(--dim-header-height);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1001;
+        }
+        
+        .header-wrapper {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 1rem;
+            height: 100%;
+        }
+        
+        .header-left-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .header-left-wrapper img {
+            height: 30px;
+        }
+        
+        .header-right svg, .header-left-wrapper svg {
+            width: 20px;
+            height: 20px;
+            color: white;
+            cursor: pointer;
+        }
+        
+        .header-right .btn-link {
+            color: white;
+        }
+        
+        .header-right .btn-link:hover, .side-nav-toggle-btn:hover {
+            opacity: 0.8;
+        }
+        
+        /* Side Navigation Styles */
+        .side-nav {
+            position: fixed;
+            top: var(--dim-header-height);
+            left: 0;
+            width: 240px;
+            height: calc(100vh - var(--dim-header-height));
+            background-color: white;
+            color: #333;
+            z-index: 1000;
+            overflow-y: auto;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .content-wrapper {
+            margin-left: 240px;
+            margin-top: var(--dim-header-height);
+            transition: margin-left 0.3s ease;
+            min-height: calc(100vh - var(--dim-header-height));
+            background-color: var(--c-background);
+        }
+        
+        .content-wrapper.no-nav {
+            margin-left: 0;
+        }
+        
+        .modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1050;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        .modal-backdrop.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .modal-content {
+            background: var(--c-card-background);
+            border-radius: 8px;
+            padding: 2rem;
+            width: 90%;
+            max-width: 56rem;
+            transform: scale(0.95);
+            transition: transform 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .modal-backdrop.active .modal-content {
+            transform: scale(1);
+        }
+        /* Tab system */
+        .tab-navigation {
+            border-bottom: 1px solid #e5e7eb;
+            margin-bottom: 20px;
+            display: flex;
+            overflow-x: auto;
+        }
+        
+        .tab-button {
+            padding: 12px 20px;
+            border: none;
+            background: none;
+            border-bottom: 3px solid transparent;
+            font-weight: 500;
+            color: var(--c-font-secondary);
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            white-space: nowrap;
+            font-size: 0.875rem;
+        }
+        
+        .tab-button.active {
+            border-color: rgb(var(--c-primary));
+            color: rgb(var(--c-primary));
+            font-weight: 600;
+        }
+        
+        .tab-button:hover:not(.active) {
+            color: var(--c-font-primary);
+            background-color: rgba(var(--c-primary), 0.05);
+        }
+        .step-indicator {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 50%;
+            font-weight: 600;
+            border: 2px solid transparent;
+        }
+        .step-indicator.active {
+            background-color: rgba(var(--c-primary), 0.1);
+            color: rgb(var(--c-primary));
+            border-color: rgb(var(--c-primary));
+        }
+        .step-indicator.complete {
+            background-color: var(--c-success);
+            color: white;
+        }
+        .step-indicator.inactive {
+            background-color: #e5e7eb;
+            color: var(--c-font-secondary);
+        }
+        .step-line {
+            height: 2px;
+            flex-grow: 1;
+            background-color: #e5e7eb;
+        }
+        .step-line.complete {
+           background-color: var(--c-success);
+        }
+        
+        /* Panel styling */
+        .panel {
+            background-color: var(--c-card-background);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Button styling to match CivicServe design */
+        .btn-primary {
+            background-color: rgb(var(--c-primary));
+            border-color: rgb(var(--c-primary));
+            color: white;
+            font-weight: 500;
+            border-radius: 4px;
+            transition: all 0.15s ease-in-out;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--c-landing-light20-primary-color);
+            border-color: var(--c-landing-light20-primary-color);
+            color: white;
+        }
+        
+        .btn-secondary {
+            background-color: #6c757d;
+            border-color: #6c757d;
+            color: white;
+            font-weight: 500;
+            border-radius: 4px;
+            transition: all 0.15s ease-in-out;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #5a6268;
+            border-color: #545b62;
+            color: white;
+        }
+        
+        /* Form controls */
+        .form-control, .form-select {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 0.875rem;
+            color: var(--c-font-primary);
+            transition: all 0.15s ease-in-out;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: rgb(var(--c-primary));
+            box-shadow: 0 0 0 2px rgba(var(--c-primary), 0.2);
+        }
+        
+        /* Page header styling */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            margin: 15px 0;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .page-header-left {
+            display: flex;
+            align-self: center;
+            gap: 15px;
+            flex-grow: 1;
+            word-break: break-word;
+        }
+        
+        .heading-3 {
+            font-size: 1.5rem;
+            margin-bottom: 0;
+            font-weight: normal;
+            color: var(--c-font-primary);
+            display: flex;
+            gap: 10px;
+        }
+        
+        h2, h3, h4, h5, h6 {
+            font-family: 'Mulish', sans-serif;
+            font-weight: normal;
+            margin-bottom: 1.5rem;
+        }
+        
+        /* Search styling */
+        .search-wrapper {
+            display: flex;
+            flex-grow: 1;
+            max-width: 600px;
+            margin: 0 20px;
+        }
+        
+        .search-input {
+            position: relative;
+            flex-grow: 1;
+        }
+        
+        .search-icon {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6b7280;
+            z-index: 1;
+        }
+        
+        .search-input input {
+            padding-left: 35px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border: none;
+        }
+        
+        .search-input input:focus {
+            background-color: white;
+            box-shadow: 0 0 0 0.2rem rgba(var(--c-primary), 0.25);
+        }
+        
+        .select-dropdown {
+            width: 100px;
+        }
+        
+        .select-dropdown select {
+            height: 100%;
+            border: none;
+            background-color: rgba(255, 255, 255, 0.9);
+        }
+        
+        .select-dropdown select:focus {
+            background-color: white;
+            box-shadow: 0 0 0 0.2rem rgba(var(--c-primary), 0.25);
+        }
+        
+        /* User details styling */
+        .user-details-wrapper {
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 4px;
+            transition: background-color 0.2s ease;
+        }
+        
+        .user-details-wrapper:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .name-initial-container {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background-color: #9CB1C1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+        
+        .user-details {
+            margin-left: 10px;
+        }
+        
+        .user-name {
+            font-weight: bold;
+            font-size: 0.9rem;
+            line-height: 1.2;
+        }
+        
+        .user-role {
+            font-size: 0.75rem;
+            opacity: 0.8;
+            line-height: 1.2;
+        }
+        
+        /* Side Navigation Styles */
+        .side-nav-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .side-nav-list li {
+            position: relative;
+        }
+        
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 15px;
+            color: #333;
+            text-decoration: none;
+            transition: background-color 0.2s ease;
+            cursor: pointer;
+            border-left: 4px solid transparent;
+            font-size: 13px;
+            line-height: 1.4;
+        }
+        
+        .menu-item:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+        
+        .menu-item.active {
+            background-color: #003760;
+            color: white;
+            border-left: 4px solid #003760;
+            font-weight: 500;
+        }
+        
+        .sub-menu .menu-item.active {
+            background-color: #003760;
+            color: white;
+            border-left: 4px solid #003760;
+            padding-left: 45px;
+            font-weight: 500;
+        }
+        
+        .sub-menu .menu-item {
+            padding-left: 45px;
+            padding-top: 8px;
+            padding-bottom: 8px;
+            font-size: 12px;
+        }
+        
+        .menu-icon {
+            margin-right: 12px;
+            width: 16px;
+            height: 16px;
+            flex-shrink: 0;
+        }
+        
+        .menu-label {
+            flex-grow: 1;
+        }
+        
+        .action-icon {
+            transition: transform 0.2s ease;
+            width: 12px !important;
+            height: 12px !important;
+            margin-left: auto;
+        }
+        
+        .sub-menu {
+            list-style: none;
+            padding-left: 0;
+            margin: 0;
+            display: none;
+            background-color: rgba(0, 0, 0, 0.02);
+        }
+        
+        .sub-menu-show {
+            display: block;
+        }
+        
+        .side-nav-toggle-btn {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            padding: 8px;
+            margin-right: 5px;
+        }
+        
+        .side-nav-toggle-btn svg {
+            width: 24px;
+            height: 24px;
+        }
+        
+        .overlay-effect {
+            display: none;
+            position: fixed;
+            top: var(--dim-header-height);
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+        
+        /* Loading indicator styles */
+        .linear-activity {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            z-index: 1002;
+            background-color: rgba(var(--c-primary), 0.2);
+            overflow: hidden;
+        }
+        
+        .linear-activity .indeterminate {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .linear-activity .indeterminate:before {
+            content: '';
+            position: absolute;
+            height: 100%;
+            background-color: rgb(var(--c-primary));
+            animation: indeterminate 1.5s infinite ease-in-out;
+            width: 30%;
+        }
+        
+        @keyframes indeterminate {
+            0% { left: -30%; }
+            100% { left: 100%; }
+        }
+        
+        /* Responsive design */
+        @media (max-width: 992px) {
+            .content-wrapper {
+                margin-left: 0;
+            }
+            
+            .side-nav {
+                transform: translateX(-100%);
+            }
+            
+            .search-wrapper {
+                display: none;
+            }
+        }
+        
+        /* Ensure d-none works properly */
+        .d-none {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div id="root">
+        <div class="container-fluid p-0 dx-viewport" data-theme="light">
+            <div id="loader" class="linear-activity" style="display: none;">
+                <div class="indeterminate"></div>
+            </div>
+            <div class="header-content-wrapper">
+                <div>
+                    <div class="header-wrapper">
+                        <div class="align-self-center header-left-wrapper">
+                            <button class="btn side-nav-toggle-btn px-0">
+                                <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="bars" class="svg-inline--fa fa-bars " role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+                                    <path fill="currentColor" d="M0 96C0 78.3 14.3 64 32 64H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32C14.3 128 0 113.7 0 96zM0 256c0-17.7 14.3-32 32-32H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32-14.3-32-32zM448 416c0 17.7-14.3 32-32 32H32c-17.7 0-32-14.3-32-32s14.3-32 32-32H416c17.7 0 32 14.3 32 32z"></path>
+                                </svg>
+                            </button>
+                            <a href="#"><img src="https://dmitri.github.io/projects/civicserve/cs-dashboard/src/cs-logo-white.png"></a>
+                        </div>
+                        <form class="search-wrapper">
+                            <div class="search-input">
+                                <div class="search-icon">
+                                    <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="magnifying-glass" class="svg-inline--fa fa-magnifying-glass " role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                                        <path fill="currentColor" d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z"></path>
+                                    </svg>
+                                </div>
+                                <input type="text" class="form-control" placeholder="Search Programs, Projects, or Contacts">
+                            </div>
+                            <div class="select-dropdown">
+                                <select class="form-select">
+                                    <option>All</option>
+                                    <option>Programs</option>
+                                    <option>Projects</option>
+                                    <option>Contacts</option>
+                                </select>
+                            </div>
+                        </form>
+                        <div class="header-right align-self-center">
+                            <div class="header-support-wrapper">
+                                <button class="btn btn-link">
+                                    <svg aria-hidden="true" focusable="false" data-prefix="far" data-icon="circle-question" class="svg-inline--fa fa-circle-question " role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                                        <path fill="currentColor" d="M464 256A208 208 0 1 0 48 256a208 208 0 1 0 416 0zM0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256zm169.8-90.7c7.9-22.3 29.1-37.3 52.8-37.3h58.3c34.9 0 63.1 28.3 63.1 63.1c0 22.6-12.1 43.5-31.7 54.8L280 264.4c-.2 13-10.9 23.6-24 23.6c-13.3 0-24-10.7-24-24V250.5c0-8.6 4.6-16.5 12.1-20.8l44.3-25.4c4.7-2.7 7.6-7.7 7.6-13.1c0-8.4-6.8-15.1-15.1-15.1H222.6c-3.4 0-6.4 2.1-7.5 5.3l-.4 1.2c-4.4 12.5-18.2 19-30.6 14.6s-19-18.2-14.6-30.6l.4-1.2zM224 352a32 32 0 1 1 64 0 32 32 0 1 1 -64 0z"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                            <div class="d-flex">
+                                <svg aria-hidden="true" focusable="false" data-prefix="far" data-icon="list-check" class="svg-inline--fa fa-list-check " role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                                    <path fill="currentColor" d="M153.8 72.1c8.9-9.9 8.1-25-1.8-33.9s-25-8.1-33.9 1.8L63.1 101.1 41 79C31.6 69.7 16.4 69.7 7 79s-9.4 24.6 0 33.9l40 40c4.7 4.7 11 7.2 17.6 7s12.8-3 17.2-7.9l72-80zm0 160c8.9-9.9 8.1-25-1.8-33.9s-25-8.1-33.9 1.8L63.1 261.1 41 239c-9.4-9.4-24.6-9.4-33.9 0s-9.4 24.6 0 33.9l40 40c4.7 4.7 11 7.2 17.6 7s12.8-3 17.2-7.9l72-80zM216 120H488c13.3 0 24-10.7 24-24s-10.7-24-24-24H216c-13.3 0-24 10.7-24 24s10.7 24 24 24zM192 256c0 13.3 10.7 24 24 24H488c13.3 0 24-10.7 24-24s-10.7-24-24-24H216c-13.3 0-24 10.7-24 24zM160 416c0 13.3 10.7 24 24 24H488c13.3 0 24-10.7 24-24s-10.7-24-24-24H184c-13.3 0-24 10.7-24 24zm-64 0a32 32 0 1 0 -64 0 32 32 0 1 0 64 0z"></path>
+                                </svg>
+                            </div>
+                            <div class="user-details-wrapper">
+                                <div class="user-details-container d-flex align-items-center">
+                                    <div class="name-initial-container">
+                                        <div id="name">GG</div>
+                                    </div>
+                                    <div class="user-details">
+                                        <div class="user-name">Gary Gov</div>
+                                        <div class="user-role">Admin</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="content-wrapper">
+                <div class="overlay-effect"></div>
+                <!-- Side Navigation -->
+                <nav class="side-nav">
+                    <ul class="side-nav-list">
+                        <li>
+                            <a class="menu-item">
+                                <svg aria-hidden="true" focusable="false" data-prefix="fal" data-icon="chart-bar" class="svg-inline--fa fa-chart-bar menu-icon" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                                    <path fill="currentColor" d="M24 32c13.3 0 24 10.7 24 24V456c0 13.3 10.7 24 24 24H488c13.3 0 24 10.7 24 24s-10.7 24-24 24H72c-39.8 0-72-32.2-72-72V56C0 42.7 10.7 32 24 32zM128 136c0-13.3 10.7-24 24-24s24 10.7 24 24V424c0 13.3-10.7 24-24 24s-24-10.7-24-24V136zm96-88c0-13.3 10.7-24 24-24s24 10.7 24 24V424c0 13.3-10.7 24-24 24s-24-10.7-24-24V48zM320 200c0-13.3 10.7-24 24-24s24 10.7 24 24V424c0 13.3-10.7 24-24 24s-24-10.7-24-24V200zm96-88c0-13.3 10.7-24 24-24s24 10.7 24 24V424c0 13.3-10.7 24-24 24s-24-10.7-24-24V112z"></path>
+                                </svg>
+                                <div class="menu-label">Data</div>
+                                <svg aria-hidden="true" focusable="false" data-prefix="far" data-icon="chevron-down" class="svg-inline--fa fa-chevron-down action-icon" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                                    <path fill="currentColor" d="M239 401c9.4 9.4 24.6 9.4 33.9 0L465 209c9.4-9.4 9.4-24.6 0-33.9s-24.6-9.4-33.9 0l-175 175L81 175c-9.4-9.4-24.6-9.4-33.9 0s-9.4 24.6 0 33.9L239 401z"></path>
+                                </svg>
+                            </a>
+                            <ul class="sub-menu sub-menu-show">
+                                <li>
+                                    <a class="menu-item">
+                                        <div class="menu-label">Core Data</div>
+                                        <svg aria-hidden="true" focusable="false" data-prefix="far" data-icon="chevron-down" class="svg-inline--fa fa-chevron-down action-icon" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                                            <path fill="currentColor" d="M239 401c9.4 9.4 24.6 9.4 33.9 0L465 209c9.4-9.4 9.4-24.6 0-33.9s-24.6-9.4-33.9 0l-175 175L81 175c-9.4-9.4-24.6-9.4-33.9 0s-9.4 24.6 0 33.9L239 401z"></path>
+                                        </svg>
+                                    </a>
+                                    <ul class="sub-menu sub-menu-show">
+                                        <li>
+                                            <a class="menu-item" href="#">
+                                                <div class="menu-label">Local Business</div>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="menu-item active" href="#">
+                                                <div class="menu-label">Information Requests</div>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="menu-item" href="#">
+                                                <div class="menu-label">Parcel Data (GIS)</div>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </nav>
+                
+                <!-- Main Content -->
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-12">
+                            <!-- Page Header -->
+                            <div class="page-header">
+                                <div class="page-header-left">
+                                    <h3 class="heading-3">Information Request Hub</h3>
+                                </div>
+                            </div>
+                            
+                            <!-- Tab Navigation -->
+                            <div class="tab-navigation">
+                                <button onclick="showTab('hub', this)" class="tab-button active">Information Request Hub</button>
+                                <button onclick="showTab('contextual', this)" class="tab-button">Contextual View (Business Page)</button>
+                                <button onclick="showTab('external', this)" class="tab-button">External Recipient View</button>
+                            </div>
+
+                            <!-- Information Request Hub -->
+                            <div id="hub-view">
+                                <div class="panel">
+                                    <!-- Header -->
+                                    <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-md-between mb-4">
+                                        <h2 class="mb-3 mb-md-0">Information Requests</h2>
+                                        <button onclick="openModal('createRequestModal')" class="btn btn-primary d-flex align-items-center">
+                                            <i data-lucide="plus" class="me-2" style="width: 16px; height: 16px;"></i>
+                                            Create Request
+                                        </button>
+                                    </div>
+
+                                    <!-- Filters -->
+                                    <div class="row g-3 mb-4">
+                                        <div class="col-md-3">
+                                            <div class="position-relative">
+                                                <i data-lucide="search" class="position-absolute" style="left: 12px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: #6b7280;"></i>
+                                                <input type="text" placeholder="Search by name or recipient..." class="form-control ps-5">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <select class="form-select">
+                                                <option>All Statuses</option>
+                                                <option>Pending</option>
+                                                <option>Completed</option>
+                                                <option>Overdue</option>
+                                                <option>Canceled</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <input type="date" class="form-control" value="2025-01-01">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <input type="date" class="form-control" value="2025-12-31">
+                                        </div>
+                                    </div>
+
+                                    <!-- Requests Table -->
+                                    <div class="table-responsive">
+                                        <table class="table table-hover">
+                                            <thead class="table-light">
+                                                <tr>
+                                                    <th scope="col" class="text-uppercase fw-medium" style="font-size: 0.75rem; color: var(--c-font-secondary);">Request Name</th>
+                                                    <th scope="col" class="text-uppercase fw-medium" style="font-size: 0.75rem; color: var(--c-font-secondary);">Recipient(s)</th>
+                                                    <th scope="col" class="text-uppercase fw-medium" style="font-size: 0.75rem; color: var(--c-font-secondary);">Status</th>
+                                                    <th scope="col" class="text-uppercase fw-medium" style="font-size: 0.75rem; color: var(--c-font-secondary);">Date Sent</th>
+                                                    <th scope="col" class="text-uppercase fw-medium" style="font-size: 0.75rem; color: var(--c-font-secondary);">Due Date</th>
+                                                    <th scope="col" class="text-uppercase fw-medium" style="font-size: 0.75rem; color: var(--c-font-secondary);">Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <!-- Multi-response request -->
+                                                <tr>
+                                                    <td class="fw-medium">Workforce Development Survey</td>
+                                                    <td class="text-muted">Multiple (3)</td>
+                                                    <td>
+                                                        <span class="badge rounded-pill" style="background-color: rgba(var(--c-primary), 0.1); color: rgb(var(--c-primary));">
+                                                            <i data-lucide="message-square" class="me-1" style="width: 14px; height: 14px;"></i>3 Responses Received
+                                                        </span>
+                                                    </td>
+                                                    <td class="text-muted">2025-08-10</td>
+                                                    <td class="text-muted">2025-09-01</td>
+                                                    <td>
+                                                        <button onclick="openModal('reviewMultiUpdatesModal')" class="btn btn-sm btn-outline-primary d-flex align-items-center">
+                                                            <i data-lucide="eye" class="me-1" style="width: 16px; height: 16px;"></i>Review Responses
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="fw-medium">Annual Business Survey 2025</td>
+                                                    <td class="text-muted">john.doe@innovatech.com</td>
+                                                    <td>
+                                                        <span class="badge rounded-pill" style="background-color: rgba(var(--c-success), 0.2); color: var(--c-success);">
+                                                            <i data-lucide="check-circle-2" class="me-1" style="width: 14px; height: 14px;"></i>Completed
+                                                        </span>
+                                                    </td>
+                                                    <td class="text-muted">2025-07-15</td>
+                                                    <td class="text-muted">2025-08-01</td>
+                                                    <td>
+                                                        <button onclick="openModal('reviewUpdatesModal')" class="btn btn-sm btn-outline-primary d-flex align-items-center">
+                                                            <i data-lucide="eye" class="me-1" style="width: 16px; height: 16px;"></i>Review
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="fw-medium">Project Site Plan Update</td>
+                                                    <td class="text-muted">sara.connor@buildwell.com</td>
+                                                    <td>
+                                                        <span class="badge rounded-pill" style="background-color: rgba(var(--c-warning), 0.2); color: var(--c-warning);">
+                                                            <i data-lucide="clock" class="me-1" style="width: 14px; height: 14px;"></i>Pending
+                                                        </span>
+                                                    </td>
+                                                    <td class="text-muted">2025-08-05</td>
+                                                    <td class="text-muted">2025-08-20</td>
+                                                    <td>
+                                                        <div class="d-flex gap-2">
+                                                            <button class="btn btn-sm btn-outline-secondary" title="Send Reminder">
+                                                                <i data-lucide="send" style="width: 16px; height: 16px;"></i>
+                                                            </button>
+                                                            <button class="btn btn-sm btn-outline-danger" title="Cancel Request">
+                                                                <i data-lucide="x-circle" style="width: 16px; height: 16px;"></i>
+                                                            </button>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="fw-medium">Q2 Financials Request</td>
+                                                    <td class="text-muted">finance@acmecorp.com</td>
+                                                    <td>
+                                                        <span class="badge rounded-pill" style="background-color: rgba(var(--c-danger), 0.2); color: var(--c-danger);">
+                                                            <i data-lucide="alert-circle" class="me-1" style="width: 14px; height: 14px;"></i>Overdue
+                                                        </span>
+                                                    </td>
+                                                    <td class="text-muted">2025-07-01</td>
+                                                    <td class="fw-bold" style="color: var(--c-danger);">2025-07-15</td>
+                                                    <td>
+                                                        <div class="d-flex gap-2">
+                                                            <button class="btn btn-sm btn-outline-secondary" title="Send Reminder">
+                                                                <i data-lucide="send" style="width: 16px; height: 16px;"></i>
+                                                            </button>
+                                                            <button class="btn btn-sm btn-outline-danger" title="Cancel Request">
+                                                                <i data-lucide="x-circle" style="width: 16px; height: 16px;"></i>
+                                                            </button>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <!-- Pagination -->
+                                    <div class="d-flex align-items-center justify-content-between border-top pt-3 mt-4">
+                                        <div class="d-block d-sm-none">
+                                            <div class="d-flex justify-content-between">
+                                                <a href="#" class="btn btn-outline-secondary btn-sm">Previous</a>
+                                                <a href="#" class="btn btn-outline-secondary btn-sm">Next</a>
+                                            </div>
+                                        </div>
+                                        <div class="d-none d-sm-flex align-items-center justify-content-between w-100">
+                                            <div>
+                                                <p class="text-muted mb-0" style="font-size: 0.875rem;">
+                                                    Showing <span class="fw-medium">1</span> to <span class="fw-medium">4</span> of <span class="fw-medium">4</span> results
+                                                </p>
+                                            </div>
+                                            <nav aria-label="Pagination">
+                                                <ul class="pagination pagination-sm mb-0">
+                                                    <li class="page-item">
+                                                        <a class="page-link" href="#" aria-label="Previous">
+                                                            <i data-lucide="chevron-left" style="width: 16px; height: 16px;"></i>
+                                                        </a>
+                                                    </li>
+                                                    <li class="page-item active">
+                                                        <a class="page-link" href="#">1</a>
+                                                    </li>
+                                                    <li class="page-item">
+                                                        <a class="page-link" href="#" aria-label="Next">
+                                                            <i data-lucide="chevron-right" style="width: 16px; height: 16px;"></i>
+                                                        </a>
+                                                    </li>
+                                                </ul>
+                                            </nav>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Contextual View -->
+                            <div id="contextual-view" class="d-none">
+                                <div class="panel">
+                                    <!-- Notification Banner -->
+                                    <div id="review-banner" class="alert alert-info mb-4" role="alert" style="background-color: rgba(var(--c-primary), 0.05); border-left: 4px solid rgb(var(--c-primary));">
+                                        <div class="d-flex">
+                                            <div class="me-3">
+                                                <i data-lucide="info" style="width: 24px; height: 24px; color: rgb(var(--c-primary));"></i>
+                                            </div>
+                                            <div>
+                                                <h6 class="alert-heading mb-2">Updates Ready for Review</h6>
+                                                <p class="mb-2">Innovatech Solutions has submitted new information for the "Annual Business Survey 2025".</p>
+                                                <button onclick="openModal('reviewUpdatesModal')" class="btn btn-link p-0 fw-bold" style="color: rgb(var(--c-primary));">
+                                                    Review Submitted Data <i data-lucide="arrow-right" class="ms-2" style="width: 16px; height: 16px;"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Business Header -->
+                                    <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-md-between mb-4 pb-4 border-bottom">
+                                        <div>
+                                            <h2 class="mb-1">Innovatech Solutions</h2>
+                                            <p class="text-muted mb-0">123 Tech Park Ave, Silicon Valley, CA 94043</p>
+                                        </div>
+                                        <button onclick="openModal('createRequestModal', true)" class="btn btn-primary d-flex align-items-center mt-3 mt-md-0">
+                                            <i data-lucide="mail-question" class="me-2" style="width: 16px; height: 16px;"></i>
+                                            Request Information
+                                        </button>
+                                    </div>
+
+                                    <!-- Business Details -->
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h4 class="mb-3">Company Information</h4>
+                                            <div class="mb-3">
+                                                <label class="form-label text-muted small">Primary Contact</label>
+                                                <p class="fw-medium mb-0">John Doe</p>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label text-muted small">Number of Employees</label>
+                                                <p class="fw-medium mb-0">150</p>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label text-muted small">Annual Revenue</label>
+                                                <p class="fw-medium mb-0">$25,000,000</p>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <h4 class="mb-3">Industry Details</h4>
+                                            <div class="mb-3">
+                                                <label class="form-label text-muted small">Services Offered</label>
+                                                <p class="fw-medium mb-0">Cloud Solutions, AI Development, Data Analytics</p>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label text-muted small">NAICS Code</label>
+                                                <p class="fw-medium mb-0">541511</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- External Recipient View -->
+                            <div id="external-view" class="d-none">
+                                <div class="row justify-content-center">
+                                    <div class="col-lg-8">
+                                        <div id="external-form-container" class="panel">
+                                            <div class="text-center mb-4">
+                                                <h2>Information Request</h2>
+                                                <p class="text-muted">from <span class="fw-semibold">Bloomington Economic Development</span></p>
+                                                <p class="text-muted small">Please provide the following information for <span class="fw-semibold">Innovatech Solutions</span>.</p>
+                                            </div>
+                                            <div class="mb-4">
+                                                <div class="mb-3">
+                                                    <label for="employees" class="form-label">Number of Employees</label>
+                                                    <input type="number" name="employees" id="employees" class="form-control" placeholder="e.g., 175">
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label for="revenue" class="form-label">Annual Revenue</label>
+                                                    <div class="input-group">
+                                                        <span class="input-group-text">$</span>
+                                                        <input type="text" name="revenue" id="revenue" class="form-control" placeholder="e.g., 28,500,000">
+                                                    </div>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label for="file-upload" class="form-label">Upload Updated Site Plan</label>
+                                                    <div class="border border-2 border-dashed rounded p-4 text-center" style="border-color: #ddd; transition: border-color 0.2s;" onmouseover="this.style.borderColor='rgb(var(--c-primary))'" onmouseout="this.style.borderColor='#ddd'">
+                                                        <i data-lucide="upload-cloud" class="mx-auto mb-3 text-muted" style="width: 48px; height: 48px;"></i>
+                                                        <div class="mb-2">
+                                                            <label for="file-upload" class="btn btn-link p-0 fw-medium" style="color: rgb(var(--c-primary)); cursor: pointer;">
+                                                                Upload a file
+                                                                <input id="file-upload" name="file-upload" type="file" class="visually-hidden">
+                                                            </label>
+                                                            <span class="text-muted"> or drag and drop</span>
+                                                        </div>
+                                                        <p class="text-muted small mb-0">PNG, JPG, PDF up to 25MB</p>
+                                                    </div>
+                                                </div>
+                                                <button onclick="showSuccessMessage()" class="btn btn-primary w-100">Submit Information</button>
+                                            </div>
+                                        </div>
+                                        <div id="success-message" class="d-none panel text-center">
+                                            <div class="mx-auto d-flex align-items-center justify-content-center rounded-circle mb-3" style="width: 48px; height: 48px; background-color: rgba(var(--c-success), 0.2);">
+                                                <i data-lucide="check" style="width: 24px; height: 24px; color: var(--c-success);"></i>
+                                            </div>
+                                            <h3 class="mb-3">Submission Successful!</h3>
+                                            <p class="mb-2">Thank you. Your information has been sent to Bloomington Economic Development.</p>
+                                            <p class="text-muted small mb-0">You can now close this window.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Request Modal -->
+    <div id="createRequestModal" class="modal-backdrop">
+        <div class="modal-content">
+            <div class="d-flex justify-content-between align-items-start mb-4">
+                <h3 class="mb-0">Create New Information Request</h3>
+                <button onclick="closeModal('createRequestModal')" class="btn btn-link p-0 text-muted">
+                    <i data-lucide="x" style="width: 24px; height: 24px;"></i>
+                </button>
+            </div>
+            
+            <!-- Stepper -->
+            <div class="d-flex align-items-center my-4">
+                <div class="d-flex flex-column align-items-center">
+                    <div class="step-indicator active" id="step-indicator-1">1</div>
+                    <p class="small mt-2 text-center fw-semibold" style="color: rgb(var(--c-primary));" id="step-label-1">Details</p>
+                </div>
+                <div class="step-line" id="step-line-1"></div>
+                <div class="d-flex flex-column align-items-center">
+                    <div class="step-indicator inactive" id="step-indicator-2">2</div>
+                    <p class="small mt-2 text-center text-muted" id="step-label-2">Data</p>
+                </div>
+                <div class="step-line" id="step-line-2"></div>
+                <div class="d-flex flex-column align-items-center">
+                    <div class="step-indicator inactive" id="step-indicator-3">3</div>
+                    <p class="small mt-2 text-center text-muted" id="step-label-3">Review</p>
+                </div>
+            </div>
+
+            <!-- Step 1: Define Request -->
+            <div id="step-1">
+                <div class="mb-3">
+                    <label class="form-label">Request Name</label>
+                    <input type="text" class="form-control" placeholder="e.g., Annual Business Survey 2025">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Recipient(s)</label>
+                    <input type="email" class="form-control" placeholder="john.doe@example.com, sara.connor@example.com">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Due Date (Optional)</label>
+                    <input type="date" class="form-control">
+                </div>
+                <div class="d-flex justify-content-end pt-3">
+                    <button onclick="goToStep(2)" class="btn btn-primary">Next</button>
+                </div>
+            </div>
+
+            <!-- Step 2: Select Data -->
+            <div id="step-2" class="d-none">
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Select Module</label>
+                        <select id="module-select" onchange="updateRecordAndFields()" class="form-select">
+                            <option>Business</option>
+                            <option>Project</option>
+                            <option>Contact</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Select Record</label>
+                        <select id="record-select" class="form-select">
+                            <option>Innovatech Solutions</option>
+                            <option>Acme Corp</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Select Fields to Request</label>
+                    <div id="fields-container" class="border rounded p-3" style="max-height: 200px; overflow-y: auto; background-color: var(--c-background);">
+                        <!-- Fields will be populated by JS -->
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Custom Message</label>
+                    <textarea rows="4" class="form-control" placeholder="Please provide the following information..."></textarea>
+                </div>
+                <div class="d-flex justify-content-between pt-3">
+                    <button onclick="goToStep(1)" class="btn btn-secondary">Back</button>
+                    <button onclick="goToStep(3)" class="btn btn-primary">Next</button>
+                </div>
+            </div>
+
+            <!-- Step 3: Review -->
+            <div id="step-3" class="d-none">
+                <div class="border rounded p-3 mb-3" style="background-color: var(--c-background);">
+                    <p class="mb-2"><strong>Request Name:</strong> Annual Business Survey 2025</p>
+                    <p class="mb-2"><strong>Recipient:</strong> john.doe@innovatech.com</p>
+                    <p class="mb-2"><strong>Record:</strong> Innovatech Solutions (Business)</p>
+                    <p class="mb-2"><strong>Requested Fields:</strong></p>
+                    <ul class="list-unstyled ps-3 small">
+                        <li>• Number of Employees</li>
+                        <li>• Annual Revenue</li>
+                        <li>• Site Plan (File Upload)</li>
+                    </ul>
+                </div>
+                <div class="d-flex justify-content-between pt-3">
+                    <button onclick="goToStep(2)" class="btn btn-secondary">Back</button>
+                    <button onclick="closeModal('createRequestModal')" class="btn btn-success d-flex align-items-center">
+                        <i data-lucide="send" class="me-2" style="width: 16px; height: 16px;"></i>Send Request
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Review Updates Modal (Single Response) -->
+    <div id="reviewUpdatesModal" class="modal-backdrop">
+        <div class="modal-content">
+            <div class="d-flex justify-content-between align-items-start mb-4">
+                <div>
+                    <h3 class="mb-1">Review Submitted Information</h3>
+                    <p class="text-muted small mb-0">From "Annual Business Survey 2025" for Innovatech Solutions.</p>
+                </div>
+                <button onclick="closeModal('reviewUpdatesModal')" class="btn btn-link p-0 text-muted">
+                    <i data-lucide="x" style="width: 24px; height: 24px;"></i>
+                </button>
+            </div>
+            
+            <div class="mb-4" style="max-height: 60vh; overflow-y: auto;">
+                <!-- Field for review -->
+                <div class="border rounded p-3 mb-3">
+                    <label class="form-label fw-bold mb-2">Number of Employees</label>
+                    <div class="d-flex align-items-center">
+                        <div class="flex-fill">
+                            <p class="small text-muted mb-1">Current Data</p>
+                            <p class="fw-medium text-muted text-decoration-line-through p-2 mb-0">150</p>
+                        </div>
+                        <i data-lucide="arrow-right" class="text-muted mx-3" style="width: 20px; height: 20px;"></i>
+                        <div class="flex-fill">
+                            <p class="small fw-semibold mb-1" style="color: var(--c-success);">Submitted Data</p>
+                            <p class="fw-medium p-2 rounded border mb-0" style="color: var(--c-success); background-color: rgba(var(--c-success), 0.1); border-color: var(--c-success) !important;">175</p>
+                        </div>
+                        <div class="d-flex gap-2 ms-3">
+                            <button class="btn btn-sm btn-outline-danger rounded-circle" title="Reject" style="width: 32px; height: 32px; padding: 0;">
+                                <i data-lucide="x" style="width: 16px; height: 16px;"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-success rounded-circle" title="Approve" style="width: 32px; height: 32px; padding: 0;">
+                                <i data-lucide="check" style="width: 16px; height: 16px;"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Field for review -->
+                <div class="border rounded p-3 mb-3">
+                    <label class="form-label fw-bold mb-2">Annual Revenue</label>
+                    <div class="d-flex align-items-center">
+                        <div class="flex-fill">
+                            <p class="small text-muted mb-1">Current Data</p>
+                            <p class="fw-medium text-muted text-decoration-line-through p-2 mb-0">$25,000,000</p>
+                        </div>
+                        <i data-lucide="arrow-right" class="text-muted mx-3" style="width: 20px; height: 20px;"></i>
+                        <div class="flex-fill">
+                            <p class="small fw-semibold mb-1" style="color: var(--c-success);">Submitted Data</p>
+                            <p class="fw-medium p-2 rounded border mb-0" style="color: var(--c-success); background-color: rgba(var(--c-success), 0.1); border-color: var(--c-success) !important;">$28,500,000</p>
+                        </div>
+                        <div class="d-flex gap-2 ms-3">
+                            <button class="btn btn-sm btn-outline-danger rounded-circle" title="Reject" style="width: 32px; height: 32px; padding: 0;">
+                                <i data-lucide="x" style="width: 16px; height: 16px;"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-success rounded-circle" title="Approve" style="width: 32px; height: 32px; padding: 0;">
+                                <i data-lucide="check" style="width: 16px; height: 16px;"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-end gap-3 border-top pt-3">
+                <button onclick="closeModal('reviewUpdatesModal')" class="btn btn-secondary">Cancel</button>
+                <button onclick="closeModal('reviewUpdatesModal')" class="btn btn-primary">Approve All & Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Review Multiple Updates Modal -->
+    <div id="reviewMultiUpdatesModal" class="modal-backdrop">
+        <div class="modal-content">
+            <div class="d-flex justify-content-between align-items-start mb-4">
+                <div>
+                    <h3 class="mb-1">Review Multiple Submissions</h3>
+                    <p class="text-muted small mb-0">From "Workforce Development Survey". Select the response(s) to approve for each field.</p>
+                </div>
+                <button onclick="closeModal('reviewMultiUpdatesModal')" class="btn btn-link p-0 text-muted">
+                    <i data-lucide="x" style="width: 24px; height: 24px;"></i>
+                </button>
+            </div>
+            
+            <div class="mb-4" style="max-height: 60vh; overflow-y: auto;">
+                <!-- Field Group for Review -->
+                <div class="border rounded p-3 mb-4" style="background-color: var(--c-background);">
+                    <label class="form-label fw-bold mb-2">Number of Open Positions</label>
+                    <p class="text-muted small mb-3">Current Data: <span class="fw-semibold badge bg-secondary">12</span></p>
+                    
+                    <div class="d-flex flex-column gap-2">
+                        <!-- Response 1 -->
+                        <div class="form-check border rounded p-3" style="background-color: white;">
+                            <input class="form-check-input" type="checkbox" name="open-positions-1" id="open-positions-1">
+                            <label class="form-check-label w-100" for="open-positions-1">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <p class="fw-semibold mb-1">15</p>
+                                        <p class="text-muted small mb-0">Submitted by: hr@innovatech.com</p>
+                                    </div>
+                                </div>
+                            </label>
+                        </div>
+                        <!-- Response 2 -->
+                        <div class="form-check border rounded p-3" style="background-color: white;">
+                            <input class="form-check-input" type="checkbox" name="open-positions-2" id="open-positions-2">
+                            <label class="form-check-label w-100" for="open-positions-2">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <p class="fw-semibold mb-1">14</p>
+                                        <p class="text-muted small mb-0">Submitted by: ceo@innovatech.com</p>
+                                    </div>
+                                </div>
+                            </label>
+                        </div>
+                        <!-- Response 3 -->
+                        <div class="form-check border rounded p-3" style="background-color: white;">
+                            <input class="form-check-input" type="checkbox" name="open-positions-3" id="open-positions-3">
+                            <label class="form-check-label w-100" for="open-positions-3">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <p class="fw-semibold mb-1">15</p>
+                                        <p class="text-muted small mb-0">Submitted by: ops@innovatech.com</p>
+                                    </div>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Field Group for Review -->
+                <div class="border rounded p-3 mb-4" style="background-color: var(--c-background);">
+                    <label class="form-label fw-bold mb-2">Top Hiring Challenge</label>
+                    <p class="text-muted small mb-3">Current Data: <span class="fw-semibold badge bg-secondary">Not specified</span></p>
+                    
+                    <div class="d-flex flex-column gap-2">
+                        <!-- Response 1 -->
+                        <div class="form-check border rounded p-3" style="background-color: white;">
+                            <input class="form-check-input" type="checkbox" name="hiring-challenge-1" id="hiring-challenge-1">
+                            <label class="form-check-label w-100" for="hiring-challenge-1">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <p class="fw-semibold mb-1">Lack of qualified candidates</p>
+                                        <p class="text-muted small mb-0">Submitted by: hr@innovatech.com</p>
+                                    </div>
+                                </div>
+                            </label>
+                        </div>
+                        <!-- Response 2 -->
+                        <div class="form-check border rounded p-3" style="background-color: white;">
+                            <input class="form-check-input" type="checkbox" name="hiring-challenge-2" id="hiring-challenge-2">
+                            <label class="form-check-label w-100" for="hiring-challenge-2">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <p class="fw-semibold mb-1">Competition from other employers</p>
+                                        <p class="text-muted small mb-0">Submitted by: ceo@innovatech.com</p>
+                                    </div>
+                                </div>
+                            </label>
+                        </div>
+                        <!-- Response 3 -->
+                        <div class="form-check border rounded p-3" style="background-color: white;">
+                            <input class="form-check-input" type="checkbox" name="hiring-challenge-3" id="hiring-challenge-3">
+                            <label class="form-check-label w-100" for="hiring-challenge-3">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <p class="fw-semibold mb-1">Lack of qualified local talent</p>
+                                        <p class="text-muted small mb-0">Submitted by: ops@innovatech.com</p>
+                                    </div>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-end gap-3 border-top pt-3">
+                <button onclick="closeModal('reviewMultiUpdatesModal')" class="btn btn-secondary">Cancel</button>
+                <button onclick="closeModal('reviewMultiUpdatesModal')" class="btn btn-primary">Approve & Log Selections</button>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        lucide.createIcons();
+
+        const fieldsData = {
+            Business: ['Number of Employees', 'Annual Revenue', 'Primary Contact', 'Services Offered', 'NAICS Code', 'Site Plan (File Upload)'],
+            Project: ['Project Status', 'Estimated Cost', 'Completion Date', 'Project Manager', 'Architectural Drawings (File Upload)'],
+            Contact: ['Job Title', 'Phone Number', 'Email Address', 'Mailing Address']
+        };
+        
+        const recordData = {
+            Business: ['Innovatech Solutions', 'Acme Corp', 'BuildWell Construction'],
+            Project: ['Downtown Revitalization TIF', 'North Industrial Park Expansion', 'City Hall Renovation'],
+            Contact: ['John Doe', 'Jane Smith', 'Peter Jones']
+        }
+
+        function showTab(tabName, clickedButton) {
+            console.log('showTab called with:', tabName, clickedButton);
+            
+            // Hide all tab views
+            const hubView = document.getElementById('hub-view');
+            const contextualView = document.getElementById('contextual-view');
+            const externalView = document.getElementById('external-view');
+            
+            console.log('Found elements:', {
+                hubView: !!hubView,
+                contextualView: !!contextualView,
+                externalView: !!externalView
+            });
+            
+            if (hubView) hubView.classList.add('d-none');
+            if (contextualView) contextualView.classList.add('d-none');
+            if (externalView) externalView.classList.add('d-none');
+
+            // Show the selected tab view
+            const targetView = document.getElementById(`${tabName}-view`);
+            console.log('Target view:', `${tabName}-view`, !!targetView);
+            
+            if (targetView) {
+                targetView.classList.remove('d-none');
+            } else {
+                console.error('Target view not found:', `${tabName}-view`);
+            }
+
+            // Update active tab button
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.classList.remove('active');
+            });
+            
+            if (clickedButton) {
+                clickedButton.classList.add('active');
+            } else {
+                const targetButton = document.querySelector(`button[onclick*="showTab('${tabName}')"]`);
+                if (targetButton) {
+                    targetButton.classList.add('active');
+                }
+            }
+            
+            lucide.createIcons();
+        }
+
+        function openModal(modalId, isContextual = false) {
+             if (modalId === 'createRequestModal') {
+                if (isContextual) {
+                    // Pre-fill for contextual request
+                    const moduleSelect = document.getElementById('module-select');
+                    const recordSelect = document.getElementById('record-select');
+                    moduleSelect.value = 'Business';
+                    updateRecordAndFields(); // update records first
+                    recordSelect.value = 'Innovatech Solutions';
+                    updateRecordAndFields(); // then update fields
+                    goToStep(2);
+                } else {
+                    // Reset to step 1 for a new request
+                    goToStep(1);
+                }
+            }
+            document.getElementById(modalId).classList.add('active');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        function goToStep(stepNumber) {
+            // Hide all steps
+            document.getElementById('step-1').classList.add('d-none');
+            document.getElementById('step-2').classList.add('d-none');
+            document.getElementById('step-3').classList.add('d-none');
+
+            // Show the target step
+            document.getElementById(`step-${stepNumber}`).classList.remove('d-none');
+
+            // Update stepper indicators
+            for (let i = 1; i <= 3; i++) {
+                const indicator = document.getElementById(`step-indicator-${i}`);
+                const line = document.getElementById(`step-line-${i-1}`);
+                const label = document.getElementById(`step-label-${i}`);
+                
+                indicator.classList.remove('active', 'complete', 'inactive');
+                label.classList.remove('fw-semibold', 'text-muted');
+                label.style.color = '';
+
+                if(line) line.classList.remove('complete');
+                
+                if (i < stepNumber) {
+                    indicator.classList.add('complete');
+                    if(line) line.classList.add('complete');
+                    label.classList.add('text-muted');
+                } else if (i === stepNumber) {
+                    indicator.classList.add('active');
+                    label.classList.add('fw-semibold');
+                    label.style.color = 'rgb(var(--c-primary))';
+                } else {
+                    indicator.classList.add('inactive');
+                    label.classList.add('text-muted');
+                }
+            }
+        }
+        
+        function updateRecordAndFields() {
+            const module = document.getElementById('module-select').value;
+            const recordSelect = document.getElementById('record-select');
+            const fieldsContainer = document.getElementById('fields-container');
+            
+            // Update records
+            recordSelect.innerHTML = '';
+            recordData[module].forEach(record => {
+                const option = document.createElement('option');
+                option.value = record;
+                option.textContent = record;
+                recordSelect.appendChild(option);
+            });
+
+            // Update fields
+            fieldsContainer.innerHTML = '';
+            fieldsData[module].forEach(field => {
+                const div = document.createElement('div');
+                div.className = 'form-check mb-2';
+                const id = `field-${field.replace(/\s+/g, '-')}`;
+                div.innerHTML = `
+                    <input class="form-check-input" type="checkbox" id="${id}" name="fields">
+                    <label class="form-check-label" for="${id}">
+                        ${field}
+                    </label>
+                `;
+                fieldsContainer.appendChild(div);
+            });
+        }
+
+        function showSuccessMessage() {
+            document.getElementById('external-form-container').classList.add('d-none');
+            document.getElementById('success-message').classList.remove('d-none');
+        }
+
+        // Initial setup
+        document.addEventListener('DOMContentLoaded', () => {
+            showTab('hub');
+            updateRecordAndFields();
+            goToStep(1);
+        });
+
+    </script>
+    
+    <!-- Bootstrap JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
