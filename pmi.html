@@ -1268,19 +1268,13 @@
             console.log('showTab called with:', tabName, clickedButton);
             
             // Hide all tab views
-            const hubView = document.getElementById('hub-view');
-            const contextualView = document.getElementById('contextual-view');
-            const externalView = document.getElementById('external-view');
-            
-            console.log('Found elements:', {
-                hubView: !!hubView,
-                contextualView: !!contextualView,
-                externalView: !!externalView
+            const allViews = ['hub-view', 'contextual-view', 'external-view'];
+            allViews.forEach(viewId => {
+                const view = document.getElementById(viewId);
+                if (view) {
+                    view.classList.add('d-none');
+                }
             });
-            
-            if (hubView) hubView.classList.add('d-none');
-            if (contextualView) contextualView.classList.add('d-none');
-            if (externalView) externalView.classList.add('d-none');
 
             // Show the selected tab view
             const targetView = document.getElementById(`${tabName}-view`);
@@ -1288,6 +1282,7 @@
             
             if (targetView) {
                 targetView.classList.remove('d-none');
+                console.log('Successfully showed:', `${tabName}-view`);
             } else {
                 console.error('Target view not found:', `${tabName}-view`);
             }
@@ -1297,13 +1292,27 @@
                 button.classList.remove('active');
             });
             
-            if (clickedButton) {
-                clickedButton.classList.add('active');
+            // Find and activate the correct button
+            let targetButton = clickedButton;
+            if (!targetButton) {
+                // Try different selectors to find the button
+                targetButton = document.querySelector(`button[onclick*="showTab('${tabName}',"]`) || 
+                              document.querySelector(`button[onclick*="showTab('${tabName}')"]`);
+            }
+            
+            if (targetButton) {
+                targetButton.classList.add('active');
+                console.log('Activated button for:', tabName);
             } else {
-                const targetButton = document.querySelector(`button[onclick*="showTab('${tabName}')"]`);
-                if (targetButton) {
-                    targetButton.classList.add('active');
-                }
+                console.error('Could not find button for:', tabName);
+                // As a fallback, try to find by text content
+                const buttons = document.querySelectorAll('.tab-button');
+                buttons.forEach(btn => {
+                    if (btn.onclick && btn.onclick.toString().includes(`showTab('${tabName}'`)) {
+                        btn.classList.add('active');
+                        console.log('Found button by onclick function for:', tabName);
+                    }
+                });
             }
             
             lucide.createIcons();
@@ -1405,6 +1414,25 @@
 
         // Initial setup
         document.addEventListener('DOMContentLoaded', () => {
+            // Set up tab button event listeners
+            const tabButtons = document.querySelectorAll('.tab-button');
+            tabButtons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const onclick = this.getAttribute('onclick');
+                    if (onclick) {
+                        // Extract tab name from onclick attribute
+                        const match = onclick.match(/showTab\('([^']+)'/);
+                        if (match) {
+                            const tabName = match[1];
+                            console.log('Button clicked for tab:', tabName);
+                            showTab(tabName, this);
+                        }
+                    }
+                });
+            });
+            
+            // Show initial tab
             showTab('hub');
             updateRecordAndFields();
             goToStep(1);
