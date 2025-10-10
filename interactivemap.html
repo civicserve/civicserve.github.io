@@ -1,0 +1,1811 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Data Map - CivicServe</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+        crossorigin=""/>
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+        crossorigin=""></script>
+    <style>
+        :root {
+            --c-primary: 0, 55, 96; /* Blue color in RGB matching header #003760 */
+            --c-landing-primary: 0, 55, 96;
+            --c-landing-light20-primary-color: #1a4a7a;
+            --c-landing-light30-primary-color: #2d5d8d;
+            --c-landing-light35-primary-color: #3a6a9a;
+            --c-landing-light40-primary-color: #4777a7;
+            --c-landing-darken10-primary-color: #002040;
+            --c-landing-secondary: #ffa800;
+            --c-primary-contrast: #003760;
+            --c-font-primary: #333333;
+            --c-font-secondary: #6b7280;
+            --c-card-background: #ffffff;
+            --c-background: #f8f9fa;
+            --c-success: #9CB1C1;
+            --c-danger: #F44336;
+            --c-warning: #f0ad4e;
+            --dim-header-height: 60px;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7f8fa;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+        
+        /* Header styles */
+        .header-content-wrapper {
+            background-color: #003760;
+            color: white;
+            height: var(--dim-header-height);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1001;
+        }
+        
+        .header-wrapper {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 1rem;
+            height: 100%;
+        }
+        
+        .header-left-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .header-left-wrapper img {
+            height: 30px;
+        }
+        
+        .header-right svg, .header-left-wrapper svg {
+            width: 20px;
+            height: 20px;
+            color: white;
+            cursor: pointer;
+        }
+        
+        .header-right .btn-link {
+            color: white;
+        }
+        
+        .header-right .btn-link:hover, .side-nav-toggle-btn:hover {
+            opacity: 0.8;
+        }
+        
+        /* Side Navigation Styles */
+        .side-nav {
+            position: fixed;
+            top: var(--dim-header-height);
+            left: 0;
+            width: 240px;
+            height: calc(100vh - var(--dim-header-height));
+            background-color: white;
+            color: #333;
+            z-index: 1000;
+            overflow-y: auto;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .content-wrapper {
+            margin-left: 240px;
+            margin-top: var(--dim-header-height);
+            transition: margin-left 0.3s ease;
+            min-height: calc(100vh - var(--dim-header-height));
+            background-color: var(--c-background);
+        }
+        
+        .content-wrapper.no-nav {
+            margin-left: 0;
+        }
+        
+        /* Search styling */
+        .search-wrapper {
+            display: flex;
+            flex-grow: 1;
+            max-width: 600px;
+            margin: 0 20px;
+            height: 40px;
+            align-items: center;
+        }
+        
+        .search-input {
+            position: relative;
+            flex-grow: 1;
+            height: 100%;
+        }
+        
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6b7280;
+            z-index: 1;
+            width: 16px;
+            height: 16px;
+        }
+        
+        .search-input input {
+            width: 100%;
+            padding: 12px 16px 12px 35px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border: none;
+            border-radius: 6px 0 0 6px;
+            font-size: .875rem;
+            outline: none;
+            transition: background-color 0.2s ease;
+        }
+        
+        .search-input input:focus {
+            background-color: white;
+            box-shadow: 0 0 0 0.2rem rgba(var(--c-primary), 0.25);
+        }
+        
+        .search-input input::placeholder {
+            color: #6b7280;
+        }
+        
+        .select-dropdown {
+            height: 100%;
+            min-width: 80px;
+        }
+        
+        .select-dropdown select {
+            width: 100%;
+            padding: 12px 16px;
+            border: none;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 0 6px 6px 0;
+            font-size: .875rem;
+            outline: none;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23333333' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 16px;
+            padding-right: 40px;
+            color: #333333;
+        }
+        
+        .select-dropdown select:focus {
+            background-color: white;
+            box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.3);
+        }
+        
+        /* Prevent dropdown from expanding beyond header */
+        .search-wrapper {
+            position: relative;
+            z-index: 1002;
+        }
+        
+        .select-dropdown {
+            position: relative;
+        }
+        
+        .select-dropdown select option {
+            background-color: white;
+            color: #333;
+            padding: 8px 12px;
+        }
+        
+        /* User details styling */
+        .user-details-wrapper {
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 4px;
+            transition: background-color 0.2s ease;
+        }
+        
+        .user-details-wrapper:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .name-initial-container {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background-color: #9CB1C1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: .875rem;
+        }
+        
+        .user-details {
+            margin-left: 10px;
+        }
+        
+        .user-name {
+            font-weight: bold;
+            font-size: .875rem;
+            line-height: 1.2;
+        }
+        
+        .user-role {
+            font-size: .875rem;
+            opacity: 0.8;
+            line-height: 1.2;
+        }
+        
+        /* Side Navigation Styles */
+        .side-nav-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .side-nav-list li {
+            position: relative;
+        }
+        
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 15px;
+            color: #333;
+            text-decoration: none;
+            transition: background-color 0.2s ease;
+            cursor: pointer;
+            border-left: 4px solid transparent;
+            font-size: .875rem;
+            font-weight: 600;
+            line-height: 1.4;
+        }
+        
+        .menu-item:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+        
+        .menu-item.active {
+            background-color: #003760;
+            color: white;
+            border-left: 4px solid #003760;
+            font-weight: 600;
+        }
+        
+        .sub-menu .menu-item.active {
+            background-color: #003760;
+            color: white;
+            border-left: 4px solid #003760;
+            padding-left: 45px;
+            font-weight: 600;
+        }
+        
+        .sub-menu .menu-item {
+            padding-left: 45px;
+            padding-top: 8px;
+            padding-bottom: 8px;
+            font-size: .875rem;
+        }
+        
+        .menu-icon {
+            margin-right: 12px;
+            width: 16px;
+            height: 16px;
+            flex-shrink: 0;
+        }
+        
+        .menu-label {
+            flex-grow: 1;
+        }
+        
+        .action-icon {
+            transition: transform 0.2s ease;
+            width: 12px !important;
+            height: 12px !important;
+            margin-left: auto;
+        }
+        
+        .sub-menu {
+            list-style: none;
+            padding-left: 0;
+            margin: 0;
+            display: none;
+            background-color: rgba(0, 0, 0, 0.02);
+        }
+        
+        .sub-menu-show {
+            display: block;
+        }
+        
+        .side-nav-toggle-btn {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            padding: 8px;
+            margin-right: 5px;
+        }
+        
+        .side-nav-toggle-btn svg {
+            width: 24px;
+            height: 24px;
+        }
+        
+        .overlay-effect {
+            display: none;
+            position: fixed;
+            top: var(--dim-header-height);
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+        
+        /* Page header styling */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            margin: 15px 0;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .page-header-left {
+            display: flex;
+            align-self: center;
+            gap: 15px;
+            flex-grow: 1;
+            word-break: break-word;
+        }
+        
+        .heading-3 {
+            font-size: 1.5rem;
+            margin-bottom: 0;
+            font-weight: normal;
+            color: var(--c-font-primary);
+            display: flex;
+            gap: 10px;
+        }
+        
+        /* Form controls - excluding search elements */
+        .form-control:not(.search-input input), .form-select:not(.select-dropdown select) {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 0.875rem;
+            color: var(--c-font-primary);
+            transition: all 0.15s ease-in-out;
+        }
+        
+        .form-control:not(.search-input input):focus, .form-select:not(.select-dropdown select):focus {
+            border-color: rgb(var(--c-primary));
+            box-shadow: 0 0 0 2px rgba(var(--c-primary), 0.2);
+        }
+        
+        /* Bootstrap-like utility classes */
+        .container-fluid {
+            width: 100%;
+            padding-right: 15px;
+            padding-left: 15px;
+            margin-right: auto;
+            margin-left: auto;
+        }
+        
+        .row {
+            display: flex;
+            flex-wrap: wrap;
+            margin-right: -15px;
+            margin-left: -15px;
+        }
+        
+        .col-12 {
+            flex: 0 0 100%;
+            max-width: 100%;
+            position: relative;
+            width: 100%;
+            padding-right: 15px;
+            padding-left: 15px;
+        }
+        
+        .d-flex {
+            display: flex !important;
+        }
+        
+        .align-items-center {
+            align-items: center !important;
+        }
+        
+        .align-self-center {
+            align-self: center !important;
+        }
+        
+        .btn {
+            display: inline-block;
+            font-weight: 400;
+            color: #212529;
+            text-align: center;
+            vertical-align: middle;
+            cursor: pointer;
+            background-color: transparent;
+            border: 1px solid transparent;
+            padding: 0.375rem 0.75rem;
+            font-size: .875rem;
+            line-height: 1.5;
+            border-radius: 0.25rem;
+            transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+        }
+        
+        .btn-link {
+            font-weight: 400;
+            color: #0d6efd;
+            text-decoration: underline;
+        }
+        
+        .btn-link:hover {
+            color: #0a58ca;
+        }
+        
+        .px-0 {
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+        }
+        
+        /* CivicServe Blue Button Styling */
+        .btn-civicserve {
+            background-color: #003760 !important;
+        }
+        
+        .btn-civicserve:hover {
+            background-color: #1a4a7a !important;
+        }
+        
+        .btn-civicserve:focus {
+            box-shadow: 0 0 0 2px rgba(0, 55, 96, 0.3) !important;
+        }
+        
+        .bg-civicserve {
+            background-color: #003760 !important;
+        }
+        
+        .bg-civicserve:hover {
+            background-color: #1a4a7a !important;
+        }
+        #map {
+            height: calc(100vh - 450px); /* Adjust height to accommodate tabs and filters */
+            width: 100%;
+            max-width: 5xl;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        /* Custom styles for Leaflet popups to make cards look better */
+        .leaflet-popup-content-wrapper {
+            border-radius: 0.5rem;
+            padding: 0;
+            background-color: #f9fafb;
+        }
+        .leaflet-popup-content {
+            margin: 0;
+            padding: 0;
+            max-width: 300px;
+        }
+        .info-card {
+            border-bottom: 1px solid #e5e7eb;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        .info-card:last-child {
+            border-bottom: none;
+        }
+        .info-card-header {
+            font-weight: 600;
+            color: #1f2937;
+            font-size: 1.125rem;
+        }
+        .info-card-item {
+            font-size: 0.875rem;
+            color: #4b5563;
+        }
+        .leaflet-control-container .leaflet-control-zoom {
+            border-radius: 0.5rem;
+        }
+        .leaflet-container a.leaflet-popup-close-button {
+            top: 0.5rem;
+            right: 0.5rem;
+            color: #4b5563;
+        }
+        /* Updated filter checkbox styling */
+        .filter-checkbox:checked + label span:first-of-type {
+            background-color: #003760;
+            border-color: #003760; 
+        }
+        .filter-checkbox:checked + label span svg {
+            display: block;
+            color: #ffffff; /* white checkmark */
+        }
+        /* Link styling within cards */
+        .info-card-link {
+            display: block;
+            text-decoration: none;
+            color: inherit;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out;
+        }
+        .info-card-link:hover {
+            background-color: #f3f4f6;
+        }
+        .info-card-link .info-card-header {
+            color: #003760;
+        }
+        .tab-button {
+            padding: 0.75rem 1.25rem;
+            border-bottom: 2px solid transparent;
+            font-weight: 500;
+            color: #6b7280;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            white-space: nowrap;
+        }
+        .tab-button.active {
+            border-bottom-color: #003760;
+            color: #003760;
+            font-weight: 600;
+        }
+        .tab-button:hover:not(.active) {
+            color: #1f2937;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .filter-section {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 1rem;
+            align-items: center;
+        }
+        .filter-label {
+            font-weight: 500;
+            color: #374151;
+            margin-right: 0.5rem;
+        }
+        .filter-select, .filter-input {
+            border: 1px solid #d1d5db;
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.375rem;
+            background-color: #fff;
+            font-size: 0.875rem;
+            color: #374151;
+            transition: all 0.15s ease-in-out;
+        }
+        .filter-select:focus, .filter-input:focus {
+            outline: none;
+            border-color: rgb(var(--c-primary));
+            box-shadow: 0 0 0 2px rgba(var(--c-primary), 0.2);
+        }
+        .dropdown {
+            position: relative;
+        }
+        /* Adjusted z-index to ensure dropdown menu appears above the map */
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            z-index: 1000;
+            background-color: #fff;
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            padding: 0.5rem;
+            min-width: 150px;
+        }
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem;
+            cursor: pointer;
+        }
+        .dropdown-item:hover {
+            background-color: #f3f4f6;
+        }
+        .dropdown-search {
+            width: 100%;
+            border: 1px solid #d1d5db;
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.375rem;
+            background-color: #fff;
+            font-size: 0.875rem;
+            color: #374151;
+            margin-bottom: 0.5rem;
+        }
+        .export-btn {
+            margin-left: auto; /* Pushes the button to the right */
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div id="root">
+        <div class="container-fluid p-0 dx-viewport" data-theme="light">
+            <div class="header-content-wrapper">
+                <div>
+                    <div class="header-wrapper">
+                        <div class="align-self-center header-left-wrapper">
+                            <button class="btn side-nav-toggle-btn px-0">
+                                <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="bars" class="svg-inline--fa fa-bars " role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+                                    <path fill="currentColor" d="M0 96C0 78.3 14.3 64 32 64H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32C14.3 128 0 113.7 0 96zM0 256c0-17.7 14.3-32 32-32H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32-14.3-32-32zM448 416c0 17.7-14.3 32-32 32H32c-17.7 0-32-14.3-32-32s14.3-32 32-32H416c17.7 0 32 14.3 32 32z"></path>
+                                </svg>
+                            </button>
+                            <a href="#"><img src="https://dmitri.github.io/projects/civicserve/cs-dashboard/src/cs-logo-white.png"></a>
+                        </div>
+                        <form class="search-wrapper">
+                            <div class="search-input">
+                                <div class="search-icon">
+                                    <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="magnifying-glass" class="svg-inline--fa fa-magnifying-glass " role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                                        <path fill="currentColor" d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z"></path>
+                                    </svg>
+                                </div>
+                                <input type="text" class="form-control" placeholder="Search Businesses, Properties, or Data">
+                            </div>
+                            <div class="select-dropdown">
+                                <select class="form-select">
+                                    <option>All</option>
+                                    <option>Businesses</option>
+                                    <option>Properties</option>
+                                    <option>Data</option>
+                                </select>
+                            </div>
+                        </form>
+                        <div class="header-right align-self-center">
+                            <div class="header-support-wrapper">
+                                <button class="btn btn-link">
+                                    <svg aria-hidden="true" focusable="false" data-prefix="far" data-icon="circle-question" class="svg-inline--fa fa-circle-question " role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                                        <path fill="currentColor" d="M464 256A208 208 0 1 0 48 256a208 208 0 1 0 416 0zM0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256zm169.8-90.7c7.9-22.3 29.1-37.3 52.8-37.3h58.3c34.9 0 63.1 28.3 63.1 63.1c0 22.6-12.1 43.5-31.7 54.8L280 264.4c-.2 13-10.9 23.6-24 23.6c-13.3 0-24-10.7-24-24V250.5c0-8.6 4.6-16.5 12.1-20.8l44.3-25.4c4.7-2.7 7.6-7.7 7.6-13.1c0-8.4-6.8-15.1-15.1-15.1H222.6c-3.4 0-6.4 2.1-7.5 5.3l-.4 1.2c-4.4 12.5-18.2 19-30.6 14.6s-19-18.2-14.6-30.6l.4-1.2zM224 352a32 32 0 1 1 64 0 32 32 0 1 1 -64 0z"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                            <div class="d-flex">
+                                <svg aria-hidden="true" focusable="false" data-prefix="far" data-icon="list-check" class="svg-inline--fa fa-list-check " role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                                    <path fill="currentColor" d="M153.8 72.1c8.9-9.9 8.1-25-1.8-33.9s-25-8.1-33.9 1.8L63.1 101.1 41 79C31.6 69.7 16.4 69.7 7 79s-9.4 24.6 0 33.9l40 40c4.7 4.7 11 7.2 17.6 7s12.8-3 17.2-7.9l72-80zm0 160c8.9-9.9 8.1-25-1.8-33.9s-25-8.1-33.9 1.8L63.1 261.1 41 239c-9.4-9.4-24.6-9.4-33.9 0s-9.4 24.6 0 33.9l40 40c4.7 4.7 11 7.2 17.6 7s12.8-3 17.2-7.9l72-80zM216 120H488c13.3 0 24-10.7 24-24s-10.7-24-24-24H216c-13.3 0-24 10.7-24 24s10.7 24 24 24zM192 256c0 13.3 10.7 24 24 24H488c13.3 0 24-10.7 24-24s-10.7-24-24-24H216c-13.3 0-24 10.7-24 24zM160 416c0 13.3 10.7 24 24 24H488c13.3 0 24-10.7 24-24s-10.7-24-24-24H184c-13.3 0-24 10.7-24 24zm-64 0a32 32 0 1 0 -64 0 32 32 0 1 0 64 0z"></path>
+                                </svg>
+                            </div>
+                            <div class="user-details-wrapper">
+                                <div class="user-details-container d-flex align-items-center">
+                                    <div class="name-initial-container">
+                                        <div id="name">ED</div>
+                                    </div>
+                                    <div class="user-details">
+                                        <div class="user-name">Econ Dev</div>
+                                        <div class="user-role">Admin</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="content-wrapper">
+                <div class="overlay-effect"></div>
+                <!-- Side Navigation -->
+                <nav class="side-nav">
+                    <ul class="side-nav-list">
+                      <li>
+                        <a class="menu-item">
+                          <svg aria-hidden="true" focusable="false" data-prefix="fal" data-icon="chart-bar" class="svg-inline--fa fa-chart-bar menu-icon" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                            <path fill="currentColor" d="M24 32c13.3 0 24 10.7 24 24V456c0 13.3 10.7 24 24 24H488c13.3 0 24 10.7 24 24s-10.7 24-24 24H72c-39.8 0-72-32.2-72-72V56C0 42.7 10.7 32 24 32zM128 136c0-13.3 10.7-24 24-24s24 10.7 24 24V424c0 13.3-10.7 24-24 24s-24-10.7-24-24V136zm96-88c0-13.3 10.7-24 24-24s24 10.7 24 24V424c0 13.3-10.7 24-24 24s-24-10.7-24-24V48zM320 200c0-13.3 10.7-24 24-24s24 10.7 24 24V424c0 13.3-10.7 24-24 24s-24-10.7-24-24V200zm96-88c0-13.3 10.7-24 24-24s24 10.7 24 24V424c0 13.3-10.7 24-24 24s-24-10.7-24-24V112z"></path>
+                          </svg>
+                          <div class="menu-label">Data</div>
+                          <svg aria-hidden="true" focusable="false" data-prefix="far" data-icon="chevron-down" class="svg-inline--fa fa-chevron-down action-icon" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                            <path fill="currentColor" d="M239 401c9.4 9.4 24.6 9.4 33.9 0L465 209c9.4-9.4 9.4-24.6 0-33.9s-24.6-9.4-33.9 0l-175 175L81 175c-9.4-9.4-24.6-9.4-33.9 0s-9.4 24.6 0 33.9L239 401z"></path>
+                          </svg>
+                        </a>
+                        <ul class="sub-menu sub-menu-show">
+                          <li>
+                            <a class="menu-item active">
+                              <div class="menu-label">Interactive Map</div>
+                            </a>
+                          </li>
+                          <li>
+                            <a class="menu-item">
+                              <div class="menu-label">Reports</div>
+                              <svg aria-hidden="true" focusable="false" data-prefix="far" data-icon="chevron-down" class="svg-inline--fa fa-chevron-down action-icon" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                                <path fill="currentColor" d="M239 401c9.4 9.4 24.6 9.4 33.9 0L465 209c9.4-9.4 9.4-24.6 0-33.9s-24.6-9.4-33.9 0l-175 175L81 175c-9.4-9.4-24.6-9.4-33.9 0s-9.4 24.6 0 33.9L239 401z"></path>
+                              </svg>
+                            </a>
+                          </li>
+                          <li>
+                            <a class="menu-item">
+                              <div class="menu-label">Analytics</div>
+                              <svg aria-hidden="true" focusable="false" data-prefix="far" data-icon="chevron-down" class="svg-inline--fa fa-chevron-down action-icon" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                                <path fill="currentColor" d="M239 401c9.4 9.4 24.6 9.4 33.9 0L465 209c9.4-9.4 9.4-24.6 0-33.9s-24.6-9.4-33.9 0l-175 175L81 175c-9.4-9.4-24.6-9.4-33.9 0s-9.4 24.6 0 33.9L239 401z"></path>
+                              </svg>
+                            </a>
+                          </li>
+                        </ul>
+                      </li>
+                    </ul>
+                  </nav>
+                
+                <!-- Main Content -->
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-12">
+                            <!-- Page Header -->
+                            <div class="page-header">
+                                <div class="page-header-left">
+                                    <h3 class="heading-3">Interactive Data Map</h3>
+                                </div>
+                                <div>
+                                    <button id="export-report-btn" class="btn bg-civicserve text-white font-semibold py-2 px-4 rounded-lg transition duration-200">Export Report</button>
+                                </div>
+                            </div>
+                            
+                            <!-- Main Container -->
+                            <div id="main-content" class="space-y-8">
+                                <div class="bg-white rounded-lg shadow-md p-6 mb-4">
+
+            <!-- Tab Buttons -->
+            <div class="flex border-b border-gray-200 mb-4 overflow-x-auto">
+                <button class="tab-button active" data-tab="overview">Overview Map</button>
+                <button class="tab-button" data-tab="businesses">Businesses Map</button>
+                <button class="tab-button" data-tab="properties">Properties Map</button>
+            </div>
+
+            <!-- Tab Content & Filters -->
+            <div id="tab-content-overview" class="tab-content active">
+                <!-- Search Bar for Overview -->
+                <div class="mb-4">
+                    <input type="text" id="overviewSearch" class="w-full filter-input" placeholder="Search businesses, properties..." autocomplete="off">
+                </div>
+
+                <div class="filter-section">
+                    <span class="font-medium text-gray-700">Filters:</span>
+                    <div class="flex items-center">
+                        <input type="checkbox" id="filterBusinessesOverview" class="hidden filter-checkbox" checked>
+                        <label for="filterBusinessesOverview" class="flex items-center cursor-pointer">
+                            <span class="w-5 h-5 inline-block mr-2 rounded-md border border-gray-300 transition duration-200 ease-in-out flex items-center justify-center">
+                                <svg class="w-3 h-3 text-white hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                            </span>
+                            <span class="text-gray-700">Businesses</span>
+                        </label>
+                    </div>
+                    <div class="flex items-center">
+                        <input type="checkbox" id="filterPropertiesOverview" class="hidden filter-checkbox" checked>
+                        <label for="filterPropertiesOverview" class="flex items-center cursor-pointer">
+                            <span class="w-5 h-5 inline-block mr-2 rounded-md border border-gray-300 transition duration-200 ease-in-out flex items-center justify-center">
+                                <svg class="w-3 h-3 text-white hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                            </span>
+                            <span class="text-gray-700">Available Properties</span>
+                        </label>
+                    </div>
+                    <div class="flex items-center ml-4">
+                        <input type="checkbox" id="filterBoundariesOverview" class="hidden filter-checkbox">
+                        <label for="filterBoundariesOverview" class="flex items-center cursor-pointer">
+                            <span class="w-5 h-5 inline-block mr-2 rounded-md border border-gray-300 transition duration-200 ease-in-out flex items-center justify-center">
+                                <svg class="w-3 h-3 text-white hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                            </span>
+                            <span class="text-gray-700">Boundary Overlay</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab-content-businesses" class="tab-content">
+                <!-- Search Bar for Businesses -->
+                <div class="mb-4 flex items-center gap-2">
+                    <input type="text" id="businessesSearch" class="w-full filter-input" placeholder="Search businesses...">
+                    <button id="bizSearchBtn" class="bg-civicserve text-white font-semibold py-2 px-4 rounded-lg transition duration-200 whitespace-nowrap">Search</button>
+                </div>
+                
+                <div class="filter-section">
+                    <!-- Boundary Dropdown -->
+                    <div class="flex-1 flex flex-col items-start w-40">
+                        <label for="bizBoundary" class="filter-label">Boundary:</label>
+                        <select id="bizBoundary" class="filter-select w-full">
+                            <option value="all">All</option>
+                            <option value="downtown_district">Downtown District</option>
+                            <option value="opportunity_zone">Opportunity Zone</option>
+                            <option value="tiff_district">TIFF District</option>
+                        </select>
+                    </div>
+
+                    <!-- Tags Dropdown with Checkboxes -->
+                    <div class="flex-1 flex flex-col items-start w-40">
+                        <label for="bizTags" class="filter-label">Tags:</label>
+                        <details class="relative w-full">
+                            <summary class="filter-select cursor-pointer w-full">Select Tags</summary>
+                            <div class="dropdown-menu">
+                                <div class="dropdown-item">
+                                    <input type="checkbox" id="tagRealEstate" value="Real Estate" class="tag-checkbox">
+                                    <label for="tagRealEstate" class="text-gray-700 cursor-pointer">Real Estate</label>
+                                </div>
+                                <div class="dropdown-item">
+                                    <input type="checkbox" id="tagManufacturing" value="Manufacturing" class="tag-checkbox">
+                                    <label for="tagManufacturing" class="text-gray-700 cursor-pointer">Manufacturing</label>
+                                </div>
+                                <div class="dropdown-item">
+                                    <input type="checkbox" id="tagGrant" value="Interested Party: Grant" class="tag-checkbox">
+                                    <label for="tagGrant" class="text-gray-700 cursor-pointer">Interested Party: Grant</label>
+                                </div>
+                            </div>
+                        </details>
+                    </div>
+
+                    <!-- New Program Dropdown Filter -->
+                    <div class="flex-1 flex flex-col items-start w-40">
+                        <label for="bizProgram" class="filter-label">Program:</label>
+                        <select id="bizProgram" class="filter-select w-full">
+                            <option value="all">All</option>
+                            <option value="TIFF">TIFF</option>
+                            <option value="Grant">Grant</option>
+                            <option value="Loan">Loan</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="filter-section">
+                    <!-- Expanded Employee Filter -->
+                    <div class="flex items-center space-x-2">
+                        <label for="bizEmployeesMin" class="filter-label">Employees:</label>
+                        <input type="number" id="bizEmployeesMin" class="filter-input w-20" placeholder="Min" min="0">
+                        <span class="text-gray-500">-</span>
+                        <input type="number" id="bizEmployeesMax" class="filter-input w-20" placeholder="Max" min="0">
+                    </div>
+
+                    <!-- Expanded Revenue Filter -->
+                    <div class="flex items-center space-x-2">
+                        <label for="bizRevenueMin" class="filter-label">Revenue ($M):</label>
+                        <input type="number" id="bizRevenueMin" class="filter-input w-20" placeholder="Min" min="0">
+                        <span class="text-gray-500">-</span>
+                        <input type="number" id="bizRevenueMax" class="filter-input w-20" placeholder="Max" min="0">
+                    </div>
+                    <!-- New NAICS Search Dropdown -->
+                    <div class="flex items-center relative">
+                        <label for="bizNaics" class="filter-label">Industry (NAICS):</label>
+                        <details class="relative">
+                            <summary id="naicsSummary" class="filter-select cursor-pointer w-48 truncate">Select NAICS codes</summary>
+                            <div class="dropdown-menu" id="naicsDropdown">
+                                <input type="text" id="naicsSearchInput" class="dropdown-search" placeholder="Search NAICS codes...">
+                                <div id="naicsCheckboxes" class="max-h-48 overflow-y-auto">
+                                    <!-- NAICS checkboxes will be populated here -->
+                                </div>
+                            </div>
+                        </details>
+                    </div>
+                </div>
+                <div class="filter-section">
+                    <select id="contactStatus" class="filter-select">
+                        <option value="has">Has</option>
+                        <option value="has_not">Doesn't Have</option>
+                    </select>
+                    <details class="relative">
+                        <summary id="activitiesSummary" class="filter-select cursor-pointer w-48">Select Activities</summary>
+                        <div class="dropdown-menu">
+                            <div class="dropdown-item">
+                                <input type="checkbox" id="activityEmail" value="email" class="activity-checkbox">
+                                <label for="activityEmail" class="text-gray-700 cursor-pointer">Email</label>
+                            </div>
+                            <div class="dropdown-item">
+                                <input type="checkbox" id="activityCall" value="call" class="activity-checkbox">
+                                <label for="activityCall" class="text-gray-700 cursor-pointer">Call</label>
+                            </div>
+                            <div class="dropdown-item">
+                                <input type="checkbox" id="activitySiteVisit" value="siteVisit" class="activity-checkbox">
+                                <label for="activitySiteVisit" class="text-gray-700 cursor-pointer">Site Visit</label>
+                            </div>
+                             <div class="dropdown-item">
+                                <input type="checkbox" id="activityMeeting" value="meeting" class="activity-checkbox">
+                                <label for="activityMeeting" class="text-gray-700 cursor-pointer">Meeting</label>
+                            </div>
+                        </div>
+                    </details>
+                    <span class="text-gray-700">during</span>
+                    <input type="date" id="lastContactStart" class="filter-input w-36">
+                    <span class="text-gray-500">-</span>
+                    <input type="date" id="lastContactEnd" class="filter-input w-36">
+                </div>
+            </div>
+
+            <div id="tab-content-properties" class="tab-content">
+                <!-- Search Bar for Properties -->
+                <div class="mb-4">
+                    <input type="text" id="propertiesSearch" class="w-full filter-input" placeholder="Search properties...">
+                </div>
+
+                <div class="filter-section">
+                    <!-- Property Type Dropdown -->
+                    <div class="flex-1 flex flex-col items-start w-40">
+                        <label for="propType" class="filter-label">Property Type:</label>
+                        <select id="propType" class="filter-select w-full">
+                            <option value="all">All</option>
+                        </select>
+                    </div>
+                    <!-- Status Dropdown -->
+                    <div class="flex-1 flex flex-col items-start w-40">
+                        <label for="propStatus" class="filter-label">Status:</label>
+                        <select id="propStatus" class="filter-select w-full">
+                            <option value="all">All</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="filter-section">
+                    <!-- New min/max filters for Parcel and Building size -->
+                    <div class="flex items-center space-x-2">
+                        <label for="parcelSqftMin" class="filter-label">Parcel Sqft:</label>
+                        <input type="number" id="parcelSqftMin" class="filter-input w-20" placeholder="Min" min="0">
+                        <span class="text-gray-500">-</span>
+                        <input type="number" id="parcelSqftMax" class="filter-input w-20" placeholder="Max" min="0">
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <label for="buildingSqftMin" class="filter-label">Building Sqft:</label>
+                        <input type="number" id="buildingSqftMin" class="filter-input w-20" placeholder="Min" min="0">
+                        <span class="text-gray-500">-</span>
+                        <input type="number" id="buildingSqftMax" class="filter-input w-20" placeholder="Max" min="0">
+                    </div>
+                </div>
+            </div>
+                                </div>
+                                <div id="map" class="w-full shadow-md" style="height: calc(100vh - 300px);"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="report-view" class="w-full hidden" style="margin-left: 240px; margin-top: 60px; padding: 15px;">
+        <!-- Report content will be generated here -->
+    </div>
+
+
+    <script>
+        // --- Dummy Data (expanded to support new filters) ---
+        const mapData = [
+            {
+                lat: 35.0710, lng: -80.8250, id: 'loc-main-st',
+                businesses: [
+                    { name: 'Global Tech Solutions', type: 'IT Consulting', employees: 150, address: '123 Main St', bizId: 'B001', revenue: 50000000, boundary: 'downtown_district', tags: ['Interested Party: Grant'], naics: '541511', program: 'Grant', activities: { email: '2025-09-15', call: '2025-09-01', siteVisit: '2025-08-20', meeting: null } },
+                    { name: 'Innovate Marketing', type: 'Advertising Agency', employees: 30, address: '123 Main St', bizId: 'B002', revenue: 10000000, boundary: 'opportunity_zone', tags: ['Real Estate'], naics: '541810', program: 'Loan', activities: { email: '2025-09-10', call: null, siteVisit: null, meeting: '2025-07-15' } }
+                ],
+                properties: [
+                    { type: 'Office Space', status: 'For Lease', area: 2000, price: 25, description: 'Modern office with city views', propId: 'PR001', parcel: { address: '123 Main St', landSize: '0.8 acres', buildingSize: '2,000 sqft', buildingUse: 'Office', numericLandSize: 34848, numericBuildingSize: 2000 } }
+                ]
+            },
+            {
+                lat: 35.0720, lng: -80.8270, id: 'loc-oak-ave',
+                businesses: [
+                    { name: 'The Cozy Book Nook', type: 'Cafe & Bookstore', employees: 8, address: '456 Oak Ave', bizId: 'B003', revenue: 500000, boundary: 'downtown_district', tags: ['Real Estate'], naics: '722515', program: 'TIFF', activities: { email: '2025-06-05', call: '2025-05-10', siteVisit: null, meeting: '2025-06-01' } }
+                ]
+            },
+            {
+                lat: 35.0700, lng: -80.8230, id: 'loc-industrial',
+                properties: [
+                    { type: 'Warehouse', status: 'For Sale', area: 15000, price: 1500000, description: 'Large industrial facility with easy highway access', propId: 'PR002', parcel: { address: '10 Industrial Way', landSize: '2.0 acres', buildingSize: '15,000 sqft', buildingUse: 'Warehouse', numericLandSize: 87120, numericBuildingSize: 15000 } }
+                ]
+            },
+            {
+                lat: 35.0750, lng: -80.8300, id: 'loc-gym',
+                businesses: [
+                    { name: 'Peak Fitness Center', type: 'Gym', employees: 15, address: '789 Pine Ln', bizId: 'B004', revenue: 1200000, boundary: 'tiff_district', tags: ['Manufacturing'], naics: '713940', program: 'None', activities: { email: '2024-01-10', call: '2023-12-01', siteVisit: null, meeting: null } }
+                ]
+            },
+            {
+                lat: 35.0695, lng: -80.8240, id: 'loc-new-prop',
+                properties: [
+                    { type: 'Land', status: 'For Sale', area: 217800, description: 'Prime development land (5 acres)', propId: 'PR003', parcel: { address: '220 Development Rd', landSize: '5 acres', buildingSize: '0 sqft', buildingUse: 'Development Land', numericLandSize: 217800, numericBuildingSize: 0 } }
+                ]
+            },
+            {
+                lat: 35.0705, lng: -80.8265, id: 'loc-consulting',
+                businesses: [
+                    { name: 'Strategic Consulting Group', type: 'Consulting', employees: 5, address: '101 Elm St', bizId: 'B005', revenue: 800000, boundary: 'opportunity_zone', tags: ['Interested Party: Grant'], naics: '541611', program: 'Grant', activities: { email: '2025-09-20', call: '2025-09-18', siteVisit: '2025-09-02', meeting: '2025-09-02' } }
+                ]
+            },
+            {
+                lat: 35.0680, lng: -80.8290, id: 'loc-retail-space',
+                properties: [
+                    { type: 'Retail', status: 'For Lease', area: 1200, price: 20, description: 'High visibility retail space', propId: 'PR004', parcel: { address: '305 Central Ave', landSize: '0.5 acres', buildingSize: '1,200 sqft', buildingUse: 'Retail Storefront', numericLandSize: 21780, numericBuildingSize: 1200 } }
+                ]
+            },
+            {
+                lat: 35.0740, lng: -80.8295, id: 'loc-manufacturing',
+                businesses: [
+                    { name: 'Precision Parts Co.', type: 'Manufacturing', employees: 250, address: '3000 Commerce Rd', bizId: 'B006', revenue: 75000000, boundary: 'tiff_district', tags: ['Manufacturing', 'Interested Party: Grant'], naics: '311314', program: 'TIFF', activities: { email: null, call: null, siteVisit: '2025-08-28', meeting: null } }
+                ]
+            },
+            {
+                lat: 35.0715, lng: -80.8245, id: 'loc-real-estate-event',
+                businesses: [
+                    { name: 'Capital Investments Group', type: 'Real Estate', employees: 40, address: '750 Main St', bizId: 'B007', revenue: 20000000, boundary: 'downtown_district', tags: ['Real Estate'], naics: '541611', program: 'None', activities: { email: '2025-07-01', call: '2025-07-01', siteVisit: null, meeting: '2025-07-01' } }
+                ]
+            },
+            {
+                lat: 35.0685, lng: -80.8275, id: 'loc-small-biz',
+                businesses: [
+                    { name: 'Local Coffee Roasters', type: 'Coffee Shop', employees: 10, address: '150 Elm St', bizId: 'B008', revenue: 1500000, boundary: 'opportunity_zone', tags: ['Real Estate'], naics: '722515', program: 'Loan', activities: { email: '2025-09-22', call: null, siteVisit: '2025-09-01', meeting: null } }
+                ]
+            },
+            {
+                lat: 35.0718, lng: -80.8268, id: 'loc-downtown-office',
+                properties: [
+                    { type: 'Office Space', status: 'For Lease', area: 5500, description: 'Premium downtown office space', propId: 'PR005', parcel: { address: '888 City Center Blvd', landSize: '1.2 acres', buildingSize: '5,500 sqft', buildingUse: 'Office Building', numericLandSize: 52272, numericBuildingSize: 5500 } }
+                ]
+            },
+            {
+                lat: 35.0725, lng: -80.8285, id: 'loc-development-land',
+                properties: [
+                    { type: 'Land', status: 'For Sale', area: 43560, description: '1 acre parcel near transit', propId: 'PR006', parcel: { address: '900 Rail Ave', landSize: '1 acre', buildingSize: '0 sqft', buildingUse: 'Development Land', numericLandSize: 43560, numericBuildingSize: 0 } }
+                ]
+            }
+        ];
+        
+        // Mock NAICS data for the new dropdown
+        const naicsCodes = [
+            { code: '541511', description: 'Custom Computer Programming Services' },
+            { code: '541611', description: 'Administrative Management and General Management Consulting Services' },
+            { code: '541810', description: 'Advertising Agencies' },
+            { code: '713940', description: 'Fitness and Recreational Sports Centers' },
+            { code: '722515', description: 'Restaurants' },
+            { code: '111110', description: 'Soybean Farming' },
+            { code: '236118', description: 'Residential Remodelers' },
+            { code: '311314', description: 'Chocolate and Confectionery Manufacturing from Cacao Beans' },
+            { code: '454110', description: 'Electronic Shopping and Mail-Order Houses' }
+        ];
+
+        // New boundary polygon data for the Business Map filters
+        const boundaryPolygonsData = {
+            downtown_district: {
+                "type": "Feature",
+                "geometry": { "type": "Polygon", "coordinates": [[[-80.828, 35.073], [-80.823, 35.073], [-80.823, 35.070], [-80.828, 35.070], [-80.828, 35.073]]] },
+                "properties": { "name": "Downtown District", "color": "#06b6d4" }
+            },
+            opportunity_zone: {
+                "type": "Feature",
+                "geometry": { "type": "Polygon", "coordinates": [[[-80.827, 35.072], [-80.822, 35.072], [-80.822, 35.068], [-80.827, 35.068], [-80.827, 35.072]]] },
+                "properties": { "name": "Opportunity Zone", "color": "#f97316" }
+            },
+            tiff_district: {
+                "type": "Feature",
+                "geometry": { "type": "Polygon", "coordinates": [[[-80.831, 35.076], [-80.828, 35.076], [-80.828, 35.074], [-80.831, 35.074], [-80.831, 35.076]]] },
+                "properties": { "name": "TIFF District", "color": "#a855f7" }
+            }
+        };
+        
+        // Dummy GIS Parcel Polygon Data (GeoJSON-like structure)
+        const parcelGeometries = [
+            {
+                "type": "Feature",
+                "geometry": { "type": "Polygon", "coordinates": [[[-80.8242, 35.0694], [-80.8238, 35.0694], [-80.8238, 35.0696], [-80.8242, 35.0696], [-80.8242, 35.0694]]] },
+                "properties": { "propId": 'PR003', "address": '220 Development Rd', "landSize": '5 acres', "buildingSize": '0 sqft', "buildingUse": 'Development Land', "assessmentValue": 1200000 }
+            },
+            {
+                "type": "Feature",
+                "geometry": { "type": "Polygon", "coordinates": [[[-80.8292, 35.0681], [-80.8288, 35.0681], [-80.8288, 35.0684], [-80.8292, 35.0684], [-80.8292, 35.0681]]] },
+                "properties": { "propId": 'PR004', "address": '305 Central Ave', "landSize": '0.5 acres', "buildingSize": '1,200 sqft', "buildingUse": 'Retail', "assessmentValue": 450000 }
+            },
+            {
+                "type": "Feature",
+                "geometry": { "type": "Polygon", "coordinates": [[[-80.827, 35.0717], [-80.8266, 35.0717], [-80.8266, 35.072], [-80.827, 35.072], [-80.827, 35.0717]]] },
+                "properties": { "propId": 'PR005', "address": '888 City Center Blvd', "landSize": '1.2 acres', "buildingSize": '5,500 sqft', "buildingUse": 'Office', "assessmentValue": 2300000 }
+            },
+            {
+                "type": "Feature",
+                "geometry": { "type": "Polygon", "coordinates": [[[-80.8288, 35.0724], [-80.8282, 35.0724], [-80.8282, 35.0727], [-80.8288, 35.0727], [-80.8288, 35.0724]]] },
+                "properties": { "propId": 'PR006', "address": '900 Rail Ave', "landSize": '1 acre', "buildingSize": '0 sqft', "buildingUse": 'Development Land', "assessmentValue": 750000 }
+            },
+             // --- Start of new parcels without property pins ---
+            { "type": "Feature", "geometry": { "type": "Polygon", "coordinates": [[[-80.8250, 35.0715], [-80.8248, 35.0715], [-80.8248, 35.0717], [-80.8250, 35.0717], [-80.8250, 35.0715]]] }, "properties": { "address": '130 Main St', "buildingUse": "Retail", "assessmentValue": 320000, "landSize": "0.3 acres", "buildingSize": "1,500 sqft" } },
+            { "type": "Feature", "geometry": { "type": "Polygon", "coordinates": [[[-80.8252, 35.0715], [-80.8250, 35.0715], [-80.8250, 35.0717], [-80.8252, 35.0717], [-80.8252, 35.0715]]] }, "properties": { "address": '132 Main St', "buildingUse": "Office", "assessmentValue": 350000, "landSize": "0.3 acres", "buildingSize": "1,800 sqft" } },
+            { "type": "Feature", "geometry": { "type": "Polygon", "coordinates": [[[-80.8275, 35.0725], [-80.8273, 35.0725], [-80.8273, 35.0727], [-80.8275, 35.0727], [-80.8275, 35.0725]]] }, "properties": { "address": '460 Oak Ave', "buildingUse": "Residential", "assessmentValue": 280000, "landSize": "0.4 acres", "buildingSize": "2,200 sqft" } },
+            { "type": "Feature", "geometry": { "type": "Polygon", "coordinates": [[[-80.8273, 35.0725], [-80.8271, 35.0725], [-80.8271, 35.0727], [-80.8273, 35.0727], [-80.8273, 35.0725]]] }, "properties": { "address": '462 Oak Ave', "buildingUse": "Residential", "assessmentValue": 295000, "landSize": "0.4 acres", "buildingSize": "2,300 sqft" } },
+            { "type": "Feature", "geometry": { "type": "Polygon", "coordinates": [[[-80.8235, 35.0705], [-80.8233, 35.0705], [-80.8233, 35.0707], [-80.8235, 35.0707], [-80.8235, 35.0705]]] }, "properties": { "address": '10 Industrial Way', "buildingUse": "Industrial", "assessmentValue": 950000, "landSize": "2 acres", "buildingSize": "10,000 sqft" } },
+            { "type": "Feature", "geometry": { "type": "Polygon", "coordinates": [[[-80.8233, 35.0705], [-80.8231, 35.0705], [-80.8231, 35.0707], [-80.8233, 35.0707], [-80.8233, 35.0705]]] }, "properties": { "address": '12 Industrial Way', "buildingUse": "Warehouse", "assessmentValue": 1100000, "landSize": "2.5 acres", "buildingSize": "15,000 sqft" } },
+            { "type": "Feature", "geometry": { "type": "Polygon", "coordinates": [[[-80.8305, 35.0755], [-80.8303, 35.0755], [-80.8303, 35.0757], [-80.8305, 35.0757], [-80.8305, 35.0755]]] }, "properties": { "address": '801 Pine Ln', "buildingUse": "Office", "assessmentValue": 410000, "landSize": "0.6 acres", "buildingSize": "3,000 sqft" } },
+            { "type": "Feature", "geometry": { "type": "Polygon", "coordinates": [[[-80.8303, 35.0755], [-80.8301, 35.0755], [-80.8301, 35.0757], [-80.8303, 35.0757], [-80.8303, 35.0755]]] }, "properties": { "address": '803 Pine Ln', "buildingUse": "Office", "assessmentValue": 425000, "landSize": "0.6 acres", "buildingSize": "3,200 sqft" } },
+            { "type": "Feature", "geometry": { "type": "Polygon", "coordinates": [[[-80.8270, 35.0690], [-80.8268, 35.0690], [-80.8268, 35.0692], [-80.8270, 35.0692], [-80.8270, 35.0690]]] }, "properties": { "address": '200 Elm St', "buildingUse": "Retail", "assessmentValue": 275000, "landSize": "0.2 acres", "buildingSize": "1,200 sqft" } },
+            { "type": "Feature", "geometry": { "type": "Polygon", "coordinates": [[[-80.8268, 35.0690], [-80.8266, 35.0690], [-80.8266, 35.0692], [-80.8268, 35.0692], [-80.8268, 35.0690]]] }, "properties": { "address": '202 Elm St', "buildingUse": "Mixed-Use", "assessmentValue": 310000, "landSize": "0.2 acres", "buildingSize": "1,600 sqft" } },
+            { "type": "Feature", "geometry": { "type": "Polygon", "coordinates": [[[-80.8295, 35.0685], [-80.8293, 35.0685], [-80.8293, 35.0687], [-80.8295, 35.0687], [-80.8295, 35.0685]]] }, "properties": { "address": '310 Central Ave', "buildingUse": "Retail", "assessmentValue": 390000, "landSize": "0.4 acres", "buildingSize": "2,000 sqft" } },
+            { "type": "Feature", "geometry": { "type": "Polygon", "coordinates": [[[-80.8293, 35.0685], [-80.8291, 35.0685], [-80.8291, 35.0687], [-80.8293, 35.0687], [-80.8293, 35.0685]]] }, "properties": { "address": '312 Central Ave', "buildingUse": "Vacant", "assessmentValue": 150000, "landSize": "0.4 acres", "buildingSize": "0 sqft" } },
+            { "type": "Feature", "geometry": { "type": "Polygon", "coordinates": [[[-80.8300, 35.0745], [-80.8298, 35.0745], [-80.8298, 35.0747], [-80.8300, 35.0747], [-80.8300, 35.0745]]] }, "properties": { "address": '3010 Commerce Rd', "buildingUse": "Manufacturing", "assessmentValue": 1800000, "landSize": "3 acres", "buildingSize": "25,000 sqft" } },
+            { "type": "Feature", "geometry": { "type": "Polygon", "coordinates": [[[-80.8298, 35.0745], [-80.8296, 35.0745], [-80.8296, 35.0747], [-80.8298, 35.0747], [-80.8298, 35.0745]]] }, "properties": { "address": '3012 Commerce Rd', "buildingUse": "Warehouse", "assessmentValue": 1650000, "landSize": "3 acres", "buildingSize": "22,000 sqft" } },
+            { "type": "Feature", "geometry": { "type": "Polygon", "coordinates": [[[-80.8250, 35.0720], [-80.8248, 35.0720], [-80.8248, 35.0722], [-80.8250, 35.0722], [-80.8250, 35.0720]]] }, "properties": { "address": '755 Main St', "buildingUse": "Office", "assessmentValue": 650000, "landSize": "0.8 acres", "buildingSize": "4,000 sqft" } },
+            { "type": "Feature", "geometry": { "type": "Polygon", "coordinates": [[[-80.8248, 35.0720], [-80.8246, 35.0720], [-80.8246, 35.0722], [-80.8248, 35.0722], [-80.8248, 35.0720]]] }, "properties": { "address": '757 Main St', "buildingUse": "Retail", "assessmentValue": 620000, "landSize": "0.7 acres", "buildingSize": "3,500 sqft" } },
+            { "type": "Feature", "geometry": { "type": "Polygon", "coordinates": [[[-80.8280, 35.0690], [-80.8278, 35.0690], [-80.8278, 35.0692], [-80.8280, 35.0692], [-80.8280, 35.0690]]] }, "properties": { "address": '155 Elm St', "buildingUse": "Restaurant", "assessmentValue": 480000, "landSize": "0.5 acres", "buildingSize": "2,500 sqft" } },
+            { "type": "Feature", "geometry": { "type": "Polygon", "coordinates": [[[-80.8278, 35.0690], [-80.8276, 35.0690], [-80.8276, 35.0692], [-80.8278, 35.0692], [-80.8278, 35.0690]]] }, "properties": { "address": '157 Elm St', "buildingUse": "Office", "assessmentValue": 465000, "landSize": "0.5 acres", "buildingSize": "2,400 sqft" } },
+            { "type": "Feature", "geometry": { "type": "Polygon", "coordinates": [[[-80.8273, 35.0723], [-80.8271, 35.0723], [-80.8271, 35.0725], [-80.8273, 35.0725], [-80.8273, 35.0723]]] }, "properties": { "address": '890 City Center Blvd', "buildingUse": "Government", "assessmentValue": 2100000, "landSize": "1.5 acres", "buildingSize": "8,000 sqft" } },
+            { "type": "Feature", "geometry": { "type": "Polygon", "coordinates": [[[-80.8271, 35.0723], [-80.8269, 35.0723], [-80.8269, 35.0725], [-80.8271, 35.0725], [-80.8271, 35.0723]]] }, "properties": { "address": '892 City Center Blvd', "buildingUse": "Office", "assessmentValue": 2050000, "landSize": "1.5 acres", "buildingSize": "7,800 sqft" } }
+            // --- End of new parcels ---
+        ];
+
+        // Single Boundary Polygon Data for Overview Tab
+        const singleBoundaryPolygon = {
+            "type": "Feature",
+            "id": 'overall_area',
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [[
+                    [-80.835, 35.075],
+                    [-80.830, 35.078],
+                    [-80.822, 35.078],
+                    [-80.819, 35.072],
+                    [-80.818, 35.068],
+                    [-80.825, 35.065],
+                    [-80.830, 35.067],
+                    [-80.835, 35.070],
+                    [-80.835, 35.075]
+                ]]
+            },
+            "properties": {
+                "boundaryId": 'overall_area',
+                "type": 'boundary',
+                "name": 'Main Area Boundary',
+                "color": '#8B5CF6',
+                "description": 'A custom boundary encompassing all data points.'
+            }
+        };
+
+        // Helper to extract unique values for dropdowns
+        function getUniqueValues(data, key, subArrayKey = null) {
+            const values = new Set();
+            data.forEach(item => {
+                if (subArrayKey && item[subArrayKey]) {
+                    item[subArrayKey].forEach(subItem => {
+                        if (subItem[key] !== undefined && subItem[key] !== null && subItem[key] !== '') {
+                            values.add(subItem[key]);
+                        }
+                    });
+                } else if (item[key] !== undefined && item[key] !== null && item[key] !== '') {
+                    values.add(item[key]);
+                }
+            });
+            return [...values].sort();
+        }
+
+        const uniquePropertyTypes = getUniqueValues(mapData, 'type', 'properties');
+        const uniquePropertyStatuses = getUniqueValues(mapData, 'status', 'properties');
+
+        // --- Map Initialization ---
+        const map = L.map('map').setView([35.072, -80.826], 15);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+        }).addTo(map);
+
+        let boundaryPolygonsLayer = L.layerGroup();
+        let bizBoundaryLayer = L.layerGroup();
+        let propertyParcelsLayer = L.layerGroup();
+
+        const allMapMarkers = [];
+
+        // --- Custom Icons ---
+        const businessIcon = L.icon({
+            iconUrl: 'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png',
+            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+            iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41]
+        });
+        const propertyIcon = L.icon({
+            iconUrl: 'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+            iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41]
+        });
+        const mixedIcon = L.icon({
+            iconUrl: 'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-violet.png',
+            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+            iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41]
+        });
+
+
+        // --- Functions to create info cards ---
+        function createBusinessCard(businesses) {
+            if (!businesses || businesses.length === 0) return '';
+            let content = `<div class="info-card"><div class="info-card-header">Businesses</div>`;
+            businesses.forEach(biz => {
+                const naicsDescription = naicsCodes.find(n => n.code === biz.naics)?.description || 'N/A';
+                content += `
+                    <a href="#" onclick="alert('Navigating to business ID: ${biz.bizId}'); return false;" class="info-card-link p-2 -mx-2 rounded-md">
+                        <div class="info-card-item"><span class="font-semibold">Name:</span> ${biz.name}</div>
+                        <div class="info-card-item"><span class="font-semibold">Type:</span> ${biz.type}</div>
+                        <div class="info-card-item"><span class="font-semibold">Employees:</span> ${biz.employees}</div>
+                        <div class="info-card-item"><span class="font-semibold">Address:</span> ${biz.address}</div>
+                        <div class="info-card-item text-purple-600 font-bold"><span class="font-semibold">Industry:</span> ${biz.naics} - ${naicsDescription}</div>
+                        ${biz.activities?.siteVisit ? `<div class="info-card-item text-green-600 font-bold">Last Site Visit: ${biz.activities.siteVisit}</div>` : ''}
+                        ${biz.boundary ? `<div class="info-card-item text-purple-600 font-bold">Boundary: ${biz.boundary.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</div>` : ''}
+                        ${biz.tags && biz.tags.length > 0 ? `<div class="info-card-item text-orange-600 font-bold">Tags: ${biz.tags.join(', ')}</div>` : ''}
+                        ${biz.program ? `<div class="info-card-item text-red-600 font-bold">Program: ${biz.program}</div>` : ''}
+                    </a>
+                `;
+            });
+            content += `</div>`;
+            return content;
+        }
+        
+        function createParcelCard(parcel) {
+            if (!parcel) return '';
+            let content = `
+                <div class="info-card">
+                    <div class="info-card-header">Parcel Information</div>
+                    <div class="info-card-item"><span class="font-semibold">Address:</span> ${parcel.address}</div>`;
+            if (parcel.buildingUse) {
+                content += `<div class="info-card-item"><span class="font-semibold">Use:</span> ${parcel.buildingUse}</div>`;
+            }
+            if (parcel.assessmentValue) {
+                content += `<div class="info-card-item"><span class="font-semibold">Assessment:</span> $${parcel.assessmentValue.toLocaleString()}</div>`;
+            }
+            if (parcel.landSize) {
+                content += `<div class="info-card-item"><span class="font-semibold">Land Area:</span> ${parcel.landSize}</div>`;
+            }
+            if (parcel.buildingSize) {
+                content += `<div class="info-card-item"><span class="font-semibold">Building Area:</span> ${parcel.buildingSize}</div>`;
+            }
+            content += `</div>`;
+            return content;
+        }
+
+        function createPropertyCard(properties) {
+            if (!properties || properties.length === 0) return '';
+            let content = `<div class="info-card"><div class="info-card-header">Available Properties</div>`;
+            properties.forEach(prop => {
+                content += `
+                    <a href="#" onclick="alert('Navigating to property ID: ${prop.propId}'); return false;" class="info-card-link p-2 -mx-2 rounded-md">
+                        <div class="info-card-item"><span class="font-semibold">Type:</span> ${prop.type}</div>
+                        <div class="info-card-item"><span class="font-semibold">Status:</span> ${prop.status}</div>
+                        <div class="info-card-item"><span class="font-semibold">Area:</span> ${prop.area} sqft</div>
+                        ${prop.parcel ? `<div class="info-card-item"><span class="font-semibold">Parcel Size:</span> ${prop.parcel.landSize}</div>` : ''}
+                        ${prop.parcel ? `<div class="info-card-item"><span class="font-semibold">Building Size:</span> ${prop.parcel.buildingSize}</div>` : ''}
+                        ${prop.description ? `<div class="info-card-item"><span class="font-semibold">Description:</span> ${prop.description}</div>` : ''}
+                    </a>
+                `;
+            });
+            content += `</div>`;
+            return content;
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const propTypeSelect = document.getElementById('propType');
+            uniquePropertyTypes.forEach(type => {
+                const option = document.createElement('option');
+                option.value = type;
+                option.textContent = type;
+                propTypeSelect.appendChild(option);
+            });
+
+            const propStatusSelect = document.getElementById('propStatus');
+            uniquePropertyStatuses.forEach(status => {
+                const option = document.createElement('option');
+                option.value = status;
+                option.textContent = status;
+                propStatusSelect.appendChild(option);
+            });
+            
+            const naicsCheckboxesContainer = document.getElementById('naicsCheckboxes');
+            naicsCodes.forEach(naics => {
+                const div = document.createElement('div');
+                div.className = 'dropdown-item';
+                div.innerHTML = `
+                    <input type="checkbox" id="naics-${naics.code}" value="${naics.code}" class="naics-checkbox">
+                    <label for="naics-${naics.code}" class="text-gray-700 cursor-pointer text-sm">${naics.code} - ${naics.description}</label>
+                `;
+                naicsCheckboxesContainer.appendChild(div);
+            });
+        });
+
+        mapData.forEach(dataPoint => {
+            const lat = dataPoint.lat;
+            const lng = dataPoint.lng;
+
+            let initialIcon = mixedIcon;
+            if (dataPoint.businesses && dataPoint.businesses.length > 0 && !dataPoint.properties) {
+                initialIcon = businessIcon;
+            } else if (dataPoint.properties && dataPoint.properties.length > 0 && !dataPoint.businesses) {
+                initialIcon = propertyIcon;
+            }
+
+            const marker = L.marker([lat, lng], { icon: initialIcon });
+
+            let popupContent = '';
+            popupContent += createBusinessCard(dataPoint.businesses);
+            popupContent += createPropertyCard(dataPoint.properties);
+
+            marker.bindPopup(popupContent, { maxWidth: 300, closeButton: true });
+
+            allMapMarkers.push({
+                marker: marker,
+                data: dataPoint,
+                categories: {
+                    business: dataPoint.businesses && dataPoint.businesses.length > 0,
+                    property: dataPoint.properties && dataPoint.properties.length > 0
+                }
+            });
+        });
+
+        // --- Map Legend ---
+        const legend = L.control({position: 'bottomright'});
+        legend.onAdd = function (map) {
+            const div = L.DomUtil.create('div', 'bg-white p-3 rounded-lg shadow-lg hidden');
+            div.id = 'map-legend';
+            div.style.width = '160px';
+            div.innerHTML = `
+                <h4 class="font-semibold mb-2 text-gray-800 text-sm border-b pb-1">Legend</h4>
+                <div class="flex items-center mb-1">
+                    <img src="https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png" style="height: 20px;" class="mr-2">
+                    <span class="text-xs text-gray-700">Business</span>
+                </div>
+                <div class="flex items-center mb-1">
+                     <img src="https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png" style="height: 20px;" class="mr-2">
+                     <span class="text-xs text-gray-700">Property</span>
+                </div>
+                <div class="flex items-center">
+                     <img src="https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-violet.png" style="height: 20px;" class="mr-2">
+                     <span class="text-xs text-gray-700">Multiple Entries</span>
+                </div>
+            `;
+            L.DomEvent.disableClickPropagation(div);
+            return div;
+        };
+        legend.addTo(map);
+
+        function addSingleBoundaryToMap() {
+            boundaryPolygonsLayer.clearLayers();
+            L.geoJSON(singleBoundaryPolygon, {
+                style: (feature) => ({
+                    color: feature.properties.color,
+                    weight: 3,
+                    opacity: 0.8,
+                    fillColor: feature.properties.color,
+                    fillOpacity: 0.2
+                }),
+                onEachFeature: (feature, layer) => {
+                    if (feature.properties?.name) {
+                        layer.bindPopup(`
+                            <div class="info-card-header">${feature.properties.name}</div>
+                            ${feature.properties.description ? `<div class="info-card-item">${feature.properties.description}</div>` : ''}
+                        `, { maxWidth: 200 });
+                    }
+                }
+            }).addTo(boundaryPolygonsLayer);
+        }
+        
+        function addBizBoundaryToMap(boundaryId) {
+            bizBoundaryLayer.clearLayers();
+            if (boundaryId && boundaryId !== 'all' && boundaryPolygonsData[boundaryId]) {
+                L.geoJSON(boundaryPolygonsData[boundaryId], {
+                    style: (feature) => ({
+                        color: feature.properties.color,
+                        weight: 3,
+                        opacity: 0.8,
+                        fillColor: feature.properties.color,
+                        fillOpacity: 0.2
+                    }),
+                    onEachFeature: (feature, layer) => {
+                        if (feature.properties.name) {
+                            layer.bindPopup(feature.properties.name);
+                        }
+                    }
+                }).addTo(bizBoundaryLayer);
+            }
+        }
+        
+        function addPropertyParcelsToMap() {
+            propertyParcelsLayer.clearLayers();
+            L.geoJSON(parcelGeometries, {
+                style: () => ({
+                    color: '#4f46e5',
+                    weight: 2,
+                    opacity: 0.7,
+                    fillColor: '#818cf8',
+                    fillOpacity: 0.2
+                }),
+                onEachFeature: (feature, layer) => {
+                    if (feature.properties) {
+                        layer.bindPopup(createParcelCard(feature.properties), { maxWidth: 300, closeButton: true });
+                    }
+                }
+            }).addTo(propertyParcelsLayer);
+        }
+
+        let currentActiveTab = 'overview';
+        const mapLegend = document.getElementById('map-legend');
+
+        const tabButtons = document.querySelectorAll('.tab-button');
+        
+        const MAX_ZOOM_LEVEL_FOR_PARCELS = 17;
+        const DEFAULT_ZOOM_LEVEL = 15;
+
+
+        const overviewFilters = {
+            overviewSearch: document.getElementById('overviewSearch'),
+            filterBusinesses: document.getElementById('filterBusinessesOverview'),
+            filterProperties: document.getElementById('filterPropertiesOverview'),
+            filterBoundaries: document.getElementById('filterBoundariesOverview')
+        };
+
+        const businessFilters = {
+            businessesSearch: document.getElementById('businessesSearch'),
+            bizBoundarySelect: document.getElementById('bizBoundary'),
+            bizTagsSelect: document.querySelectorAll('.tag-checkbox'),
+            bizProgramSelect: document.getElementById('bizProgram'),
+            bizEmployeesMin: document.getElementById('bizEmployeesMin'),
+            bizEmployeesMax: document.getElementById('bizEmployeesMax'),
+            bizRevenueMin: document.getElementById('bizRevenueMin'),
+            bizRevenueMax: document.getElementById('bizRevenueMax'),
+            naicsSearchInput: document.getElementById('naicsSearchInput'),
+            naicsCheckboxesContainer: document.getElementById('naicsCheckboxes'),
+            activityCheckboxes: document.querySelectorAll('.activity-checkbox'),
+            lastContactStart: document.getElementById('lastContactStart'),
+            lastContactEnd: document.getElementById('lastContactEnd'),
+            contactStatus: document.getElementById('contactStatus'),
+            bizSearchBtn: document.getElementById('bizSearchBtn')
+        };
+
+        const propertyFilters = {
+            propertiesSearch: document.getElementById('propertiesSearch'),
+            propType: document.getElementById('propType'),
+            propStatus: document.getElementById('propStatus'),
+            parcelSqftMin: document.getElementById('parcelSqftMin'),
+            parcelSqftMax: document.getElementById('parcelSqftMax'),
+            buildingSqftMin: document.getElementById('buildingSqftMin'),
+            buildingSqftMax: document.getElementById('buildingSqftMax')
+        };
+        
+        function updateDropdownSummary(summaryId, checkboxClass, defaultText) {
+             const selectedCount = Array.from(document.querySelectorAll(`.${checkboxClass}:checked`)).length;
+             const summaryEl = document.getElementById(summaryId);
+             summaryEl.textContent = selectedCount === 0 ? defaultText : `${selectedCount} selected`;
+        }
+
+        function isDataMatch(dataPoint, searchTerm) {
+            const lowerSearchTerm = searchTerm.toLowerCase();
+            return (dataPoint.id && dataPoint.id.toLowerCase().includes(lowerSearchTerm)) ||
+                   (dataPoint.businesses && dataPoint.businesses.some(biz => JSON.stringify(biz).toLowerCase().includes(lowerSearchTerm))) ||
+                   (dataPoint.properties && dataPoint.properties.some(prop => JSON.stringify(prop).toLowerCase().includes(lowerSearchTerm)));
+        }
+        
+        function getVisibleDataForCurrentTab() {
+            const visibleData = { businesses: [], properties: [] };
+
+             allMapMarkers.forEach(markerInfo => {
+                const dataPoint = markerInfo.data;
+
+                // Flatten businesses and properties for easier filtering
+                const allBusinesses = mapData.flatMap(d => d.businesses || []);
+                const allProperties = mapData.flatMap(d => d.properties || []);
+
+                if (currentActiveTab === 'overview') {
+                    const searchTerm = overviewFilters.overviewSearch.value.toLowerCase();
+                    const showBusinesses = overviewFilters.filterBusinesses.checked;
+                    const showProperties = overviewFilters.filterProperties.checked;
+
+                    if (showBusinesses) {
+                        dataPoint.businesses?.forEach(biz => {
+                            if (!searchTerm || JSON.stringify(biz).toLowerCase().includes(searchTerm)) {
+                                visibleData.businesses.push(biz);
+                            }
+                        });
+                    }
+                    if (showProperties) {
+                        dataPoint.properties?.forEach(prop => {
+                            if (!searchTerm || JSON.stringify(prop).toLowerCase().includes(searchTerm)) {
+                                visibleData.properties.push(prop);
+                            }
+                        });
+                    }
+                } else if (currentActiveTab === 'businesses') {
+                    const filteredBusinesses = allBusinesses.filter(biz => {
+                        const searchTerm = businessFilters.businessesSearch.value.toLowerCase();
+                        if (searchTerm && !JSON.stringify(biz).toLowerCase().includes(searchTerm)) return false;
+                        
+                        const selectedBoundary = businessFilters.bizBoundarySelect.value;
+                        if (selectedBoundary !== 'all' && biz.boundary !== selectedBoundary) return false;
+
+                        const selectedProgram = businessFilters.bizProgramSelect.value;
+                        if (selectedProgram !== 'all' && biz.program !== selectedProgram) return false;
+                        
+                        const selectedTags = Array.from(businessFilters.bizTagsSelect).filter(cb => cb.checked).map(cb => cb.value);
+                        if (selectedTags.length > 0 && !biz.tags?.some(tag => selectedTags.includes(tag))) return false;
+
+                        const selectedNaics = Array.from(document.querySelectorAll('.naics-checkbox:checked')).map(cb => cb.value);
+                        if (selectedNaics.length > 0 && !selectedNaics.includes(biz.naics)) return false;
+
+                        const minEmployees = parseInt(businessFilters.bizEmployeesMin.value) || 0;
+                        const maxEmployees = parseInt(businessFilters.bizEmployeesMax.value) || Infinity;
+                        if (biz.employees < minEmployees || biz.employees > maxEmployees) return false;
+
+                        const minRevenue = parseFloat(businessFilters.bizRevenueMin.value) * 1000000 || 0;
+                        const maxRevenue = parseFloat(businessFilters.bizRevenueMax.value) * 1000000 || Infinity;
+                        if (biz.revenue < minRevenue || biz.revenue > maxRevenue) return false;
+
+                        const startDate = businessFilters.lastContactStart.value;
+                        const endDate = businessFilters.lastContactEnd.value;
+                        if (startDate && endDate) {
+                            const contactStatus = businessFilters.contactStatus.value;
+                            const selectedActivities = Array.from(businessFilters.activityCheckboxes).filter(cb => cb.checked).map(cb => cb.value);
+                            const activitiesToCheck = selectedActivities.length > 0 ? selectedActivities : ['email', 'call', 'siteVisit', 'meeting'];
+                            const hasContactInRange = activitiesToCheck.some(act => biz.activities?.[act] >= startDate && biz.activities?.[act] <= endDate);
+                            
+                            if ((contactStatus === 'has' && !hasContactInRange) || (contactStatus === 'has_not' && hasContactInRange)) {
+                                return false;
+                            }
+                        }
+                        return true;
+                    });
+                    visibleData.businesses.push(...filteredBusinesses);
+
+                } else if (currentActiveTab === 'properties') {
+                    const filteredProperties = allProperties.filter(prop => {
+                        const searchTerm = propertyFilters.propertiesSearch.value.toLowerCase();
+                        if (searchTerm && !JSON.stringify(prop).toLowerCase().includes(searchTerm)) return false;
+
+                        const selectedPropType = propertyFilters.propType.value;
+                        if (selectedPropType !== 'all' && prop.type !== selectedPropType) return false;
+                        
+                        const selectedPropStatus = propertyFilters.propStatus.value;
+                        if (selectedPropStatus !== 'all' && prop.status !== selectedPropStatus) return false;
+                        
+                        const minParcelSqft = parseFloat(propertyFilters.parcelSqftMin.value) || 0;
+                        const maxParcelSqft = parseFloat(propertyFilters.parcelSqftMax.value) || Infinity;
+                        if ((prop.parcel?.numericLandSize ?? 0) < minParcelSqft || (prop.parcel?.numericLandSize ?? Infinity) > maxParcelSqft) return false;
+
+                        const minBuildingSqft = parseFloat(propertyFilters.buildingSqftMin.value) || 0;
+                        const maxBuildingSqft = parseFloat(propertyFilters.buildingSqftMax.value) || Infinity;
+                        if ((prop.parcel?.numericBuildingSize ?? 0) < minBuildingSqft || (prop.parcel?.numericBuildingSize ?? Infinity) > maxBuildingSqft) return false;
+
+                        return true;
+                    });
+                    visibleData.properties.push(...filteredProperties);
+                }
+            });
+            // Deduplicate
+            visibleData.businesses = [...new Map(visibleData.businesses.map(item => [item['bizId'], item])).values()];
+            visibleData.properties = [...new Map(visibleData.properties.map(item => [item['propId'], item])).values()];
+            
+            return visibleData;
+        }
+
+        function applyFiltersForCurrentTab() {
+            allMapMarkers.forEach(markerInfo => map.removeLayer(markerInfo.marker));
+            boundaryPolygonsLayer.clearLayers();
+            bizBoundaryLayer.clearLayers();
+            propertyParcelsLayer.clearLayers();
+
+            const visibleData = getVisibleDataForCurrentTab();
+            const visibleBusinessIds = new Set(visibleData.businesses.map(b => b.bizId));
+            const visiblePropertyIds = new Set(visibleData.properties.map(p => p.propId));
+
+            allMapMarkers.forEach(markerInfo => {
+                const { marker, data } = markerInfo;
+                
+                const hasVisibleBusiness = data.businesses?.some(b => visibleBusinessIds.has(b.bizId));
+                const hasVisibleProperty = data.properties?.some(p => visiblePropertyIds.has(p.propId));
+
+                let iconToUse = null;
+
+                if (currentActiveTab === 'overview') {
+                    if (hasVisibleBusiness && hasVisibleProperty) iconToUse = mixedIcon;
+                    else if (hasVisibleBusiness) iconToUse = businessIcon;
+                    else if (hasVisibleProperty) iconToUse = propertyIcon;
+                } else if (currentActiveTab === 'businesses' && hasVisibleBusiness) {
+                    iconToUse = businessIcon;
+                } else if (currentActiveTab === 'properties' && hasVisibleProperty) {
+                    iconToUse = propertyIcon;
+                }
+
+                if (iconToUse) {
+                    marker.setIcon(iconToUse);
+                    marker.addTo(map);
+                }
+            });
+
+            if (currentActiveTab === 'overview' && overviewFilters.filterBoundaries.checked) {
+                map.addLayer(boundaryPolygonsLayer);
+                addSingleBoundaryToMap();
+            } else if (currentActiveTab === 'businesses') {
+                map.addLayer(bizBoundaryLayer);
+                addBizBoundaryToMap(businessFilters.bizBoundarySelect.value);
+            } else if (currentActiveTab === 'properties' && map.getZoom() >= MAX_ZOOM_LEVEL_FOR_PARCELS) {
+                map.addLayer(propertyParcelsLayer);
+                addPropertyParcelsToMap();
+            }
+        }
+        
+        map.on('zoomend', () => {
+            if (currentActiveTab === 'properties') {
+                if (map.getZoom() >= MAX_ZOOM_LEVEL_FOR_PARCELS) {
+                    map.addLayer(propertyParcelsLayer);
+                    addPropertyParcelsToMap();
+                } else {
+                    map.removeLayer(propertyParcelsLayer);
+                }
+            } else {
+                map.removeLayer(propertyParcelsLayer);
+            }
+        });
+
+
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const tabId = button.dataset.tab;
+
+                document.querySelector(`.tab-button.active`)?.classList.remove('active');
+                document.querySelector(`.tab-content.active`)?.classList.remove('active');
+
+                button.classList.add('active');
+                document.getElementById(`tab-content-${tabId}`).classList.add('active');
+
+                currentActiveTab = tabId;
+
+                if (tabId === 'overview') {
+                    mapLegend.classList.remove('hidden');
+                } else {
+                    mapLegend.classList.add('hidden');
+                }
+
+                applyFiltersForCurrentTab();
+                
+                map.setView([35.072, -80.826], DEFAULT_ZOOM_LEVEL);
+                 const visibleMarkersGroup = L.featureGroup();
+                 allMapMarkers.forEach(markerInfo => {
+                     if (map.hasLayer(markerInfo.marker)) {
+                         visibleMarkersGroup.addLayer(markerInfo.marker);
+                     }
+                 });
+                 if (visibleMarkersGroup.getLayers().length > 0) {
+                     map.fitBounds(visibleMarkersGroup.getBounds().pad(0.1));
+                 }
+            });
+        });
+
+        // --- Export and Report Generation Logic ---
+        const mainView = document.getElementById('main-view');
+        const reportView = document.getElementById('report-view');
+
+        function generateReport(tabId) {
+            const data = getVisibleDataForCurrentTab();
+            let reportHTML = '';
+
+            const titleMap = {
+                overview: 'Overview Report',
+                businesses: 'Businesses Report',
+                properties: 'Properties Report'
+            };
+
+            reportHTML += `<div class="bg-white rounded-lg shadow-md p-6 mb-4">`;
+            reportHTML += `<div class="flex justify-between items-center mb-4">`;
+            reportHTML += `<h1 class="text-2xl font-bold text-gray-800">${titleMap[tabId]}</h1>`;
+            reportHTML += `<button id="back-to-map" class="bg-gray-500 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded-lg transition duration-200">Back to Map</button>`;
+            reportHTML += `</div>`;
+
+            // Map Snapshot Placeholder
+            reportHTML += `<div class="mb-6"><img src="https://placehold.co/1000x400/e2e8f0/64748b?text=Map+Snapshot+Placeholder" alt="Map Snapshot" class="rounded-lg shadow-md w-full"></div>`;
+            
+            // Data Tables
+            if(tabId === 'overview' || tabId === 'businesses'){
+                 if(data.businesses.length > 0){
+                     reportHTML += `<h2 class="text-xl font-bold text-gray-700 mb-2">Businesses Data</h2>`;
+                     reportHTML += `<div class="overflow-x-auto"><table class="min-w-full bg-white border border-gray-200"><thead><tr class="bg-gray-100">`;
+                     ['Name', 'Type', 'Employees', 'Revenue ($)', 'Address'].forEach(h => reportHTML += `<th class="py-2 px-4 border-b text-left">${h}</th>`);
+                     reportHTML += `</tr></thead><tbody>`;
+                     data.businesses.forEach(biz => {
+                         reportHTML += `<tr class="hover:bg-gray-50">`;
+                         reportHTML += `<td class="py-2 px-4 border-b">${biz.name}</td>`;
+                         reportHTML += `<td class="py-2 px-4 border-b">${biz.type}</td>`;
+                         reportHTML += `<td class="py-2 px-4 border-b">${biz.employees}</td>`;
+                         reportHTML += `<td class="py-2 px-4 border-b">${biz.revenue.toLocaleString()}</td>`;
+                         reportHTML += `<td class="py-2 px-4 border-b">${biz.address}</td>`;
+                         reportHTML += `</tr>`;
+                     });
+                     reportHTML += `</tbody></table></div>`;
+                 }
+            }
+             if(tabId === 'overview' || tabId === 'properties'){
+                 if(data.properties.length > 0){
+                     reportHTML += `<h2 class="text-xl font-bold text-gray-700 mt-6 mb-2">Properties Data</h2>`;
+                     reportHTML += `<div class="overflow-x-auto"><table class="min-w-full bg-white border border-gray-200"><thead><tr class="bg-gray-100">`;
+                     ['Type', 'Status', 'Area (sqft)', 'Description'].forEach(h => reportHTML += `<th class="py-2 px-4 border-b text-left">${h}</th>`);
+                     reportHTML += `</tr></thead><tbody>`;
+                     data.properties.forEach(prop => {
+                         reportHTML += `<tr class="hover:bg-gray-50">`;
+                         reportHTML += `<td class="py-2 px-4 border-b">${prop.type}</td>`;
+                         reportHTML += `<td class="py-2 px-4 border-b">${prop.status}</td>`;
+                         reportHTML += `<td class="py-2 px-4 border-b">${prop.area.toLocaleString()}</td>`;
+                         reportHTML += `<td class="py-2 px-4 border-b">${prop.description}</td>`;
+                         reportHTML += `</tr>`;
+                     });
+                     reportHTML += `</tbody></table></div>`;
+                 }
+            }
+
+            reportHTML += `</div>`;
+            
+            reportView.innerHTML = reportHTML;
+            mainView.classList.add('hidden');
+            reportView.classList.remove('hidden');
+
+            document.getElementById('back-to-map').addEventListener('click', () => {
+                reportView.classList.add('hidden');
+                mainView.classList.remove('hidden');
+                map.invalidateSize(); // Important: re-renders the map correctly
+            });
+        }
+        
+        document.getElementById('export-report-btn').addEventListener('click', () => {
+            generateReport(currentActiveTab);
+        });
+
+        // --- Event Listeners for Filters (All tabs) ---
+        overviewFilters.overviewSearch.addEventListener('input', applyFiltersForCurrentTab);
+        propertyFilters.propertiesSearch.addEventListener('input', applyFiltersForCurrentTab);
+        overviewFilters.filterBusinesses.addEventListener('change', applyFiltersForCurrentTab);
+        overviewFilters.filterProperties.addEventListener('change', applyFiltersForCurrentTab);
+        overviewFilters.filterBoundaries.addEventListener('change', applyFiltersForCurrentTab);
+        
+        businessFilters.bizSearchBtn.addEventListener('click', applyFiltersForCurrentTab);
+        
+        businessFilters.naicsCheckboxesContainer.addEventListener('change', () => {
+             updateDropdownSummary('naicsSummary', 'naics-checkbox', 'Select NAICS codes');
+        });
+        businessFilters.activityCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', () => {
+                updateDropdownSummary('activitiesSummary', 'activity-checkbox', 'Select Activities');
+            });
+        });
+
+        businessFilters.naicsSearchInput.addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            const checkboxes = businessFilters.naicsCheckboxesContainer.querySelectorAll('.dropdown-item');
+            checkboxes.forEach(item => {
+                const label = item.querySelector('label').textContent.toLowerCase();
+                item.style.display = label.includes(searchTerm) ? 'flex' : 'none';
+            });
+        });
+        propertyFilters.propType.addEventListener('change', applyFiltersForCurrentTab);
+        propertyFilters.propStatus.addEventListener('change', applyFiltersForCurrentTab);
+        propertyFilters.parcelSqftMin.addEventListener('input', applyFiltersForCurrentTab);
+        propertyFilters.parcelSqftMax.addEventListener('input', applyFiltersForCurrentTab);
+        propertyFilters.buildingSqftMin.addEventListener('input', applyFiltersForCurrentTab);
+        propertyFilters.buildingSqftMax.addEventListener('input', applyFiltersForCurrentTab);
+
+        applyFiltersForCurrentTab();
+        mapLegend.classList.remove('hidden'); // Show legend on initial load for overview tab
+
+        const initialVisibleMarkersGroup = L.featureGroup();
+        allMapMarkers.forEach(markerInfo => {
+            initialVisibleMarkersGroup.addLayer(markerInfo.marker);
+        });
+
+        if (initialVisibleMarkersGroup.getLayers().length > 0) {
+            map.fitBounds(initialVisibleMarkersGroup.getBounds().pad(0.1));
+        }
+        
+        // Initialize Lucide icons
+        lucide.createIcons();
+    </script>
+</body>
+</html>
+
