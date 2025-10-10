@@ -17,23 +17,40 @@
         crossorigin=""></script>
     <style>
         :root {
-            --c-primary: 0, 55, 96; /* Blue color in RGB matching header #003760 */
-            --c-landing-primary: 0, 55, 96;
-            --c-landing-light20-primary-color: #1a4a7a;
-            --c-landing-light30-primary-color: #2d5d8d;
-            --c-landing-light35-primary-color: #3a6a9a;
-            --c-landing-light40-primary-color: #4777a7;
-            --c-landing-darken10-primary-color: #002040;
-            --c-landing-secondary: #ffa800;
-            --c-primary-contrast: #003760;
-            --c-font-primary: #333333;
-            --c-font-secondary: #6b7280;
+            /* App Colors */
+            --c-primary: 0, 55, 96;
+            --c-secondary: #616ca8;
+            --c-primary-contrast: #ffffff;
+            --c-font-primary: #000000;
+            --c-font-secondary: #ffffff;
             --c-card-background: #ffffff;
-            --c-background: #f8f9fa;
-            --c-success: #9CB1C1;
-            --c-danger: #F44336;
-            --c-warning: #f0ad4e;
-            --dim-header-height: 60px;
+            --c-info: #c2e3ff;
+            --c-lite-danger: #ffd7d7;
+            --c-sub-title: #958f8f;
+            --c-card-title: #666;
+            --c-danger: #dc3545;
+            --c-warning: #bd5116;
+            --c-success: #5f7e1e;
+            --c-decline: #808080;
+            --c-abandoned: #6c6162e0;
+            --c-outlook-primary: #0377d6;
+            /* Landing Colors */
+            --c-landing-primary: 28, 56, 89;
+            --c-landing-secondary: #616ca8;
+            --c-landing-secondary-color: #cadef1;
+            --c-landing-light20-primary-color: #285080;
+            --c-landing-light30-primary-color: #3469a7;
+            --c-landing-light35-primary-color: #3b75ba;
+            --c-landing-light40-primary-color: #4882c6;
+            --c-landing-darken10-primary-color: #162c46;
+            /* App Dimensions */
+            --dim-side-nav-width: 250px;
+            --dim-collapsed-side-nav-width: 100px;
+            --dim-header-height: 70px;
+            --business-side-panel-width: 350px;
+            --business-collapsed-side-panel-width: 0px;
+            /*Scroll colors*/
+            --scrollbarBG: #cfd8dc;
         }
         
         body {
@@ -44,9 +61,34 @@
             min-height: 100vh;
         }
         
+        .dx-viewport {
+            &.container-fluid {
+                min-height: calc(100vh - var(--dim-header-height));
+            }
+        }
+        
+        html {
+            --thumbBG: #616ca8;
+        }
+        
+        [data-theme="light"] {
+            --c-side-nav-bg: 255, 255, 255;
+            --c-active-bg: 0, 55, 96;
+            --c-active-color: #ffffff;
+            --c-popover-bg: #616ca8;
+        }
+        
+        [data-theme="dark"] {
+            --c-side-nav-bg: 0, 55, 96;
+            --c-active-bg: 255, 255, 255;
+            --c-active-color: #616ca8;
+            --c-menu-label: #ffffff;
+            --c-popover-bg: #ffffff;
+        }
+        
         /* Header styles */
         .header-content-wrapper {
-            background-color: #003760;
+            background-color: rgb(var(--c-primary));
             color: white;
             height: var(--dim-header-height);
             position: fixed;
@@ -100,9 +142,9 @@
             position: fixed;
             top: var(--dim-header-height);
             left: 0;
-            width: 240px;
+            width: var(--dim-side-nav-width);
             height: calc(100vh - var(--dim-header-height));
-            background-color: white;
+            background-color: rgb(var(--c-side-nav-bg, 255, 255, 255));
             color: #333;
             z-index: 1000;
             overflow-y: auto;
@@ -111,11 +153,15 @@
         }
         
         .content-wrapper {
-            margin-left: 240px;
+            margin-left: var(--dim-side-nav-width);
             margin-top: var(--dim-header-height);
             transition: margin-left 0.3s ease;
             min-height: calc(100vh - var(--dim-header-height));
-            background-color: var(--c-background);
+            background-color: #f7f8fa;
+        }
+        
+        .content-wrapper.menu-collapsed {
+            margin-left: var(--dim-collapsed-side-nav-width);
         }
         
         .content-wrapper.no-nav {
@@ -287,16 +333,16 @@
         }
         
         .menu-item.active {
-            background-color: #003760;
-            color: white;
-            border-left: 4px solid #003760;
+            background-color: rgb(var(--c-active-bg, 0, 55, 96));
+            color: var(--c-active-color, #ffffff);
+            border-left: 4px solid rgb(var(--c-active-bg, 0, 55, 96));
             font-weight: 600;
         }
         
         .sub-menu .menu-item.active {
-            background-color: #003760;
-            color: white;
-            border-left: 4px solid #003760;
+            background-color: rgb(var(--c-active-bg, 0, 55, 96));
+            color: var(--c-active-color, #ffffff);
+            border-left: 4px solid rgb(var(--c-active-bg, 0, 55, 96));
             padding-left: 45px;
             font-weight: 600;
         }
@@ -491,6 +537,117 @@
         .bg-civicserve:hover {
             background-color: #1a4a7a !important;
         }
+        
+        /* Panel Styles from PlatformAPI */
+        .panel-container {
+            display: flex;
+            gap: 20px;
+            padding-top: 20px;
+        }
+        
+        .panel {
+            background-color: var(--c-card-background);
+            border-radius: 5px;
+            padding: 15px !important;
+            margin-bottom: 15px;
+            height: 100%;
+            box-shadow: rgb(0 0 0 / 5%) 0px 4px 12px;
+        }
+        
+        .panel .panel-inner {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+        
+        .panel .panel-heading {
+            font-size: 1.125rem;
+            color: var(--c-font-primary);
+            font-weight: normal;
+            position: relative;
+            align-self: center;
+        }
+        
+        .panel .panel-heading::before {
+            content: "";
+            position: absolute;
+            height: 30px;
+            width: 8px;
+            background-color: rgba(var(--c-primary), 0.77);
+            left: -15px;
+            border-radius: 0 5px 5px 0;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        
+        /* Main content wrapper */
+        .main-content-wrapper {
+            padding: 15px;
+        }
+        
+        /* Admin wrapper */
+        .admin-wrapper {
+            padding: 15px;
+        }
+        /* Filter Panel Styles */
+.panel-body {
+    padding: 15px;
+}
+
+.btn-primary {
+    background-color: rgb(var(--c-primary));
+    border-color: rgb(var(--c-primary));
+    color: white;
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid transparent;
+}
+
+.btn-primary:hover {
+    background-color: var(--c-landing-light20-primary-color);
+    border-color: var(--c-landing-light20-primary-color);
+}
+
+.filter-form-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.filter-form-item {
+    flex: 1;
+    min-width: 200px;
+    display: flex;
+    flex-direction: column;
+}
+
+.filter-form-label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--c-font-primary);
+    margin-bottom: 5px;
+}
+
+.filter-form-control {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    background-color: white;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.filter-form-control:focus {
+    border-color: rgb(var(--c-primary));
+    box-shadow: 0 0 0 2px rgba(var(--c-primary), 0.2);
+    outline: none;
+}
         #map {
             height: calc(100vh - 450px); /* Adjust height to accommodate tabs and filters */
             width: 100%;
@@ -753,22 +910,24 @@
                   </nav>
                 
                 <!-- Main Content -->
-                <div class="container-fluid">
-                    <div class="row">
-                        <div class="col-12">
-                            <!-- Page Header -->
-                            <div class="page-header">
-                                <div class="page-header-left">
-                                    <h3 class="heading-3">Interactive Data Map</h3>
-                                </div>
-                                <div>
-                                    <button id="export-report-btn" class="btn bg-civicserve text-white font-semibold py-2 px-4 rounded-lg transition duration-200">Export Report</button>
-                                </div>
+                <div class="main-content-wrapper">
+                    <div class="admin-wrapper">
+                        <!-- Page Header -->
+                        <div class="page-header">
+                            <div class="page-header-left">
+                                <h3 class="heading-3">Interactive Data Map</h3>
                             </div>
-                            
-                            <!-- Main Container -->
-                            <div id="main-content" class="space-y-8">
-                                <div class="bg-white rounded-lg shadow-md p-6 mb-4">
+                            <div class="page-header-right">
+                                <button id="export-report-btn" class="btn bg-civicserve text-white font-semibold py-2 px-4 rounded-lg transition duration-200">Export Report</button>
+                            </div>
+                        </div>
+                        
+                        <!-- Main Container -->
+                        <div id="main-content">
+                            <div class="panel">
+                                <div class="panel-inner">
+                                    <div class="panel-heading">Map Controls & Filters</div>
+                                </div>
 
             <!-- Tab Buttons -->
             <div class="flex border-b border-gray-200 mb-4 overflow-x-auto">
@@ -970,8 +1129,13 @@
                     </div>
                 </div>
             </div>
+                            </div>
+                            
+                            <div class="panel">
+                                <div class="panel-inner">
+                                    <div class="panel-heading">Interactive Map View</div>
                                 </div>
-                                <div id="map" class="w-full shadow-md" style="height: calc(100vh - 300px);"></div>
+                                <div id="map" class="w-full" style="height: calc(100vh - 400px); border-radius: 5px;"></div>
                             </div>
                         </div>
                     </div>
@@ -979,8 +1143,19 @@
             </div>
         </div>
     </div>
-    <div id="report-view" class="w-full hidden" style="margin-left: 240px; margin-top: 60px; padding: 15px;">
-        <!-- Report content will be generated here -->
+    <div id="report-view" class="w-full hidden" style="margin-left: var(--dim-side-nav-width); margin-top: var(--dim-header-height); padding: 15px;">
+        <div class="main-content-wrapper">
+            <div class="admin-wrapper">
+                <div class="panel">
+                    <div class="panel-inner">
+                        <div class="panel-heading">Generated Report</div>
+                    </div>
+                    <div id="report-content">
+                        <!-- Report content will be generated here -->
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
 
@@ -1805,6 +1980,21 @@
         
         // Initialize Lucide icons
         lucide.createIcons();
+        // Filter panel toggle functionality
+document.getElementById('toggle-filters-btn').addEventListener('click', function() {
+    const filtersPanel = document.getElementById('filters-panel');
+    const isVisible = filtersPanel.style.display !== 'none';
+    
+    if (isVisible) {
+        filtersPanel.style.display = 'none';
+        this.classList.remove('btn-info');
+        this.classList.add('btn-primary');
+    } else {
+        filtersPanel.style.display = 'block';
+        this.classList.remove('btn-primary');
+        this.classList.add('btn-info');
+    }
+});
     </script>
 </body>
 </html>
