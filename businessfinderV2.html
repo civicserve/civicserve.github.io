@@ -97,8 +97,6 @@
             font-family: 'Inter', sans-serif;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
-            /* New prototype border */
-            border: 8px solid #0A7E8B;
             min-height: 100vh;
             margin: 0;
             padding: 0;
@@ -225,9 +223,9 @@
             color: white;
             height: var(--dim-header-height);
             position: fixed;
-            top: 8px; /* Account for prototype border */
-            left: 8px;
-            right: 8px;
+            top: 0;
+            left: 0;
+            right: 0;
             z-index: 1001;
         }
         
@@ -273,10 +271,10 @@
         /* Side Navigation Styles */
         .side-nav {
             position: fixed;
-            top: calc(var(--dim-header-height) + 8px); /* Account for prototype border */
-            left: 8px;
+            top: var(--dim-header-height);
+            left: 0;
             width: var(--dim-side-nav-width);
-            height: calc(100vh - var(--dim-header-height) - 16px); /* Account for top and bottom borders */
+            height: calc(100vh - var(--dim-header-height));
             background-color: rgb(var(--c-side-nav-bg, 255, 255, 255));
             color: #333;
             z-index: 1000;
@@ -290,21 +288,28 @@
         }
         
         .content-wrapper {
-            margin-left: calc(var(--dim-side-nav-width) + 8px); /* Account for side nav and border */
-            margin-top: calc(var(--dim-header-height) + 8px); /* Account for header and border */
-            margin-right: 8px; /* Account for right border */
-            margin-bottom: 8px; /* Account for bottom border */
+            margin-left: var(--dim-side-nav-width);
+            margin-top: var(--dim-header-height);
             transition: margin-left 0.3s ease;
-            min-height: calc(100vh - var(--dim-header-height) - 16px);
+            min-height: calc(100vh - var(--dim-header-height));
             background-color: #f7f8fa;
         }
         
         .content-wrapper.menu-collapsed {
-            margin-left: calc(var(--dim-collapsed-side-nav-width) + 8px);
+            margin-left: var(--dim-collapsed-side-nav-width);
         }
         
         .content-wrapper.no-nav {
-            margin-left: 8px;
+            margin-left: 0;
+        }
+        
+        /* Main content wrapper with prototype border */
+        .main-content-wrapper {
+            /* New prototype border */
+            border: 8px solid #0A7E8B;
+            margin: 15px;
+            border-radius: 8px;
+            background-color: #f7f8fa;
         }
         
         /* Search styling */
