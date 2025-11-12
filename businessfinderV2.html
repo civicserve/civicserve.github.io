@@ -6,10 +6,14 @@
     <title>Business Search Tool Mockup</title>
     <!-- Load Tailwind CSS from CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Load Inter font for CivicServe branding -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <!-- Load Poppins font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
     
     <!-- Configure Tailwind with custom blue theme and font -->
     <script>
@@ -37,12 +41,68 @@
     
     <!-- Custom styles for the page -->
     <style>
+        :root {
+            /* App Colors */
+            --c-primary: 0, 55, 96;
+            --c-secondary: #616ca8;
+            --c-primary-contrast: #ffffff;
+            --c-font-primary: #000000;
+            --c-font-secondary: #ffffff;
+            --c-card-background: #ffffff;
+            --c-info: #c2e3ff;
+            --c-lite-danger: #ffd7d7;
+            --c-sub-title: #958f8f;
+            --c-card-title: #666;
+            --c-danger: #dc3545;
+            --c-warning: #bd5116;
+            --c-success: #5f7e1e;
+            --c-decline: #808080;
+            --c-abandoned: #6c6162e0;
+            --c-outlook-primary: #0377d6;
+            /* Landing Colors */
+            --c-landing-primary: 28, 56, 89;
+            --c-landing-secondary: #616ca8;
+            --c-landing-secondary-color: #cadef1;
+            --c-landing-light20-primary-color: #285080;
+            --c-landing-light30-primary-color: #3469a7;
+            --c-landing-light35-primary-color: #3b75ba;
+            --c-landing-light40-primary-color: #4882c6;
+            --c-landing-darken10-primary-color: #162c46;
+            /* App Dimensions */
+            --dim-side-nav-width: 250px;
+            --dim-collapsed-side-nav-width: 100px;
+            --dim-header-height: 70px;
+            --business-side-panel-width: 350px;
+            --business-collapsed-side-panel-width: 0px;
+            /*Scroll colors*/
+            --scrollbarBG: #cfd8dc;
+        }
+        
+        [data-theme="light"] {
+            --c-side-nav-bg: 255, 255, 255;
+            --c-active-bg: 0, 55, 96;
+            --c-active-color: #ffffff;
+            --c-popover-bg: #616ca8;
+        }
+        
+        [data-theme="dark"] {
+            --c-side-nav-bg: 0, 55, 96;
+            --c-active-bg: 255, 255, 255;
+            --c-active-color: #616ca8;
+            --c-menu-label: #ffffff;
+            --c-popover-bg: #ffffff;
+        }
+        
         body {
+            font-family: 'Inter', sans-serif;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
             /* New prototype border */
             border: 8px solid #0A7E8B;
             min-height: 100vh;
+            margin: 0;
+            padding: 0;
+            background-color: #f7f8fa;
         }
         
         /* Custom styles for autocomplete */
@@ -158,17 +218,471 @@
         .sortable-header.sorted .sort-indicator {
             color: #003760; /* brand.text */
         }
+        
+        /* Header styles */
+        .header-content-wrapper {
+            background-color: rgb(var(--c-primary));
+            color: white;
+            height: var(--dim-header-height);
+            position: fixed;
+            top: 8px; /* Account for prototype border */
+            left: 8px;
+            right: 8px;
+            z-index: 1001;
+        }
+        
+        .header-wrapper {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 1rem;
+            height: 100%;
+        }
+        
+        .header-left-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .header-left-wrapper img {
+            height: 30px;
+        }
+        
+        .header-right svg, .header-left-wrapper svg {
+            width: 20px;
+            height: 20px;
+            color: white;
+            cursor: pointer;
+        }
+        
+        .header-right .btn-link {
+            color: white;
+        }
+        
+        .header-right .btn-link:hover, .side-nav-toggle-btn:hover {
+            opacity: 0.8;
+        }
+        
+        /* Side Navigation Styles */
+        .side-nav {
+            position: fixed;
+            top: calc(var(--dim-header-height) + 8px); /* Account for prototype border */
+            left: 8px;
+            width: var(--dim-side-nav-width);
+            height: calc(100vh - var(--dim-header-height) - 16px); /* Account for top and bottom borders */
+            background-color: rgb(var(--c-side-nav-bg, 255, 255, 255));
+            color: #333;
+            z-index: 1000;
+            overflow-y: auto;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .side-nav.hidden {
+            transform: translateX(-100%);
+        }
+        
+        .content-wrapper {
+            margin-left: calc(var(--dim-side-nav-width) + 8px); /* Account for side nav and border */
+            margin-top: calc(var(--dim-header-height) + 8px); /* Account for header and border */
+            margin-right: 8px; /* Account for right border */
+            margin-bottom: 8px; /* Account for bottom border */
+            transition: margin-left 0.3s ease;
+            min-height: calc(100vh - var(--dim-header-height) - 16px);
+            background-color: #f7f8fa;
+        }
+        
+        .content-wrapper.menu-collapsed {
+            margin-left: calc(var(--dim-collapsed-side-nav-width) + 8px);
+        }
+        
+        .content-wrapper.no-nav {
+            margin-left: 8px;
+        }
+        
+        /* Search styling */
+        .search-wrapper {
+            display: flex;
+            flex-grow: 1;
+            max-width: 600px;
+            margin: 0 20px;
+            height: 40px;
+            align-items: center;
+        }
+        
+        .search-input {
+            position: relative;
+            flex-grow: 1;
+            height: 100%;
+        }
+        
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6b7280;
+            z-index: 1;
+            width: 16px;
+            height: 16px;
+        }
+        
+        .search-input input {
+            width: 100%;
+            padding: 12px 16px 12px 35px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border: none;
+            border-radius: 6px 0 0 6px;
+            font-size: .875rem;
+            outline: none;
+            transition: background-color 0.2s ease;
+        }
+        
+        .search-input input:focus {
+            background-color: white;
+            box-shadow: 0 0 0 0.2rem rgba(var(--c-primary), 0.25);
+        }
+        
+        .search-input input::placeholder {
+            color: #6b7280;
+        }
+        
+        .select-dropdown {
+            height: 100%;
+            min-width: 80px;
+        }
+        
+        .select-dropdown select {
+            width: 100%;
+            padding: 12px 16px;
+            border: none;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 0 6px 6px 0;
+            font-size: .875rem;
+            outline: none;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23333333' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 16px;
+            padding-right: 40px;
+            color: #333333;
+        }
+        
+        .select-dropdown select:focus {
+            background-color: white;
+            box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.3);
+        }
+        
+        /* User details styling */
+        .user-details-wrapper {
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 4px;
+            transition: background-color 0.2s ease;
+        }
+        
+        .user-details-wrapper:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .name-initial-container {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background-color: #9CB1C1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: .875rem;
+        }
+        
+        .user-details {
+            margin-left: 10px;
+        }
+        
+        .user-name {
+            font-weight: bold;
+            font-size: .875rem;
+            line-height: 1.2;
+        }
+        
+        .user-role {
+            font-size: .875rem;
+            opacity: 0.8;
+            line-height: 1.2;
+        }
+        
+        /* Side Navigation Styles */
+        .side-nav-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .side-nav-list li {
+            position: relative;
+        }
+        
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 15px;
+            color: #333;
+            text-decoration: none;
+            transition: background-color 0.2s ease;
+            cursor: pointer;
+            border-left: 4px solid transparent;
+            font-size: .875rem;
+            font-weight: 600;
+            line-height: 1.4;
+        }
+        
+        .menu-item:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+        
+        .menu-item.active {
+            background-color: rgb(var(--c-active-bg, 0, 55, 96));
+            color: var(--c-active-color, #ffffff);
+            border-left: 4px solid rgb(var(--c-active-bg, 0, 55, 96));
+            font-weight: 600;
+        }
+        
+        .sub-menu .menu-item.active {
+            background-color: rgb(var(--c-active-bg, 0, 55, 96));
+            color: var(--c-active-color, #ffffff);
+            border-left: 4px solid rgb(var(--c-active-bg, 0, 55, 96));
+            padding-left: 45px;
+            font-weight: 600;
+        }
+        
+        .sub-menu .menu-item {
+            padding-left: 45px;
+            padding-top: 8px;
+            padding-bottom: 8px;
+            font-size: .875rem;
+        }
+        
+        .menu-icon {
+            margin-right: 12px;
+            width: 16px;
+            height: 16px;
+            flex-shrink: 0;
+        }
+        
+        .menu-label {
+            flex-grow: 1;
+        }
+        
+        .action-icon {
+            transition: transform 0.2s ease;
+            width: 12px !important;
+            height: 12px !important;
+            margin-left: auto;
+        }
+        
+        .sub-menu {
+            list-style: none;
+            padding-left: 0;
+            margin: 0;
+            display: none;
+            background-color: rgba(0, 0, 0, 0.02);
+        }
+        
+        .sub-menu-show {
+            display: block;
+        }
+        
+        .side-nav-toggle-btn {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            padding: 8px;
+            margin-right: 5px;
+        }
+        
+        .side-nav-toggle-btn svg {
+            width: 24px;
+            height: 24px;
+        }
+        
+        .overlay-effect {
+            display: none;
+            position: fixed;
+            top: var(--dim-header-height);
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+        
+        /* Bootstrap-like utility classes */
+        .d-flex {
+            display: flex !important;
+        }
+        
+        .align-items-center {
+            align-items: center !important;
+        }
+        
+        .align-self-center {
+            align-self: center !important;
+        }
+        
+        .btn {
+            display: inline-block;
+            font-weight: 400;
+            color: #212529;
+            text-align: center;
+            vertical-align: middle;
+            cursor: pointer;
+            background-color: transparent;
+            border: 1px solid transparent;
+            padding: 0.375rem 0.75rem;
+            font-size: .875rem;
+            line-height: 1.5;
+            border-radius: 0.25rem;
+            transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+        }
+        
+        .btn-link {
+            font-weight: 400;
+            color: #0d6efd;
+            text-decoration: underline;
+        }
+        
+        .btn-link:hover {
+            color: #0a58ca;
+        }
+        
+        .px-0 {
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+        }
     </style>
 </head>
-<body class="bg-gray-50 font-sans text-gray-800">
+<body class="bg-gray-50 font-sans text-gray-800" data-theme="light">
+    <!-- Header -->
+    <div id="root">
+        <div class="container-fluid p-0 dx-viewport" data-theme="light">
+            <div class="header-content-wrapper">
+                <div>
+                    <div class="header-wrapper">
+                        <div class="align-self-center header-left-wrapper">
+                            <button class="btn side-nav-toggle-btn px-0" id="side-nav-toggle">
+                                <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="bars" class="svg-inline--fa fa-bars " role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+                                    <path fill="currentColor" d="M0 96C0 78.3 14.3 64 32 64H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32C14.3 128 0 113.7 0 96zM0 256c0-17.7 14.3-32 32-32H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32-14.3-32-32zM448 416c0 17.7-14.3 32-32 32H32c-17.7 0-32-14.3-32-32s14.3-32 32-32H416c17.7 0 32 14.3 32 32z"></path>
+                                </svg>
+                            </button>
+                            <a href="#"><img src="https://dmitri.github.io/projects/civicserve/cs-dashboard/src/cs-logo-white.png"></a>
+                        </div>
+                        <form class="search-wrapper">
+                            <div class="search-input">
+                                <div class="search-icon">
+                                    <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="magnifying-glass" class="svg-inline--fa fa-magnifying-glass " role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                                        <path fill="currentColor" d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z"></path>
+                                    </svg>
+                                </div>
+                                <input type="text" class="form-control" placeholder="Search Businesses, Properties, or Data">
+                            </div>
+                            <div class="select-dropdown">
+                                <select class="form-select">
+                                    <option>All</option>
+                                    <option>Businesses</option>
+                                    <option>Properties</option>
+                                    <option>Data</option>
+                                </select>
+                            </div>
+                        </form>
+                        <div class="header-right align-self-center">
+                            <div class="header-support-wrapper">
+                                <button class="btn btn-link">
+                                    <svg aria-hidden="true" focusable="false" data-prefix="far" data-icon="circle-question" class="svg-inline--fa fa-circle-question " role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                                        <path fill="currentColor" d="M464 256A208 208 0 1 0 48 256a208 208 0 1 0 416 0zM0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256zm169.8-90.7c7.9-22.3 29.1-37.3 52.8-37.3h58.3c34.9 0 63.1 28.3 63.1 63.1c0 22.6-12.1 43.5-31.7 54.8L280 264.4c-.2 13-10.9 23.6-24 23.6c-13.3 0-24-10.7-24-24V250.5c0-8.6 4.6-16.5 12.1-20.8l44.3-25.4c4.7-2.7 7.6-7.7 7.6-13.1c0-8.4-6.8-15.1-15.1-15.1H222.6c-3.4 0-6.4 2.1-7.5 5.3l-.4 1.2c-4.4 12.5-18.2 19-30.6 14.6s-19-18.2-14.6-30.6l.4-1.2zM224 352a32 32 0 1 1 64 0 32 32 0 1 1 -64 0z"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                            <div class="d-flex">
+                                <svg aria-hidden="true" focusable="false" data-prefix="far" data-icon="list-check" class="svg-inline--fa fa-list-check " role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                                    <path fill="currentColor" d="M153.8 72.1c8.9-9.9 8.1-25-1.8-33.9s-25-8.1-33.9 1.8L63.1 101.1 41 79C31.6 69.7 16.4 69.7 7 79s-9.4 24.6 0 33.9l40 40c4.7 4.7 11 7.2 17.6 7s12.8-3 17.2-7.9l72-80zm0 160c8.9-9.9 8.1-25-1.8-33.9s-25-8.1-33.9 1.8L63.1 261.1 41 239c-9.4-9.4-24.6-9.4-33.9 0s-9.4 24.6 0 33.9l40 40c4.7 4.7 11 7.2 17.6 7s12.8-3 17.2-7.9l72-80zM216 120H488c13.3 0 24-10.7 24-24s-10.7-24-24-24H216c-13.3 0-24 10.7-24 24s10.7 24 24 24zM192 256c0 13.3 10.7 24 24 24H488c13.3 0 24-10.7 24-24s-10.7-24-24-24H216c-13.3 0-24 10.7-24 24zM160 416c0 13.3 10.7 24 24 24H488c13.3 0 24-10.7 24-24s-10.7-24-24-24H184c-13.3 0-24 10.7-24 24zm-64 0a32 32 0 1 0 -64 0 32 32 0 1 0 64 0z"></path>
+                                </svg>
+                            </div>
+                            <div class="user-details-wrapper">
+                                <div class="user-details-container d-flex align-items-center">
+                                    <div class="name-initial-container">
+                                        <div id="name">ED</div>
+                                    </div>
+                                    <div class="user-details">
+                                        <div class="user-name">Gary Gov</div>
+                                        <div class="user-role">Admin</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="content-wrapper" id="content-wrapper">
+                <div class="overlay-effect"></div>
+                <!-- Side Navigation -->
+                <nav class="side-nav" id="side-nav">
+                    <ul class="side-nav-list">
+                      <li>
+                        <a class="menu-item">
+                          <svg aria-hidden="true" focusable="false" data-prefix="fal" data-icon="chart-bar" class="svg-inline--fa fa-chart-bar menu-icon" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                            <path fill="currentColor" d="M24 32c13.3 0 24 10.7 24 24V456c0 13.3 10.7 24 24 24H488c13.3 0 24 10.7 24 24s-10.7 24-24 24H72c-39.8 0-72-32.2-72-72V56C0 42.7 10.7 32 24 32zM128 136c0-13.3 10.7-24 24-24s24 10.7 24 24V424c0 13.3-10.7 24-24 24s-24-10.7-24-24V136zm96-88c0-13.3 10.7-24 24-24s24 10.7 24 24V424c0 13.3-10.7 24-24 24s-24-10.7-24-24V48zM320 200c0-13.3 10.7-24 24-24s24 10.7 24 24V424c0 13.3-10.7 24-24 24s-24-10.7-24-24V200zm96-88c0-13.3 10.7-24 24-24s24 10.7 24 24V424c0 13.3-10.7 24-24 24s-24-10.7-24-24V112z"></path>
+                          </svg>
+                          <div class="menu-label">Data</div>
+                          <svg aria-hidden="true" focusable="false" data-prefix="far" data-icon="chevron-down" class="svg-inline--fa fa-chevron-down action-icon" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                            <path fill="currentColor" d="M239 401c9.4 9.4 24.6 9.4 33.9 0L465 209c9.4-9.4 9.4-24.6 0-33.9s-24.6-9.4-33.9 0l-175 175L81 175c-9.4-9.4-24.6-9.4-33.9 0s-9.4 24.6 0 33.9L239 401z"></path>
+                          </svg>
+                        </a>
+                        <ul class="sub-menu sub-menu-show">
+                          <li>
+                            <a class="menu-item">
+                              <div class="menu-label">Interactive Map</div>
+                            </a>
+                          </li>
+                          <li>
+                            <a class="menu-item active">
+                              <div class="menu-label">Business Finder</div>
+                            </a>
+                          </li>
+                          <li>
+                            <a class="menu-item">
+                              <div class="menu-label">Reports</div>
+                            </a>
+                          </li>
+                        </ul>
+                      </li>
+                    </ul>
+                </nav>
 
-    <!-- NEW: Prototype Label -->
-    <div class="text-center py-2 bg-gray-100">
-        <span class="text-4xl font-bold text-brand-text">CivicServeLabs: </span>
-        <span class="text-4xl font-bold text-prototype-teal">Coming Soon!</span>
-    </div>
+                <!-- Main Content Area -->
+                <div class="main-content-wrapper">
+                    <!-- NEW: Prototype Label -->
+                    <div class="text-center py-2 bg-gray-100 mb-4 rounded">
+                        <span class="text-2xl font-bold text-brand-text">CivicServeLabs: </span>
+                        <span class="text-2xl font-bold text-prototype-teal">Coming Soon!</span>
+                    </div>
 
-    <div class="container mx-auto p-4 md:p-8 max-w-7xl">
+                    <div class="container mx-auto p-4 md:p-8 max-w-7xl">
 
         <!-- Page Title -->
         <h1 class="text-3xl md:text-4xl font-semibold text-brand-text text-center mt-4">
@@ -1597,7 +2111,25 @@
             // --- INITIALIZATION ---
             regionFilter.value = 'Illinois'; // Set default region
             applyFilters();
+
+            // --- SIDE NAVIGATION TOGGLE ---
+            const sideNavToggle = document.getElementById('side-nav-toggle');
+            const sideNav = document.getElementById('side-nav');
+            const contentWrapper = document.getElementById('content-wrapper');
+
+            sideNavToggle.addEventListener('click', () => {
+                sideNav.classList.toggle('hidden');
+                if (sideNav.classList.contains('hidden')) {
+                    contentWrapper.classList.add('no-nav');
+                } else {
+                    contentWrapper.classList.remove('no-nav');
+                }
+            });
         });
     </script>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
