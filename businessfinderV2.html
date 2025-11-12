@@ -1,0 +1,1603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Business Search Tool Mockup</title>
+    <!-- Load Tailwind CSS from CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Load Poppins font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Configure Tailwind with custom blue theme and font -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'sans': ['Poppins', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            light: '#e0f2fe', // sky-100 (Keeping this as a light accent)
+                            DEFAULT: '#003760', // New custom blue
+                            dark: '#003760', // New custom blue
+                            text: '#003760', // New custom blue
+                        },
+                        prototype: {
+                            teal: '#0A7E8B',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Custom styles for the page -->
+    <style>
+        body {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            /* New prototype border */
+            border: 8px solid #0A7E8B;
+            min-height: 100vh;
+        }
+        
+        /* Custom styles for autocomplete */
+        .autocomplete-list {
+            position: absolute;
+            background-color: white;
+            border: 1px solid #e2e8f0; /* gray-200 */
+            border-top: none;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 50; /* Ensure autocomplete is on top */
+            border-radius: 0 0 0.375rem 0.375rem; /* rounded-b-md */
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* shadow-md */
+        }
+        .autocomplete-item {
+            padding: 0.5rem 0.75rem;
+            cursor: pointer;
+        }
+        .autocomplete-item:hover {
+            background-color: #f1f5f9; /* gray-100 */
+        }
+        .autocomplete-item-new {
+            padding: 0.5rem 0.75rem;
+            cursor: pointer;
+            font-style: italic;
+            color: #003760; /* brand.DEFAULT */
+        }
+        .autocomplete-item-new:hover {
+            background-color: #f1f5f9; /* gray-100 */
+        }
+
+        /* Custom styles for the search toggle */
+        input[type="radio"].toggle-radio {
+            display: none;
+        }
+        input[type="radio"].toggle-radio + label {
+            transition: all 0.2s ease-in-out;
+            border: 1px solid #003760; /* brand.DEFAULT */
+            color: #003760;
+        }
+        input[type="radio"].toggle-radio:checked + label {
+            background-color: #003760; /* brand.DEFAULT */
+            color: white;
+            border: 1px solid #003760;
+        }
+
+        /* Custom modal styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100; /* Higher than autocomplete */
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease-in-out;
+        }
+        .modal-overlay.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+        .modal-content {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 0.5rem;
+            text-align: left; /* Changed from center */
+            width: 90%;
+            max-width: 500px; /* Max width for the modal */
+            transform: scale(0.9);
+            transition: all 0.3s ease-in-out;
+        }
+        .modal-overlay.visible .modal-content {
+            transform: scale(1);
+        }
+
+        /* Toast Notification Styles */
+        .toast {
+            position: fixed;
+            bottom: -100px; /* Start off-screen */
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #2d3748; /* gray-800 */
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.375rem; /* rounded-md */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* shadow-lg */
+            z-index: 200;
+            transition: all 0.5s ease-in-out;
+        }
+        .toast.show {
+            bottom: 20px; /* Slide in */
+        }
+        
+        /* Sortable Header Styles */
+        .sortable-header {
+            cursor: pointer;
+            user-select: none;
+        }
+        .sortable-header:hover {
+            background-color: #f9fafb; /* gray-50 */
+        }
+        .sort-indicator {
+            display: inline-block;
+            margin-left: 5px;
+            color: #9ca3af; /* gray-400 */
+            width: 1em; /* Allocate space for the arrow */
+        }
+        .sortable-header.sorted .sort-indicator {
+            color: #003760; /* brand.text */
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans text-gray-800">
+
+    <!-- NEW: Prototype Label -->
+    <div class="text-center py-2 bg-gray-100">
+        <span class="text-4xl font-bold text-brand-text">CivicServeLabs: </span>
+        <span class="text-4xl font-bold text-prototype-teal">Coming Soon!</span>
+    </div>
+
+    <div class="container mx-auto p-4 md:p-8 max-w-7xl">
+
+        <!-- Page Title -->
+        <h1 class="text-3xl md:text-4xl font-semibold text-brand-text text-center mt-4">
+            Find the Businesses that support your regional economy
+        </h1>
+
+        <!-- Search Mode Toggle -->
+        <div class="flex justify-center my-6">
+            <div class="flex rounded-md" role="group">
+                <input type="radio" id="quick-search-toggle" name="search-type" value="quick" class="toggle-radio" checked>
+                <label for="quick-search-toggle" class="px-6 py-2 font-medium rounded-l-md cursor-pointer bg-white">
+                    Quick Search
+                </label>
+                
+                <input type="radio" id="advanced-search-toggle" name="search-type" value="advanced" class="toggle-radio">
+                <label for="advanced-search-toggle" class="px-6 py-2 font-medium rounded-r-md cursor-pointer bg-white">
+                    Advanced Search
+                </label>
+            </div>
+        </div>
+
+        <!-- Main Business Search -->
+        <div class="mt-8 mb-6">
+            <label for="filter-business-name" class="block text-sm font-medium text-gray-700 sr-only">Business Search</label>
+            <input type="text" id="filter-business-name" placeholder="Search by Business Name..." class="w-full rounded-md border-gray-300 shadow-sm focus:border-brand-DEFAULT focus:ring-brand-DEFAULT sm:text-lg p-4">
+        </div>
+
+        <!-- Quick Search Filters Container -->
+        <div id="quick-search-container" class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+            <h2 class="text-xl font-semibold text-brand-text">Quick Multi-Search Fields</h2>
+            <p class="text-sm text-gray-600 mt-1 mb-6">Use any of the fields below to filter your results. You can use a single field or combine multiple.</p>
+            
+            <!-- 2x2 Filter Grid (Quick Search) -->
+            <div id="quick-search-filters" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                
+                <!-- Region Filter -->
+                <div class="bg-gray-50 p-6 rounded-lg border border-gray-200">
+                    <h3 class="text-lg font-semibold text-brand-text">Region</h3>
+                    <p class="text-sm text-gray-600 mt-1 mb-4">Find businesses across the US to include in attraction campaigns.</p>
+                    <div class="relative">
+                        <input type="text" id="filter-region" placeholder="Enter city, state, or county..." class="block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-DEFAULT focus:ring-brand-DEFAULT sm:text-sm p-3">
+                        <div id="region-suggestions" class="autocomplete-list w-full hidden"></div>
+                    </div>
+                </div>
+
+                <!-- Industry Filter -->
+                <div class="bg-gray-50 p-6 rounded-lg border border-gray-200">
+                    <h3 class="text-lg font-semibold text-brand-text">Industry</h3>
+                    <p class="text-sm text-gray-600 mt-1 mb-4">Target specific industries that support your regional economy!</p>
+                    <div class="relative">
+                        <input type="text" id="filter-industry" placeholder="e.g. 'Manufacturing' or 'Data Centers'" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-DEFAULT focus:ring-brand-DEFAULT sm:text-sm p-3">
+                        <div id="industry-suggestions" class="autocomplete-list w-full hidden"></div>
+                    </div>
+                </div>
+
+                <!-- Size Filter -->
+                <div class="bg-gray-50 p-6 rounded-lg border border-gray-200">
+                    <h3 class="text-lg font-semibold text-brand-text">Size</h3>
+                    <p class="text-sm text-gray-600 mt-1 mb-4">Filter by company size based on sales revenue or employee count.</p>
+                    <div class="flex flex-col md:flex-row gap-4">
+                        <div class="flex-1">
+                            <label for="filter-sales" class="block text-sm font-medium text-gray-700">Sales</label>
+                            <select id="filter-sales" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-DEFAULT focus:ring-brand-DEFAULT sm:text-sm p-3">
+                                <option value="">Any Sales</option>
+                                <option value="0-500000">$0 - $500k</option>
+                                <option value="500000-1000000">$500k - $1M</option>
+                                <option value="1000000-5000000">$1M - $5M</option>
+                                <option value="5000000-10000000">$5M - $10M</option>
+                                <option value="10000000-25000000">$10M - $25M</option>
+                                <option value="25000000-50000000">$25M - $50M</option>
+                                <option value="50000000-100000000">$50M - $100M</option>
+                                <option value="100000000-500000000">$100M - $500M</option>
+                                <option value="500000000-Infinity">$500M+</option>
+                            </select>
+                        </div>
+                        <div class="flex-1">
+                            <label for="filter-employees" class="block text-sm font-medium text-gray-700">Employees</label>
+                            <select id="filter-employees" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-DEFAULT focus:ring-brand-DEFAULT sm:text-sm p-3">
+                                <option value="">Any Employees</option>
+                                <option value="1-4">1-4</option>
+                                <option value="5-9">5-9</option>
+                                <option value="10-19">10-19</option>
+                                <option value="20-49">20-49</option>
+                                <option value="50-99">50-99</option>
+                                <option value="100-249">100-249</option>
+                                <option value="250-499">250-499</option>
+                                <option value="500-999">500-999</option>
+                                <option value="1000-2499">1000-2499</option>
+                                <option value="2500-4999">2500-4999</option>
+                                <option value="5000-9999">5000-9999</option>
+                                <option value="10000-Infinity">10000+</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Health Filter -->
+                <div class="bg-gray-50 p-6 rounded-lg border border-gray-200">
+                    <h3 class="text-lg font-semibold text-brand-text">Health</h3>
+                    <p class="text-sm text-gray-600 mt-1 mb-4">Our health score (1-100) estimates business viability. Find healthy companies to target.</p>
+                    <div class="flex flex-col md:flex-row gap-4">
+                        <div class="flex-1">
+                            <label for="filter-health-min" class="block text-sm font-medium text-gray-700">Min Health</label>
+                            <input type="number" id="filter-health-min" min="0" max="100" placeholder="0" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-DEFAULT focus:ring-brand-DEFAULT sm:text-sm p-3">
+                        </div>
+                        <div class="flex-1">
+                            <label for="filter-health-max" class="block text-sm font-medium text-gray-700">Max Health</label>
+                            <input type="number" id="filter-health-max" min="0" max="100" placeholder="100" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-DEFAULT focus:ring-brand-DEFAULT sm:text-sm p-3">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Advanced Search Filters -->
+        <div id="advanced-search-filters" class="hidden mt-6 space-y-6">
+
+            <!-- Collapsible Section: Region Filters -->
+            <div>
+                <button data-toggle-target="#region-filters-content" class="collapsible-trigger flex justify-between items-center w-full p-4 font-semibold text-left bg-white rounded-lg shadow-sm border border-gray-200 hover:bg-gray-50 focus:outline-none">
+                    <span class="text-xl text-brand-text">Region Filters</span>
+                    <svg class="w-6 h-6 transform transition-transform rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                </button>
+                <div id="region-filters-content" class="collapsible-content pt-4 p-6 bg-white rounded-b-lg border border-t-0 border-gray-200 hidden">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div class="relative">
+                            <label for="filter-adv-city" class="block text-sm font-medium text-gray-700">City</label>
+                            <input type="text" id="filter-adv-city" placeholder="e.g. 'New York'" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-DEFAULT focus:ring-brand-DEFAULT sm:text-sm p-3">
+                            <div id="filter-adv-city-suggestions" class="autocomplete-list w-full hidden"></div>
+                        </div>
+                        <div class="relative">
+                            <label for="filter-adv-state" class="block text-sm font-medium text-gray-700">State</Lgabel>
+                            <input type="text" id="filter-adv-state" placeholder="e.g. 'CA'" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-DEFAULT focus:ring-brand-DEFAULT sm:text-sm p-3">
+                            <div id="filter-adv-state-suggestions" class="autocomplete-list w-full hidden"></div>
+                        </div>
+                        <div class="relative">
+                            <label for="filter-adv-county" class="block text-sm font-medium text-gray-700">County</label>
+                            <input type="text" id="filter-adv-county" placeholder="e.g. 'Fulton County'" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-DEFAULT focus:ring-brand-DEFAULT sm:text-sm p-3">
+                            <div id="filter-adv-county-suggestions" class="autocomplete-list w-full hidden"></div>
+                        </div>
+                        <div class="relative">
+                            <label for="filter-adv-msa" class="block text-sm font-medium text-gray-700">MSA</label>
+                            <input type="text" id="filter-adv-msa" placeholder="e.g. 'Atlanta-Sandy Springs'" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-DEFAULT focus:ring-brand-DEFAULT sm:text-sm p-3">
+                            <div id="filter-adv-msa-suggestions" class="autocomplete-list w-full hidden"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Collapsible Section: Industry Filters -->
+            <div>
+                <button data-toggle-target="#industry-filters-content" class="collapsible-trigger flex justify-between items-center w-full p-4 font-semibold text-left bg-white rounded-lg shadow-sm border border-gray-200 hover:bg-gray-50 focus:outline-none">
+                    <span class="text-xl text-brand-text">Industry Filters</span>
+                    <svg class="w-6 h-6 transform transition-transform rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                </button>
+                <div id="industry-filters-content" class="collapsible-content pt-4 p-6 bg-white rounded-b-lg border border-t-0 border-gray-200 hidden">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="relative">
+                            <label for="filter-adv-naics" class="block text-sm font-medium text-gray-700">NAICS Code</label>
+                            <input type="text" id="filter-adv-naics" placeholder="e.g. '5112 - Software Publishers'" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-DEFAULT focus:ring-brand-DEFAULT sm:text-sm p-3">
+                            <div id="filter-adv-naics-suggestions" class="autocomplete-list w-full hidden"></div>
+                        </div>
+                        <div class="relative">
+                            <label for="filter-adv-sic" class="block text-sm font-medium text-gray-700">SIC Code</label>
+                            <input type="text" id="filter-adv-sic" placeholder="e.g. '7371 - Software'" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-DEFAULT focus:ring-brand-DEFAULT sm:text-sm p-3">
+                            <div id="filter-adv-sic-suggestions" class="autocomplete-list w-full hidden"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Collapsible Section: Business Data Filters -->
+            <div>
+                <button data-toggle-target="#business-data-filters-content" class="collapsible-trigger flex justify-between items-center w-full p-4 font-semibold text-left bg-white rounded-lg shadow-sm border border-gray-200 hover:bg-gray-50 focus:outline-none">
+                    <span class="text-xl text-brand-text">Business Data Filters</span>
+                    <svg class="w-6 h-6 transform transition-transform rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                </button>
+                <div id="business-data-filters-content" class="collapsible-content pt-4 p-6 bg-white rounded-b-lg border border-t-0 border-gray-200 hidden">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <!-- Employees -->
+                        <div class="col-span-1 md:col-span-2 lg:col-span-2">
+                            <label class="block text-sm font-medium text-gray-700">Employees</label>
+                            <div class="flex gap-4 mt-1">
+                                <input type="number" id="filter-adv-emp-min" placeholder="Min" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-DEFAULT focus:ring-brand-DEFAULT sm:text-sm p-3">
+                                <input type="number" id="filter-adv-emp-max" placeholder="Max" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-DEFAULT focus:ring-brand-DEFAULT sm:text-sm p-3">
+                            </div>
+                        </div>
+                        <!-- Sales -->
+                        <div class="col-span-1 md:col-span-2 lg:col-span-2">
+                            <label class="block text-sm font-medium text-gray-700">Sales</label>
+                            <div class="flex gap-4 mt-1">
+                                <input type="number" id="filter-adv-sales-min" placeholder="Min ($)" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-DEFAULT focus:ring-brand-DEFAULT sm:text-sm p-3">
+                                <input type="number" id="filter-adv-sales-max" placeholder="Max ($)" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-DEFAULT focus:ring-brand-DEFAULT sm:text-sm p-3">
+                            </div>
+                        </div>
+                        <!-- Health Score -->
+                        <div class="col-span-1 md:col-span-2 lg:col-span-2">
+                            <label class="block text-sm font-medium text-gray-700">Health Score</label>
+                            <div class="flex gap-4 mt-1">
+                                <input type="number" id="filter-adv-health-min" min="0" max="100" placeholder="Min (0)" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-DEFAULT focus:ring-brand-DEFAULT sm:text-sm p-3">
+                                <input type="number" id="filter-adv-health-max" min="0" max="100" placeholder="Max (100)" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-DEFAULT focus:ring-brand-DEFAULT sm:text-sm p-3">
+                            </div>
+                        </div>
+                        <!-- Square Feet -->
+                        <div class="col-span-1 md:col-span-2 lg:col-span-2">
+                            <label class="block text-sm font-medium text-gray-700">Square Feet</label>
+                            <div class="flex gap-4 mt-1">
+                                <input type="number" id="filter-adv-sqft-min" placeholder="Min" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-DEFAULT focus:ring-brand-DEFAULT sm:text-sm p-3">
+                                <input type="number" id="filter-adv-sqft-max" placeholder="Max" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-DEFAULT focus:ring-brand-DEFAULT sm:text-sm p-3">
+                            </div>
+                        </div>
+                        <!-- At-Risk -->
+                        <div>
+                            <label for="filter-adv-at-risk" class="block text-sm font-medium text-gray-700">At-Risk</Lgabel>
+                            <select id="filter-adv-at-risk" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-DEFAULT focus:ring-brand-DEFAULT sm:text-sm p-3">
+                                <option value="">Any</option>
+                                <option value="High">High</option>
+                                <option value="Medium">Medium</option>
+                                <option value="Low">Low</option>
+                            </select>
+                        </div>
+                        <!-- Expandability -->
+                        <div>
+                            <label for="filter-adv-expandability" class="block text-sm font-medium text-gray-700">Expandability</label>
+                            <select id="filter-adv-expandability" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-DEFAULT focus:ring-brand-DEFAULT sm:text-sm p-3">
+                                <option value="">Any</option>
+                                <option value="High">High</option>
+                                <option value="Medium">Medium</option>
+                                <option value="Low">Low</option>
+                            </select>
+                        </div>
+                        <!-- Credit Rating -->
+                        <div class="col-span-1 md:col-span-2">
+                            <label for="filter-adv-credit" class="block text-sm font-medium text-gray-700">Credit Rating</label>
+                            <select id="filter-adv-credit" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-DEFAULT focus:ring-brand-DEFAULT sm:text-sm p-3">
+                                <option value="">Any</option>
+                                <option value="Excellent">Excellent</option>
+                                <option value="Good">Good</option>
+                                <option value="Fair">Fair</option>
+                                <option value="Poor">Poor</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Advanced Search Action Buttons -->
+            <div class="flex justify-end gap-4 mt-6">
+                <button id="advanced-clear-btn" class="px-6 py-2 font-medium text-gray-700 bg-white rounded-md border border-gray-300 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-DEFAULT">
+                    Clear Filters
+                </button>
+                <button id="advanced-search-btn" class="px-6 py-2 font-medium text-white bg-brand-DEFAULT rounded-md shadow-sm hover:bg-brand-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-DEFAULT" style="background-color: #003760;">
+                    Search
+                </button>
+            </div>
+        </div>
+
+        <!-- NEW: Data Table Container -->
+        <div class="mt-8 bg-white rounded-lg shadow-sm border border-gray-200">
+            <!-- Container Header -->
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h2 id="table-container-title" class="text-xl font-semibold text-brand-text">
+                    Top 25 businesses sorted by Health Score
+                </h2>
+                <p class="text-sm text-gray-600 mt-1">This is a list of the top 25 businesses based on your search and sort criteria. Select businesses and add them to your contacts.</p>
+            </div>
+
+            <!-- Action Bar (Select Count & Button) -->
+            <div class="flex flex-row justify-between items-center py-4 px-6 gap-4">
+                <div class="flex items-center gap-3">
+                    <input type="checkbox" id="select-all-visible" class="h-4 w-4 rounded text-brand-DEFAULT focus:ring-brand-DEFAULT">
+                    <label for="select-all-visible" class="font-medium text-gray-700">Select all on page</label>
+                    <span id="selected-count" class="text-sm text-gray-600 font-medium">0 businesses | 0 selected</span>
+                </div>
+                <button id="add-to-crm-btn" class="px-6 py-2 font-medium text-white bg-brand-DEFAULT rounded-md shadow-sm hover:bg-brand-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-DEFAULT disabled:bg-gray-400 disabled:cursor-not-allowed" style="background-color: #003760;" disabled>
+                    Add to Contacts
+                </button>
+            </div>
+
+            <!-- Data Table -->
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th scope="col" class="px-6 py-3">
+                                <!-- This cell is for the checkbox, but the input is in the action bar -->
+                            </th>
+                            <!-- 1. Health -->
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider sortable-header whitespace-nowrap" data-sort-key="health" style="min-width: 130px;">
+                                Health Score <span class="sort-indicator"></span>
+                            </th>
+                            <!-- 2. Business Name -->
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider sortable-header whitespace-nowrap" data-sort-key="name">
+                                Business Name <span class="sort-indicator"></span>
+                            </th>
+                            <!-- 3. Location -->
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider sortable-header whitespace-nowrap" data-sort-key="location">
+                                Location <span class="sort-indicator"></span>
+                            </th>
+                            <!-- 4. Size (Employees) -->
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider sortable-header whitespace-nowrap" data-sort-key="employees">
+                                Employees <span class="sort-indicator"></span>
+                            </th>
+                            <!-- 5. Size (Sales) -->
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider sortable-header whitespace-nowrap" data-sort-key="sales">
+                                Sales <span class="sort-indicator"></span>
+                            </th>
+                            <!-- 6. Size (Sq. Ft.) -->
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider sortable-header whitespace-nowrap" data-sort-key="sqft">
+                                Sq. Ft. <span class="sort-indicator"></span>
+                            </th>
+                            <!-- 7. Industry (NAICS) -->
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider sortable-header whitespace-nowrap" data-sort-key="industry.name">
+                                Industry (NAICS) <span class="sort-indicator"></span>
+                            </th>
+                            <!-- 8. Industry (SIC) -->
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider sortable-header whitespace-nowrap" data-sort-key="sic">
+                                Industry (SIC) <span class="sort-indicator"></span>
+                            </th>
+                            <!-- 9. Region (County) -->
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider sortable-header whitespace-nowrap" data-sort-key="county">
+                                County <span class="sort-indicator"></span>
+                            </th>
+                            <!-- 10. Region (MSA) -->
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider sortable-header whitespace-nowrap" data-sort-key="msa">
+                                MSA <span class="sort-indicator"></span>
+                            </th>
+                            <!-- Other Business Data -->
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider sortable-header whitespace-nowrap" data-sort-key="atRisk">
+                                At-Risk <span class="sort-indicator"></span>
+                            </th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider sortable-header whitespace-nowrap" data-sort-key="expandability">
+                                Expandability <span class="sort-indicator"></span>
+                            </th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider sortable-header whitespace-nowrap" data-sort-key="creditRating">
+                                Credit Rating <span class="sort-indicator"></span>
+                            </th>
+                            <!-- Contact -->
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
+                                Contact
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-body" class="bg-white divide-y divide-gray-200">
+                        <!-- Rows will be injected by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <div id="pagination-controls" class="flex flex-col md:flex-row justify-between items-center px-4 py-3 border-t border-gray-200">
+                <span id="pagination-summary" class="text-sm text-gray-700 mb-2 md:mb-0">
+                    Showing 1-25 of 12,345 results
+                </span>
+                <div class="flex gap-2">
+                    <button id="page-first" class="px-3 py-1 text-sm font-medium rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 disabled:opacity-50">First</button>
+                    <button id="page-prev" class="px-3 py-1 text-sm font-medium rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 disabled:opacity-50">Previous</button>
+                    <span class="px-3 py-1 text-sm font-medium text-gray-900">
+                        Page <span id="current-page">1</span> of <span id="total-pages">494</span>
+                    </span>
+                    <button id="page-next" class="px-3 py-1 text-sm font-medium rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 disabled:opacity-50">Next</button>
+                    <button id="page-last" class="px-3 py-1 text-sm font-medium rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 disabled:opacity-50">Last</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Modal for CRM confirmation -->
+    <div id="crm-modal" class="modal-overlay">
+        <div class="modal-content">
+            <h3 class="text-xl font-semibold text-gray-900 mb-4" id="modal-title">Add Businesses to Contacts</h3>
+            <p id="modal-message" class="text-gray-600 mb-6">X businesses will be added to your contacts list.</p>
+            
+            <!-- Tag Input Section -->
+            <div class="relative mb-6">
+                <label for="modal-tag-input" class="block text-sm font-medium text-gray-700 mb-1">Add a tag (optional)</label>
+                <input type="text" id="modal-tag-input" placeholder="e.g. 'Downtown District' or 'New Tag'" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-DEFAULT focus:ring-brand-DEFAULT sm:text-sm p-3">
+                <div id="modal-tag-suggestions" class="autocomplete-list w-full hidden"></div>
+            </div>
+
+            <!-- Modal Actions -->
+            <div class="flex justify-end gap-4">
+                <button id="close-modal-btn" class="px-6 py-2 font-medium text-gray-700 bg-white rounded-md border border-gray-300 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-DEFAULT">
+                    Cancel
+                </button>
+                <button id="confirm-modal-btn" class="px-6 py-2 font-medium text-white bg-brand-DEFAULT rounded-md shadow-sm hover:bg-brand-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-DEFAULT" style="background-color: #003760;">
+                    OK
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast-notification" class="toast">
+        <!-- Message will be injected here -->
+    </div>
+
+
+    <!-- JavaScript Logic -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // --- MOCK DATA ---
+            const allBusinesses = [];
+            const mockNames = ['Apex Solutions', 'QuantumLeap Inc.', 'StellarCore', 'Vertex Innovations', 'BlueWave Tech', 'Phoenix Industries', 'Omega Services', 'Zenith Logistics', 'NovaCrest', 'Echo Systems', 'TerraFirm', 'Helios Energy', 'Momentum Dynamics', 'Orion Group', 'Pinnacle Corp'];
+            
+            // Updated locations with fictional data
+            const mockLocations = [
+                'New York, NY', 'Los Angeles, CA', 'Chicago, IL', 'Houston, TX', 'Phoenix, AZ', 
+                'Philadelphia, PA', 'San Antonio, TX', 'San Diego, CA', 'Dallas, TX', 'San Jose, CA', 
+                'Atlanta, GA', 'Miami, FL', 'Seattle, WA',
+                'Springfield, IL', // Changed from Progress City
+                'Scranton, PA',     // Added Scranton
+                'Pawnee, IN',        // Added Pawnee
+                'Peoria, IL',        // NEW
+                'Rockford, IL',      // NEW
+                'Naperville, IL'     // NEW
+            ];
+            
+            const mockCounties = [
+                'New York County', 'Los Angeles County', 'Cook County', 'Harris County', 'Maricopa County', 
+                'Philadelphia County', 'Bexar County', 'San Diego County', 'Dallas County', 'Santa Clara County', 
+                'Fulton County', 'Miami-Dade County', 'King County',
+                'Sangamon County',  // Added Sangamon (for Springfield)
+                'Lackawanna County',// Added Lackawanna (for Scranton)
+                'Wamapoke County',   // Added Wamapoke (for Pawnee)
+                'Peoria County',     // NEW
+                'Winnebago County',  // NEW
+                'DuPage County'      // NEW
+            ];
+            
+            const mockMSAs = [
+                'New York-Newark-Jersey City, NY-NJ-PA', 'Los Angeles-Long Beach-Anaheim, CA', 
+                'Chicago-Naperville-Elgin, IL-IN-WI', 'Dallas-Fort Worth-Arlington, TX', 
+                'Houston-The Woodlands-Sugar Land, TX', 'Washington-Arlington-Alexandria, DC-VA-MD-WV', 
+                'Miami-Fort Lauderdale-Pompano Beach, FL', 'Philadelphia-Camden-Wilmington, PA-NJ-DE-MD', 
+                'Atlanta-Sandy Springs-Alpharetta, GA',
+                'Springfield, IL', // Added Springfield MSA
+                'Scranton–Wilkes-Barre, PA',    // Added Scranton MSA
+                'Indianapolis-Carmel-Muncie, IN', // Pawnee is near Indianapolis
+                'Peoria, IL',                   // NEW
+                'Rockford, IL'                  // NEW
+            ];
+            
+            const mockIndustries = [
+                { code: '11', name: 'Agriculture, Forestry, Fishing and Hunting', sic: '01' },
+                { code: '1111', name: 'Oilseed and Grain Farming', sic: '011' },
+                { code: '21', name: 'Mining, Quarrying, and Oil and Gas Extraction', sic: '13' },
+                { code: '2121', name: 'Coal Mining', sic: '122' },
+                { code: '23', name: 'Construction', sic: '15' },
+                { code: '2362', name: 'Nonresidential Building Construction', sic: '154' },
+                { code: '31-33', name: 'Manufacturing', sic: '30' },
+                { code: '3344', name: 'Semiconductor Manufacturing', sic: '3674' },
+                { code: '3341', name: 'High Tech Manufacturing', sic: '3571' },
+                { code: '42', name: 'Wholesale Trade', sic: '50' },
+                { code: '4238', name: 'Machinery and Equipment Wholesale', sic: '508' },
+                { code: '44-45', name: 'Retail Trade', sic: '52' },
+                { code: '4451', name: 'Grocery Stores', sic: '5411' },
+                { code: '48-49', name: 'Transportation and Warehousing', sic: '40' },
+                { code: '4911', name: 'Electric Power Generation', sic: '491' },
+                { code: '51', name: 'Information', sic: '73' },
+                { code: '5112', name: 'Software Publishers', sic: '7372' },
+                { code: '5182', name: 'Data Centers', sic: '7374' },
+                { code: '5121', name: 'Motion Picture and Video Industries', sic: '781' },
+                { code: '52', name: 'Finance and Insurance', sic: '60' },
+                { code: '5221', name: 'Depository Credit Intermediation', sic: '602' },
+                { code: '5312', name: 'Offices of Real Estate Agents', sic: '6531' },
+                { code: '54', name: 'Professional, Scientific, and Technical Services', sic: '87' },
+                { code: '5411', name: 'Legal Services', sic: '8111' },
+                { code: '5415', name: 'Computer Systems Design', sic: '7373' },
+                { code: '5417', name: 'Quantum Computing R&D', sic: '8731' },
+                { code: '56', name: 'Administrative and Support Services', sic: '73' },
+                { code: '5613', name: 'Employment Services', sic: '736' },
+                { code: '62', name: 'Health Care and Social Assistance', sic: '80' },
+                { code: '6211', name: 'Offices of Physicians', sic: '8011' },
+                { code: '71', name: 'Arts, Entertainment, and Recreation', sic: '79' },
+                { code: '7131', name: 'Amusement Parks and Arcades', sic: '799' },
+                { code: '72', name: 'Accommodation and Food Services', sic: '70' },
+                { code: '7225', name: 'Restaurants', sic: '5812' },
+                { code: '81', name: 'Other Services (except Public Administration)', sic: '89' },
+                { code: '8131', name: 'Religious Organizations', sic: '866' },
+                { code: '92', name: 'Public Administration', sic: '91' },
+                { code: '9211', name: 'Government - General', sic: '911' }
+            ];
+            
+            const mockSICs = mockIndustries.map(ind => `${ind.sic} - ${ind.name.split(' ')[0]}`);
+            const mockNAICS = mockIndustries.map(ind => `${ind.code} - ${ind.name}`);
+            const mockCities = [...new Set(mockLocations.map(loc => loc.split(', ')[0]))].sort();
+            const mockStates = [...new Set(mockLocations.map(loc => loc.split(', ')[1]))].sort();
+            const mockCreditRatings = ['Excellent', 'Good', 'Fair', 'Poor'];
+            const mockRiskLevels = ['High', 'Medium', 'Low'];
+            const mockTags = ['Downtown District', 'Key Industry', 'Manufacturing', 'High-Wage Jobs', 'Target Q4'];
+
+            function generateMockData(count) {
+                for (let i = 1; i <= count; i++) {
+                    const industry = mockIndustries[i % mockIndustries.length];
+                    const employees = Math.floor(Math.random() * 11000) + 1;
+                    const sales = Math.floor(Math.random() * 600000000) + 50000;
+                    let name = mockNames[i % mockNames.length] + (i % 3 === 0 ? ' LLC' : i % 3 === 1 ? ' Corp' : ' Inc.');
+                    let location = mockLocations[i % mockLocations.length];
+                    
+                    // --- Custom Fictional Data Logic ---
+                    let county, msa;
+                    
+                    if (location === 'Springfield, IL') {
+                        county = 'Sangamon County';
+                        msa = 'Springfield, IL';
+                    } else if (location === 'Scranton, PA') {
+                        county = 'Lackawanna County';
+                        msa = 'Scranton–Wilkes-Barre, PA';
+                    } else if (location === 'Pawnee, IN') {
+                        county = 'Wamapoke County';
+                        msa = 'Indianapolis-Carmel-Muncie, IN';
+                    } else if (location === 'Peoria, IL') { // NEW
+                        county = 'Peoria County';
+                        msa = 'Peoria, IL';
+                    } else if (location === 'Rockford, IL') { // NEW
+                        county = 'Winnebago County';
+                        msa = 'Rockford, IL';
+                    } else if (location === 'Naperville, IL') { // NEW
+                        county = 'DuPage County';
+                        msa = 'Chicago-Naperville-Elgin, IL-IN-WI'; // Part of Chicagoland
+                    } else {
+                        // Default random assignment
+                        county = mockCounties[i % mockCounties.length];
+                        msa = mockMSAs[i % mockMSAs.length];
+                        
+                        // Avoid assigning fictional counties to real cities
+                        if (['Sangamon County', 'Lackawanna County', 'Wamapoke County', 'Peoria County', 'Winnebago County', 'DuPage County'].includes(county)) {
+                            county = 'Cook County'; // Just assign a default
+                        }
+                    }
+                    // --- End Fictional Data Logic ---
+
+                    const locationParts = location.split(', ');
+                    
+                    // --- Apply At-Risk / Expandability Rule ---
+                    const generatedAtRisk = mockRiskLevels[i % mockRiskLevels.length];
+                    let generatedExpandability = mockRiskLevels[(i+1) % mockRiskLevels.length];
+
+                    if (generatedAtRisk === 'High' && generatedExpandability === 'High') {
+                        generatedExpandability = 'Medium';
+                    }
+                    // --- End Rule ---
+
+                    allBusinesses.push({
+                        id: i,
+                        name: name,
+                        location: location,
+                        city: locationParts[0] || null,
+                        state: locationParts[1] || null,
+                        county: county,
+                        msa: msa,
+                        industry: industry,
+                        sic: industry.sic,
+                        employees: employees,
+                        sales: sales,
+                        health: Math.floor(Math.random() * 100) + 1,
+                        sqft: Math.floor(Math.random() * 100000) + 1000,
+                        atRisk: generatedAtRisk,
+                        expandability: generatedExpandability,
+                        creditRating: mockCreditRatings[i % mockCreditRatings.length],
+                        website: name.toLowerCase().replace(/[^a-z0-9]/g, '') + '.com',
+                        email: 'contact@' + name.toLowerCase().replace(/[^a-z0-9]/g, '') + '.com',
+                        phone: `(555) ${Math.floor(Math.random() * 900) + 100}-${Math.floor(Math.random() * 9000) + 1000}`
+                    });
+                }
+            }
+            generateMockData(12345); // Generate a large set of mock data
+            
+            // --- Add Specific Fictional Businesses ---
+            
+            // Springfield (ID 20000+)
+            allBusinesses.push({
+                id: 20001, name: 'Capital City Futures Lab', location: 'Springfield, IL', city: 'Springfield', state: 'IL', county: 'Sangamon County', msa: 'Springfield, IL',
+                industry: mockIndustries.find(i => i.code === '5417'), sic: '8731', employees: 850, sales: 150000000, health: 98, sqft: 120000,
+                atRisk: 'Low', expandability: 'High', creditRating: 'Excellent', website: 'ccfl.com', email: 'info@ccfl.com', phone: '(555) 100-1000'
+            });
+            allBusinesses.push({
+                id: 20002, name: 'Tomorrow Tower Industries', location: 'Springfield, IL', city: 'Springfield', state: 'IL', county: 'Sangamon County', msa: 'Springfield, IL',
+                industry: mockIndustries.find(i => i.code === '3341'), sic: '3571', employees: 2200, sales: 450000000, health: 92, sqft: 500000,
+                atRisk: 'Low', expandability: 'Medium', creditRating: 'Excellent', website: 'tomorrowtower.com', email: 'contact@tomorrowtower.com', phone: '(555) 100-2000'
+            });
+            allBusinesses.push({
+                id: 20003, name: 'Old Capitol Magic Shoppe', location: 'Springfield, IL', city: 'Springfield', state: 'IL', county: 'Sangamon County', msa: 'Springfield, IL',
+                industry: mockIndustries.find(i => i.code === '44-45'), sic: '52', employees: 12, sales: 850000, health: 65, sqft: 2000,
+                atRisk: 'Medium', expandability: 'Low', creditRating: 'Good', website: 'oldcapitolmagic.com', email: 'magic@oldcapitolmagic.com', phone: '(555) 100-3000'
+            });
+
+            // Scranton (ID 30000+)
+            allBusinesses.push({
+                id: 30001, name: 'Dunder Mifflin Paper Company', location: 'Scranton, PA', city: 'Scranton', state: 'PA', county: 'Lackawanna County', msa: 'Scranton–Wilkes-Barre, PA',
+                industry: mockIndustries.find(i => i.code === '42'), sic: '50', employees: 15, sales: 2500000, health: 42, sqft: 5000,
+                atRisk: 'High', expandability: 'Low', creditRating: 'Fair', website: 'dundermifflin.com', email: 'info@dundermifflin.com', phone: '(555) 200-1000'
+            });
+            allBusinesses.push({
+                id: 30002, name: 'Scranton White Pages', location: 'Scranton, PA', city: 'Scranton', state: 'PA', county: 'Lackawanna County', msa: 'Scranton–Wilkes-Barre, PA',
+                industry: mockIndustries.find(i => i.code === '5112'), sic: '7372', employees: 5, sales: 500000, health: 25, sqft: 1200,
+                atRisk: 'High', expandability: 'Low', creditRating: 'Poor', website: 'scrantonwhitepages.com', email: 'info@scrantonwhitepages.com', phone: '(555) 200-2000'
+            });
+            allBusinesses.push({
+                id: 30003, name: 'Lackawanna Coal Mining Co.', location: 'Scranton, PA', city: 'Scranton', state: 'PA', county: 'Lackawanna County', msa: 'Scranton–Wilkes-Barre, PA',
+                industry: mockIndustries.find(i => i.code === '2121'), sic: '122', employees: 120, sales: 18000000, health: 55, sqft: 20000,
+                atRisk: 'Medium', expandability: 'Medium', creditRating: 'Good', website: 'lackawannacoal.com', email: 'info@lackawannacoal.com', phone: '(555) 200-3000'
+            });
+            
+            // Pawnee (ID 40000+)
+            allBusinesses.push({
+                id: 40001, name: 'Pawnee Parks and Recreation', location: 'Pawnee, IN', city: 'Pawnee', state: 'IN', county: 'Wamapoke County', msa: 'Indianapolis-Carmel-Muncie, IN',
+                industry: mockIndustries.find(i => i.code === '92'), sic: '91', employees: 8, sales: 0, health: 70, sqft: 6000,
+                atRisk: 'Low', expandability: 'Low', creditRating: 'Excellent', website: 'pawnee.gov/parks', email: 'parks@pawnee.gov', phone: '(555) 300-1000'
+            });
+            allBusinesses.push({
+                id: 40002, name: 'Sweetums Corp.', location: 'Pawnee, IN', city: 'Pawnee', state: 'IN', county: 'Wamapoke County', msa: 'Indianapolis-Carmel-Muncie, IN',
+                industry: mockIndustries.find(i => i.code === '31-33'), sic: '30', employees: 3500, sales: 300000000, health: 80, sqft: 800000,
+                atRisk: 'Low', expandability: 'Medium', creditRating: 'Good', website: 'sweetums.com', email: 'info@sweetums.com', phone: '(555) 300-2000'
+            });
+            allBusinesses.push({
+                id: 40003, name: 'Food and Stuff', location: 'Pawnee, IN', city: 'Pawnee', state: 'IN', county: 'Wamapoke County', msa: 'Indianapolis-Carmel-Muncie,. IN',
+                industry: mockIndustries.find(i => i.code === '4451'), sic: '5411', employees: 25, sales: 4000000, health: 88, sqft: 15000,
+                atRisk: 'Low', expandability: 'Low', creditRating: 'Excellent', website: 'foodandstuff.com', email: 'info@foodandstuff.com', phone: '(555) 300-3000'
+            });
+            allBusinesses.push({
+                id: 40004, name: 'Entertainment 720', location: 'Pawnee, IN', city: 'Pawnee', state: 'IN', county: 'Wamapoke County', msa: 'Indianapolis-Carmel-Muncie, IN',
+                industry: mockIndustries.find(i => i.code === '56'), sic: '73', employees: 3, sales: 10000, health: 5, sqft: 10000,
+                atRisk: 'High', expandability: 'High', creditRating: 'Poor', website: 'e720.com', email: 'tom@e720.com', phone: '(555) 300-4000'
+            });
+
+            // --- STATE ---
+            let currentPage = 1;
+            const rowsPerPage = 25;
+            let filteredBusinesses = [...allBusinesses];
+            let selectedBusinessIds = new Set();
+            let currentSort = {
+                key: 'health',
+                direction: 'desc'
+            };
+            // Map keys to human-readable names
+            const sortKeyNames = {
+                'health': 'Health Score',
+                'name': 'Business Name',
+                'location': 'Location',
+                'employees': 'Employees',
+                'sales': 'Sales',
+                'sqft': 'Sq. Ft.',
+                'industry.name': 'Industry (NAICS)',
+                'sic': 'Industry (SIC)',
+                'county': 'County',
+                'msa': 'MSA',
+                'atRisk': 'At-Risk',
+                'expandability': 'Expandability',
+                'creditRating': 'Credit Rating'
+            };
+
+            // --- DOM ELEMENTS ---
+            const tableBody = document.getElementById('table-body');
+            const tableHeaders = document.querySelectorAll('.sortable-header');
+            const tableContainerTitle = document.getElementById('table-container-title');
+            const selectedCountEl = document.getElementById('selected-count');
+            const selectAllCheckbox = document.getElementById('select-all-visible');
+            const addToCrmBtn = document.getElementById('add-to-crm-btn');
+            
+            const paginationSummary = document.getElementById('pagination-summary');
+            const currentPageEl = document.getElementById('current-page');
+            const totalPagesEl = document.getElementById('total-pages');
+            const pageFirstBtn = document.getElementById('page-first');
+            const pagePrevBtn = document.getElementById('page-prev');
+            const pageNextBtn = document.getElementById('page-next');
+            const pageLastBtn = document.getElementById('page-last');
+            
+            // Filter Inputs
+            const nameFilter = document.getElementById('filter-business-name');
+            const regionFilter = document.getElementById('filter-region');
+            const industryFilter = document.getElementById('filter-industry');
+            const salesFilter = document.getElementById('filter-sales');
+            const employeesFilter = document.getElementById('filter-employees');
+            const healthMinFilter = document.getElementById('filter-health-min');
+            const healthMaxFilter = document.getElementById('filter-health-max');
+            
+            // Advanced Filter Inputs
+            const quickSearchContainer = document.getElementById('quick-search-container');
+            const advancedSearchFiltersEl = document.getElementById('advanced-search-filters');
+            const quickSearchToggle = document.getElementById('quick-search-toggle');
+            const advancedSearchToggle = document.getElementById('advanced-search-toggle');
+
+            const advCity = document.getElementById('filter-adv-city');
+            const advState = document.getElementById('filter-adv-state');
+            const advCounty = document.getElementById('filter-adv-county');
+            const advMsa = document.getElementById('filter-adv-msa');
+            const advNaics = document.getElementById('filter-adv-naics');
+            const advSic = document.getElementById('filter-adv-sic');
+            const advEmpMin = document.getElementById('filter-adv-emp-min');
+            const advEmpMax = document.getElementById('filter-adv-emp-max');
+            const advSalesMin = document.getElementById('filter-adv-sales-min');
+            const advSalesMax = document.getElementById('filter-adv-sales-max');
+            const advHealthMin = document.getElementById('filter-adv-health-min');
+            const advHealthMax = document.getElementById('filter-adv-health-max');
+            const advSqftMin = document.getElementById('filter-adv-sqft-min');
+            const advSqftMax = document.getElementById('filter-adv-sqft-max');
+            const advAtRisk = document.getElementById('filter-adv-at-risk');
+            const advExpandability = document.getElementById('filter-adv-expandability');
+            const advCredit = document.getElementById('filter-adv-credit');
+
+            const advancedSearchBtn = document.getElementById('advanced-search-btn');
+            const advancedClearBtn = document.getElementById('advanced-clear-btn');
+
+            // Modal
+            const crmModal = document.getElementById('crm-modal');
+            const modalMessage = document.getElementById('modal-message');
+            const closeModalBtn = document.getElementById('close-modal-btn');
+            const confirmModalBtn = document.getElementById('confirm-modal-btn');
+            const modalTagInput = document.getElementById('modal-tag-input');
+            const modalTagSuggestions = document.getElementById('modal-tag-suggestions');
+
+            // Toast
+            const toast = document.getElementById('toast-notification');
+
+
+            // --- STATE NAME/ABBREVIATION MAP ---
+            const stateMap = {
+                'alabama': 'al', 'alaska': 'ak', 'arizona': 'az', 'arkansas': 'ar', 'california': 'ca',
+                'colorado': 'co', 'connecticut': 'ct', 'delaware': 'de', 'florida': 'fl', 'georgia': 'ga',
+                'hawaii': 'hi', 'idaho': 'id', 'illinois': 'il', 'indiana': 'in', 'iowa': 'ia',
+                'kansas': 'ks', 'kentucky': 'ky', 'louisiana': 'la', 'maine': 'me', 'maryland': 'md',
+                'massachusetts': 'ma', 'michigan': 'mi', 'minnesota': 'mn', 'mississippi': 'ms', 'missouri': 'mo',
+                'montana': 'mt', 'nebraska': 'ne', 'nevada': 'nv', 'new hampshire': 'nh', 'new jersey': 'nj',
+                'new mexico': 'nm', 'new york': 'ny', 'north carolina': 'nc', 'north dakota': 'nd', 'ohio': 'oh',
+                'oklahoma': 'ok', 'oregon': 'or', 'pennsylvania': 'pa', 'rhode island': 'ri', 'south carolina': 'sc',
+                'south dakota': 'sd', 'tennessee': 'tn', 'texas': 'tx', 'utah': 'ut', 'vermont': 'vt',
+                'virginia': 'va', 'washington': 'wa', 'west virginia': 'wv', 'wisconsin': 'wi', 'wyoming': 'wy',
+                // Add abbreviations back to full names
+                'al': 'alabama', 'ak': 'alaska', 'az': 'arizona', 'ar': 'arkansas', 'ca': 'california',
+                'co': 'colorado', 'ct': 'connecticut', 'de': 'delaware', 'fl': 'florida', 'ga': 'georgia',
+                'hi': 'hawaii', 'id': 'idaho', 'il': 'illinois', 'in': 'indiana', 'ia': 'iowa',
+                'ks': 'kansas', 'ky': 'kentucky', 'la': 'louisiana', 'me': 'maine', 'md': 'maryland',
+                'ma': 'massachusetts', 'mi': 'michigan', 'mn': 'minnesota', 'ms': 'mississippi', 'mo': 'missouri',
+                'mt': 'montana', 'ne': 'nebraska', 'nv': 'nevada', 'nh': 'new hampshire', 'nj': 'new jersey',
+                'nm': 'new mexico', 'ny': 'new york', 'nc': 'north carolina', 'nd': 'north dakota', 'oh': 'ohio',
+                'ok': 'oklahoma', 'or': 'oregon', 'pa': 'pennsylvania', 'ri': 'rhode island', 'sc': 'south carolina',
+                'sd': 'south dakota', 'tn': 'tennessee', 'tx': 'texas', 'ut': 'utah', 'vt': 'vermont',
+                'va': 'virginia', 'wa': 'washington', 'wv': 'west virginia', 'wi': 'wisconsin', 'wy': 'wyoming'
+            };
+
+
+            // --- UTILITY FUNCTIONS ---
+            
+            // Get color class for health score
+            function getHealthColor(score) {
+                if (score > 80) return 'text-green-600';
+                if (score >= 60) return 'text-green-500';
+                if (score >= 40) return 'text-orange-500';
+                return 'text-red-600';
+            }
+
+            // Get color class for At-Risk
+            function getAtRiskColor(level) {
+                switch (level) {
+                    case 'High': return 'text-red-600';
+                    case 'Medium': return 'text-orange-500';
+                    case 'Low': return 'text-green-600';
+                    default: return 'text-gray-700';
+                }
+            }
+
+            // Get color class for Expandability
+            function getExpandabilityColor(level) {
+                switch (level) {
+                    case 'High': return 'text-green-600';
+                    case 'Medium': return 'text-orange-500';
+                    case 'Low': return 'text-red-600';
+                    default: return 'text-gray-700';
+                }
+            }
+            
+            // Format sales number to a readable string (e.g., $1.5M, $750k)
+            function formatSales(num) {
+                if (num >= 1000000) {
+                    return `$${(num / 1000000).toFixed(1)}M`;
+                }
+                if (num >= 1000) {
+                    return `$${(num / 1000).toFixed(0)}k`;
+                }
+                return `$${num}`;
+            }
+
+            // Parse range strings like "1000-2499" or "10000-Infinity"
+            function parseRange(rangeStr) {
+                if (!rangeStr) return [null, null];
+                const [min, max] = rangeStr.split('-').map(val => (val === 'Infinity' ? Infinity : Number(val)));
+                return [min, max];
+            }
+
+            // Show Toast Notification
+            function showToast(message) {
+                toast.textContent = message;
+                toast.classList.add('show');
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                }, 3000); // Hide after 3 seconds
+            }
+
+            // --- CORE FUNCTIONS ---
+
+            // Render the table for the current page
+            function renderTable() {
+                tableBody.innerHTML = ''; // Clear existing rows
+                
+                const start = (currentPage - 1) * rowsPerPage;
+                const end = start + rowsPerPage;
+                const paginatedBusinesses = filteredBusinesses.slice(start, end);
+                
+                if (paginatedBusinesses.length === 0) {
+                    tableBody.innerHTML = `<tr><td colspan="15" class="text-center py-10 text-gray-500">No businesses found matching your criteria.</td></tr>`;
+                    return;
+                }
+
+                paginatedBusinesses.forEach(biz => {
+                    const row = document.createElement('tr');
+                    row.className = selectedBusinessIds.has(biz.id) ? 'bg-brand-light' : 'hover:bg-gray-50';
+                    
+                    const healthColor = getHealthColor(biz.health);
+                    const atRiskColor = getAtRiskColor(biz.atRisk);
+                    const expandabilityColor = getExpandabilityColor(biz.expandability);
+                    
+                    // Helper to check for null/undefined before toLocaleString
+                    const formatNum = (num) => num ? num.toLocaleString() : 'N/A';
+                    
+                    row.innerHTML = `
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <input type="checkbox" class="row-checkbox h-4 w-4 rounded text-brand-DEFAULT focus:ring-brand-DEFAULT" data-id="${biz.id}" ${selectedBusinessIds.has(biz.id) ? 'checked' : ''}>
+                        </td>
+                        <!-- 1. Health -->
+                        <td class="px-6 py-4 whitespace-nowrap text-lg font-bold ${healthColor}" style="min-width: 130px;">${biz.health}</td>
+                        <!-- 2. Business Name -->
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm font-medium text-gray-900">${biz.name}</div>
+                            <div class="text-xs text-gray-500">${biz.website}</div>
+                        </td>
+                        <!-- 3. Location -->
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">${biz.location}</td>
+                        
+                        <!-- 4. Size (Employees) -->
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">${formatNum(biz.employees)}</td>
+                        <!-- 5. Size (Sales) -->
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">${formatSales(biz.sales)}</td>
+                        <!-- 6. Size (Sq. Ft.) -->
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">${formatNum(biz.sqft)}</td>
+
+                        <!-- 7. Industry (NAICS) -->
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-900">${biz.industry.name}</div>
+                            <div class="text-xs text-gray-500">NAICS: ${biz.industry.code}</div>
+                        </td>
+                        <!-- 8. Industry (SIC) -->
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-900">${biz.industry.name.split(' ')[0]}</div>
+                            <div class="text-xs text-gray-500">SIC: ${biz.sic}</div>
+                        </td>
+
+                        <!-- 9. Region (County) -->
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">${biz.county || 'N/A'}</td>
+                        <!-- 10. Region (MSA) -->
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">${biz.msa || 'N/A'}</td>
+
+                        <!-- Other Business Data -->
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium ${atRiskColor}">${biz.atRisk}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium ${expandabilityColor}">${biz.expandability}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">${biz.creditRating}</td>
+                        
+                        <!-- Contact -->
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-900">${biz.email}</div>
+                            <div class="text-xs text-gray-500">${biz.phone}</div>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            }
+
+            // Update pagination controls and summary
+            function renderPagination() {
+                const totalResults = filteredBusinesses.length;
+                const totalPages = Math.max(1, Math.ceil(totalResults / rowsPerPage));
+                
+                paginationSummary.textContent = `Showing ${totalResults === 0 ? 0 : (currentPage - 1) * rowsPerPage + 1}-${Math.min(currentPage * rowsPerPage, totalResults)} of ${totalResults.toLocaleString()} results`;
+                currentPageEl.textContent = currentPage;
+                totalPagesEl.textContent = totalPages;
+
+                pageFirstBtn.disabled = currentPage === 1;
+                pagePrevBtn.disabled = currentPage === 1;
+                pageNextBtn.disabled = currentPage === totalPages;
+                pageLastBtn.disabled = currentPage === totalPages;
+            }
+
+            // Update the selected count and CRM button state
+            function updateSelection() {
+                const count = selectedBusinessIds.size;
+                const totalResults = filteredBusinesses.length;
+                
+                selectedCountEl.textContent = `${totalResults.toLocaleString()} ${totalResults === 1 ? 'business' : 'businesses'} | ${count} selected`;
+
+                addToCrmBtn.disabled = count === 0;
+
+                // Update row styles
+                document.querySelectorAll('#table-body tr').forEach(row => {
+                    const checkbox = row.querySelector('.row-checkbox');
+                    if (checkbox) {
+                        const id = Number(checkbox.dataset.id);
+                        if (selectedBusinessIds.has(id)) {
+                            row.classList.add('bg-brand-light');
+                        } else {
+                            row.classList.remove('bg-brand-light');
+                        }
+                    }
+                });
+                
+                // Update select-all-visible checkbox
+                const visibleIds = getVisibleBusinessIds();
+                const allVisibleSelected = visibleIds.length > 0 && visibleIds.every(id => selectedBusinessIds.has(id));
+                selectAllCheckbox.checked = allVisibleSelected;
+                selectAllCheckbox.indeterminate = !allVisibleSelected && visibleIds.some(id => selectedBusinessIds.has(id));
+            }
+
+            // Get IDs of businesses currently visible in the table
+            function getVisibleBusinessIds() {
+                return Array.from(document.querySelectorAll('.row-checkbox')).map(cb => Number(cb.dataset.id));
+            }
+
+            // --- SORTING LOGIC ---
+
+            // Function to get nested property value
+            function getNestedValue(obj, path) {
+                return path.split('.').reduce((acc, part) => acc && acc[part], obj);
+            }
+
+            function sortData(key, direction) {
+                filteredBusinesses.sort((a, b) => {
+                    let valA = getNestedValue(a, key);
+                    let valB = getNestedValue(b, key);
+
+                    // Handle different data types
+                    if (typeof valA === 'string') {
+                        valA = valA.toLowerCase();
+                        valB = valB ? valB.toLowerCase() : '';
+                    } else if (typeof valB === 'string') {
+                        valB = valB.toLowerCase();
+                        valA = valA ? valA.toLowerCase() : '';
+                    }
+                    
+                    if (valA === null || valA === undefined) valA = (typeof valB === 'string' ? '' : -Infinity);
+                    if (valB === null || valB === undefined) valB = (typeof valA === 'string' ? '' : -Infinity);
+
+                    if (valA < valB) {
+                        return direction === 'asc' ? -1 : 1;
+                    }
+                    if (valA > valB) {
+                        return direction === 'asc' ? 1 : -1;
+                    }
+                    return 0;
+                });
+            }
+
+            function updateSortIndicators() {
+                // --- NEW DYNAMIC TITLE LOGIC ---
+                const sortName = sortKeyNames[currentSort.key] || 'Health Score';
+                let regionName = '';
+                
+                // Only check regionFilter if in quick search mode
+                if (quickSearchToggle.checked) {
+                    const regionValue = regionFilter.value.trim();
+                    if (regionValue) {
+                        regionName = ` in ${regionValue}`;
+                    }
+                }
+                
+                tableContainerTitle.textContent = `Top 25 businesses${regionName} sorted by ${sortName}`;
+                // --- END NEW DYNAMIC TITLE LOGIC ---
+
+                // Update header indicators
+                tableHeaders.forEach(header => {
+                    const indicator = header.querySelector('.sort-indicator');
+                    if (header.dataset.sortKey === currentSort.key) {
+                        header.classList.add('sorted');
+                        indicator.textContent = currentSort.direction === 'asc' ? '▲' : '▼';
+                    } else {
+                        header.classList.remove('sorted');
+                        indicator.textContent = '';
+                    }
+                });
+            }
+
+            // Main filter function
+            function applyFilters(keepPage = false) {
+                const mode = quickSearchToggle.checked ? 'quick' : 'advanced';
+                
+                // Shared filter
+                const name = nameFilter.value.toLowerCase();
+                
+                // Declare filter vars
+                let region, industry, salesMin, salesMax, empMin, empMax, healthMin, healthMax;
+                
+                // Advanced filter vars
+                let city, state, county, msa, naics, sic, sqftMin, sqftMax, atRisk, expandability, credit;
+
+                if (mode === 'quick') {
+                    region = regionFilter.value.toLowerCase().trim(); // trim whitespace
+                    industry = industryFilter.value.toLowerCase();
+                    [salesMin, salesMax] = parseRange(salesFilter.value);
+                    [empMin, empMax] = parseRange(employeesFilter.value);
+                    healthMin = Number(healthMinFilter.value) || 0;
+                    healthMax = Number(healthMaxFilter.value) || 100;
+                } else {
+                    // Get values from advanced filters
+                    city = advCity.value.toLowerCase();
+                    state = advState.value.toLowerCase();
+                    county = advCounty.value.toLowerCase();
+                    msa = advMsa.value.toLowerCase();
+                    naics = advNaics.value.toLowerCase();
+                    sic = advSic.value.toLowerCase();
+                    empMin = Number(advEmpMin.value) || null;
+                    empMax = Number(advEmpMax.value) || null;
+                    salesMin = Number(advSalesMin.value) || null;
+                    salesMax = Number(advSalesMax.value) || null;
+                    healthMin = Number(advHealthMin.value) || 0;
+                    healthMax = Number(advHealthMax.value) || 100;
+                    sqftMin = Number(advSqftMin.value) || null;
+                    sqftMax = Number(advSqftMax.value) || null;
+                    atRisk = advAtRisk.value;
+                    expandability = advExpandability.value;
+                    credit = advCredit.value;
+                }
+
+                filteredBusinesses = allBusinesses.filter(biz => {
+                    // Name filter (applies to both)
+                    if (name && !biz.name.toLowerCase().includes(name)) return false;
+                    
+                    if (mode === 'quick') {
+                        // --- QUICK FILTER LOGIC ---
+                        if (region) {
+                            const regionAlt = stateMap[region] || null; // Get mapped value (e.g., "il" -> "illinois" or "illinois" -> "il")
+                            const bizState = biz.state ? biz.state.toLowerCase() : null;
+
+                            const regionMatch = biz.location.toLowerCase().includes(region) ||
+                                (biz.county && biz.county.toLowerCase().includes(region)) ||
+                                (bizState && bizState === region) || // Match "il"
+                                (bizState && regionAlt && bizState === regionAlt); // Match "illinois"
+
+                            if (!regionMatch) return false;
+                        }
+
+                        if (industry && !biz.industry.name.toLowerCase().includes(industry)) return false;
+                        
+                        if (salesMin !== null && biz.sales < salesMin) return false;
+                        if (salesMax !== null && salesMax !== Infinity && biz.sales > salesMax) return false;
+                        if (salesMax === Infinity && salesMin !== null && biz.sales < salesMin) return false;
+                        
+                        if (empMin !== null && biz.employees < empMin) return false;
+                        if (empMax !== null && empMax !== Infinity && biz.employees > empMax) return false;
+                        if (empMax === Infinity && empMin !== null && biz.employees < empMin) return false;
+                        
+                        if (biz.health < healthMin || biz.health > healthMax) return false;
+                        
+                    } else {
+                        // --- ADVANCED FILTER LOGIC ---
+                        // Added checks for undefined properties to prevent crashes
+                        if (city && (!biz.city || !biz.city.toLowerCase().includes(city))) return false;
+                        if (state && (!biz.state || !biz.state.toLowerCase().includes(state))) return false;
+                        if (county && (!biz.county || !biz.county.toLowerCase().includes(county))) return false;
+                        if (msa && (!biz.msa || !biz.msa.toLowerCase().includes(msa))) return false;
+                        
+                        // Industry
+                        if (naics && !`${biz.industry.code} - ${biz.industry.name}`.toLowerCase().includes(naics)) return false;
+                        if (sic && !`${biz.sic} - ${biz.industry.name.split(' ')[0]}`.toLowerCase().includes(sic)) return false;
+
+                        // Business Data
+                        if (empMin !== null && biz.employees < empMin) return false;
+                        if (empMax !== null && biz.employees > empMax) return false;
+                        
+                        if (salesMin !== null && biz.sales < salesMin) return false;
+                        if (salesMax !== null && biz.sales > salesMax) return false;
+                        
+                        if (biz.health < healthMin || biz.health > healthMax) return false;
+
+                        if (sqftMin !== null && biz.sqft < sqftMin) return false;
+                        if (sqftMax !== null && biz.sqft > sqftMax) return false;
+                        
+                        if (atRisk && biz.atRisk !== atRisk) return false;
+                        if (expandability && biz.expandability !== expandability) return false;
+                        if (credit && biz.creditRating !== credit) return false;
+                    }
+
+                    return true;
+                });
+                
+                // Apply current sort
+                sortData(currentSort.key, currentSort.direction);
+
+                if (!keepPage) {
+                    currentPage = 1;
+                }
+                
+                renderTable();
+                renderPagination();
+                updateSelection(); // To update select-all checkbox state and counts
+                updateSortIndicators(); // To show default sort AND UPDATE TITLE
+            }
+            
+            // --- AUTOCOMPLETE LOGIC ---
+            
+            // Autocomplete data
+            const regionSuggestions = [...new Set(allBusinesses.flatMap(b => [b.location, b.county].filter(Boolean)))].sort();
+            const industrySuggestions = mockIndustries.map(ind => ind.name);
+            
+            function setupAutocomplete(inputEl, suggestionsEl, data, autoFilter = true) {
+                inputEl.addEventListener('input', () => {
+                    const value = inputEl.value.toLowerCase();
+                    if (!value) {
+                        suggestionsEl.innerHTML = '';
+                        suggestionsEl.classList.add('hidden');
+                        return;
+                    }
+                    
+                    const filteredData = data.filter(item => item.toLowerCase().includes(value)).slice(0, 5);
+                    suggestionsEl.innerHTML = '';
+                    
+                    if (filteredData.length > 0) {
+                        suggestionsEl.classList.remove('hidden');
+                        filteredData.forEach(item => {
+                            const itemEl = document.createElement('div');
+                            itemEl.className = 'autocomplete-item';
+                            itemEl.textContent = item;
+                            itemEl.addEventListener('click', () => {
+                                inputEl.value = item;
+                                suggestionsEl.innerHTML = '';
+                                suggestionsEl.classList.add('hidden');
+                                if (autoFilter) {
+                                    applyFilters(); // Re-apply filters when item is selected
+                                }
+                            });
+                            suggestionsEl.appendChild(itemEl);
+                        });
+                    } else {
+                        suggestionsEl.classList.add('hidden');
+                    }
+                });
+                
+                // Hide suggestions on outside click
+                document.addEventListener('click', (e) => {
+                    if (e.target !== inputEl && !suggestionsEl.contains(e.target)) {
+                        suggestionsEl.classList.add('hidden');
+                    }
+                });
+            }
+
+            // Special Autocomplete for Tags (with "Create New")
+            function setupTagAutocomplete(inputEl, suggestionsEl, data) {
+                const renderSuggestions = () => {
+                    const value = inputEl.value.toLowerCase();
+                    suggestionsEl.innerHTML = '';
+                    
+                    const filteredData = data.filter(item => item.toLowerCase().includes(value)).slice(0, 5);
+                    
+                    // Check if exact match or new tag
+                    const isNewTag = value && !data.some(item => item.toLowerCase() === value);
+                    
+                    if (isNewTag) {
+                        const newTagEl = document.createElement('div');
+                        newTagEl.className = 'autocomplete-item-new';
+                        newTagEl.innerHTML = `Create new tag: "<strong>${inputEl.value}</strong>"`;
+                        newTagEl.addEventListener('click', () => {
+                            // Value is already in the input, just close
+                            suggestionsEl.classList.add('hidden');
+                        });
+                        suggestionsEl.appendChild(newTagEl);
+                    }
+
+                    if (filteredData.length > 0) {
+                        filteredData.forEach(item => {
+                            const itemEl = document.createElement('div');
+                            itemEl.className = 'autocomplete-item';
+                            itemEl.textContent = item;
+                            itemEl.addEventListener('click', () => {
+                                inputEl.value = item;
+                                suggestionsEl.innerHTML = '';
+                                suggestionsEl.classList.add('hidden');
+                            });
+                            suggestionsEl.appendChild(itemEl);
+                        });
+                    }
+
+                    if (suggestionsEl.children.length > 0) {
+                        suggestionsEl.classList.remove('hidden');
+                    } else {
+                        suggestionsEl.classList.add('hidden');
+                    }
+                };
+                
+                inputEl.addEventListener('input', renderSuggestions);
+                inputEl.addEventListener('focus', renderSuggestions); // Show on focus
+                
+                // Hide suggestions on outside click
+                document.addEventListener('click', (e) => {
+                    if (e.target !== inputEl && !suggestionsEl.contains(e.target)) {
+                        suggestionsEl.classList.add('hidden');
+                    }
+                });
+            }
+            
+            // Quick Search Autocompletes
+            setupAutocomplete(regionFilter, document.getElementById('region-suggestions'), regionSuggestions, true);
+            setupAutocomplete(industryFilter, document.getElementById('industry-suggestions'), industrySuggestions, true);
+
+            // Advanced Search Autocompletes
+            setupAutocomplete(advCity, document.getElementById('filter-adv-city-suggestions'), mockCities, false);
+            setupAutocomplete(advState, document.getElementById('filter-adv-state-suggestions'), mockStates, false);
+            setupAutocomplete(advCounty, document.getElementById('filter-adv-county-suggestions'), mockCounties, false);
+            setupAutocomplete(advMsa, document.getElementById('filter-adv-msa-suggestions'), mockMSAs, false);
+            setupAutocomplete(advNaics, document.getElementById('filter-adv-naics-suggestions'), mockNAICS, false);
+            setupAutocomplete(advSic, document.getElementById('filter-adv-sic-suggestions'), mockSICs, false);
+
+            // Modal Tag Autocomplete
+            setupTagAutocomplete(modalTagInput, modalTagSuggestions, mockTags);
+            
+            // --- EVENT LISTENERS ---
+            
+            // Shared Filter Listener
+            let nameFilterTimeout; // Declare timeout variable outside the listener
+            nameFilter.addEventListener('keyup', () => {
+                clearTimeout(nameFilterTimeout); // Clear previous timeout
+                nameFilterTimeout = setTimeout(() => applyFilters(), 300); // Set new timeout
+            });
+
+            // Quick Filter listeners
+            [regionFilter, industryFilter, salesFilter, employeesFilter, healthMinFilter, healthMaxFilter].forEach(el => {
+                if (el.tagName === 'SELECT') {
+                    el.addEventListener('change', () => applyFilters());
+                } else {
+                    // Apply filters on keyup for text inputs, but debounce it for performance
+                    let timeout;
+                    el.addEventListener('keyup', () => {
+                        clearTimeout(timeout);
+                        timeout = setTimeout(() => applyFilters(), 300);
+                    });
+                }
+            });
+            
+            // Advanced Filter Listeners
+            advancedSearchBtn.addEventListener('click', () => applyFilters());
+            advancedClearBtn.addEventListener('click', () => {
+                // Clear all advanced fields
+                const advancedInputs = advancedSearchFiltersEl.querySelectorAll('input, select');
+                advancedInputs.forEach(input => {
+                    if (input.tagName === 'SELECT') {
+                        input.value = '';
+                    } else {
+                        input.value = '';
+                    }
+                });
+                // Re-run the (now empty) search
+                applyFilters();
+            });
+
+            // Search Mode Toggle Listeners
+            quickSearchToggle.addEventListener('change', () => {
+                if (quickSearchToggle.checked) {
+                    quickSearchContainer.classList.remove('hidden');
+                    advancedSearchFiltersEl.classList.add('hidden');
+                    applyFilters(); // Re-apply quick filters
+                }
+            });
+            advancedSearchToggle.addEventListener('change', () => {
+                if (advancedSearchToggle.checked) {
+                    quickSearchContainer.classList.add('hidden');
+                    advancedSearchFiltersEl.classList.remove('hidden');
+                    // Do not auto-apply filters, wait for "Search" button click
+                    // We call applyFilters() here to clear the results and show the state
+                    // of the empty advanced filters.
+                    applyFilters(); 
+                }
+            });
+
+            // Collapsible Section Listeners
+            document.querySelectorAll('.collapsible-trigger').forEach(button => {
+                button.addEventListener('click', () => {
+                    const content = document.querySelector(button.dataset.toggleTarget);
+                    const icon = button.querySelector('svg');
+                    if (content) {
+                        content.classList.toggle('hidden');
+                        icon.classList.toggle('rotate-180');
+                    }
+                });
+            });
+
+            // Sorting Listeners
+            tableHeaders.forEach(header => {
+                header.addEventListener('click', () => {
+                    const key = header.dataset.sortKey;
+                    if (!key) return;
+
+                    if (currentSort.key === key) {
+                        currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+                    } else {
+                        currentSort.key = key;
+                        currentSort.direction = 'asc';
+                    }
+                    
+                    // Re-apply filters which will also sort and render
+                    applyFilters(true); // true = keep current page
+                });
+            });
+
+            // Pagination listeners
+            pageFirstBtn.addEventListener('click', () => {
+                currentPage = 1;
+                renderTable();
+                renderPagination();
+                updateSelection();
+            });
+            pagePrevBtn.addEventListener('click', () => {
+                if (currentPage > 1) {
+                    currentPage--;
+                    renderTable();
+                    renderPagination();
+                    updateSelection();
+                }
+            });
+            pageNextBtn.addEventListener('click', () => {
+                const totalPages = Math.ceil(filteredBusinesses.length / rowsPerPage);
+                if (currentPage < totalPages) {
+                    currentPage++;
+                    renderTable();
+                    renderPagination();
+                    updateSelection();
+                }
+            });
+            pageLastBtn.addEventListener('click', () => {
+                currentPage = Math.max(1, Math.ceil(filteredBusinesses.length / rowsPerPage));
+                renderTable();
+                renderPagination();
+                updateSelection();
+            });
+            
+            // Selection listeners
+            tableBody.addEventListener('click', (e) => {
+                if (e.target.classList.contains('row-checkbox')) {
+                    const id = Number(e.target.dataset.id);
+                    if (e.target.checked) {
+                        selectedBusinessIds.add(id);
+                    } else {
+                        selectedBusinessIds.delete(id);
+                    }
+                    updateSelection();
+                }
+            });
+            
+            selectAllCheckbox.addEventListener('click', (e) => {
+                const visibleIds = getVisibleBusinessIds();
+                if (e.target.checked) {
+                    // Select all visible
+                    visibleIds.forEach(id => selectedBusinessIds.add(id));
+                } else {
+                    // Deselect all visible
+                    visibleIds.forEach(id => selectedBusinessIds.delete(id));
+                }
+                updateSelection();
+                
+                // Need to re-check checkboxes manually
+                document.querySelectorAll('.row-checkbox').forEach(cb => {
+                    cb.checked = e.target.checked;
+                });
+            });
+            
+            // Modal listeners
+            addToCrmBtn.addEventListener('click', () => {
+                const count = selectedBusinessIds.size;
+                if (count > 0) {
+                    modalMessage.textContent = `${count} ${count === 1 ? 'business' : 'businesses'} will be added to your contacts list.`;
+                    crmModal.classList.add('visible');
+                }
+            });
+
+            const closeModal = () => {
+                crmModal.classList.remove('visible');
+                // Clear tag input for next time
+                modalTagInput.value = '';
+                modalTagSuggestions.classList.add('hidden');
+            };
+
+            closeModalBtn.addEventListener('click', closeModal);
+            crmModal.addEventListener('click', (e) => {
+                if (e.target === crmModal) { // Only close if clicking the overlay
+                    closeModal();
+                }
+            });
+
+            confirmModalBtn.addEventListener('click', () => {
+                const count = selectedBusinessIds.size;
+                const tag = modalTagInput.value.trim();
+
+                // Logic to "add to CRM" would go here
+                // For demo, we just log it
+                console.log(`Adding ${count} businesses to CRM...`);
+                if (tag) {
+                    console.log(`With new tag: "${tag}"`);
+                    // Add new tag to mock data if it's not already there
+                    if (!mockTags.some(t => t.toLowerCase() === tag.toLowerCase())) {
+                        mockTags.push(tag);
+                    }
+                } else {
+                    console.log("With no tag.");
+                }
+
+                // Clear selection
+                selectedBusinessIds.clear();
+                
+                closeModal();
+                
+                // Show toast notification
+                showToast(`${count} ${count === 1 ? 'business' : 'businesses'} added to contacts.`);
+
+                // Re-render table to show cleared selection
+                applyFilters(true); // true = keep current page
+            });
+
+
+            // --- INITIALIZATION ---
+            regionFilter.value = 'Illinois'; // Set default region
+            applyFilters();
+        });
+    </script>
+</body>
+</html>
