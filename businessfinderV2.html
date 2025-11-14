@@ -140,6 +140,9 @@
             transition: all 0.2s ease-in-out;
             border: 1px solid #003760; /* brand.DEFAULT */
             color: #003760;
+            white-space: nowrap; /* Prevent wrapping */
+            font-size: 0.875rem; /* text-sm */
+            padding: 0.5rem 1rem; /* Reduced padding */
         }
         input[type="radio"].toggle-radio:checked + label {
             background-color: #003760; /* brand.DEFAULT */
@@ -179,6 +182,61 @@
         }
         .modal-overlay.visible .modal-content {
             transform: scale(1);
+        }
+
+        /* Hide scrollbar on real table container */
+        #real-table-container {
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
+        #real-table-container::-webkit-scrollbar {
+            display: none; /* Chrome, Safari, Opera */
+        }
+
+        /* Tooltip styles */
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 250px;
+            background-color: #2d3748; /* gray-800 */
+            color: #fff;
+            text-align: center;
+            border-radius: 0.375rem; /* rounded-md */
+            padding: 8px;
+            position: absolute;
+            z-index: 10;
+            bottom: 150%; /* Position above the icon */
+            left: 50%;
+            margin-left: -125px; /* Use half of the width to center */
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 0.75rem; /* text-xs */
+            font-weight: 400; /* normal */
+            line-height: 1.5;
+        }
+        .tooltip .tooltiptext::after {
+            content: "";
+            position: absolute;
+            top: 100%; /* At the bottom of the tooltip */
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #2d3748 transparent transparent transparent;
+        }
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+        .tooltip-icon {
+            cursor: help;
+            color: #9ca3af; /* gray-400 */
+            width: 16px;
+            height: 16px;
+            margin-left: 4px;
         }
 
         /* Toast Notification Styles */
@@ -630,7 +688,7 @@
                                 </svg>
                             </div>
                             <div class="user-details-wrapper">
-                                <div class="user-details-container d-flex align-items-center">
+                                <div class="user-details-container d-flex align-items: center">
                                     <div class="name-initial-container">
                                         <div id="name">ED</div>
                                     </div>
@@ -692,7 +750,7 @@
                 <!-- Main Content Area -->
                 <div class="main-content-wrapper">
                     <!-- NEW: Prototype Label -->
-                    <div class="text-center py-2 bg-gray-100 mb-4 rounded">
+                    <div class="text-center py-2 bg-gray-100 rounded mb-1"> <!-- Reduced mb-4 to mb-1 -->
                         <span class="text-2xl font-bold text-brand-text">CivicServeLabs: </span>
                         <span class="text-2xl font-bold text-prototype-teal">Coming Soon!</span>
                     </div>
@@ -700,67 +758,70 @@
                     <div class="container mx-auto p-4 md:p-8 max-w-7xl">
 
         <!-- Page Title -->
-        <h1 class="text-3xl md:text-4xl font-semibold text-brand-text text-center mt-4">
-            Find the Businesses that support your regional economy
+        <h1 class="text-2xl md:text-3xl font-semibold text-brand-text text-center mt-2"> <!-- Reduced font size -->
+            Discover Businesses to Recruit to Your Region!
         </h1>
 
-        <!-- Search Mode Toggle -->
-        <div class="flex justify-center my-6">
-            <div class="flex rounded-md" role="group">
-                <input type="radio" id="quick-search-toggle" name="search-type" value="quick" class="toggle-radio" checked>
-                <label for="quick-search-toggle" class="px-6 py-2 font-medium rounded-l-md cursor-pointer bg-white">
-                    Quick Search
-                </label>
-                
-                <input type="radio" id="advanced-search-toggle" name="search-type" value="advanced" class="toggle-radio">
-                <label for="advanced-search-toggle" class="px-6 py-2 font-medium rounded-r-md cursor-pointer bg-white">
-                    Advanced Search
-                </label>
+        <!-- Main Business Search & Toggle -->
+        <div class="mt-6 mb-6 flex flex-col md:flex-row items-center gap-4"> <!-- Reduced mt-8 to mt-6 -->
+            <!-- Search Bar -->
+            <div class="flex-grow w-full">
+                <label for="filter-business-name" class="block text-sm font-medium text-gray-700 sr-only">Business Search</label>
+                <input type="text" id="filter-business-name" placeholder="Search by Business Name..." class="w-full rounded-md border-gray-300 shadow-sm focus:border-brand-DEFAULT focus:ring-brand-DEFAULT sm:text-lg p-4">
+            </div>
+            
+            <!-- Search Mode Toggle -->
+            <div class="flex-shrink-0">
+                <div class="flex rounded-md" role="group">
+                    <input type="radio" id="quick-search-toggle" name="search-type" value="quick" class="toggle-radio" checked>
+                    <label for="quick-search-toggle" class="px-4 py-2 font-medium rounded-l-md cursor-pointer bg-white"> <!-- Adjusted padding -->
+                        Quick
+                    </label>
+                    
+                    <input type="radio" id="advanced-search-toggle" name="search-type" value="advanced" class="toggle-radio">
+                    <label for="advanced-search-toggle" class="px-4 py-2 font-medium rounded-r-md cursor-pointer bg-white"> <!-- Adjusted padding -->
+                        Advanced
+                    </label>
+                </div>
             </div>
         </div>
 
-        <!-- Main Business Search -->
-        <div class="mt-8 mb-6">
-            <label for="filter-business-name" class="block text-sm font-medium text-gray-700 sr-only">Business Search</label>
-            <input type="text" id="filter-business-name" placeholder="Search by Business Name..." class="w-full rounded-md border-gray-300 shadow-sm focus:border-brand-DEFAULT focus:ring-brand-DEFAULT sm:text-lg p-4">
-        </div>
-
         <!-- Quick Search Filters Container -->
-        <div id="quick-search-container" class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-            <h2 class="text-xl font-semibold text-brand-text">Quick Multi-Search Fields</h2>
-            <p class="text-sm text-gray-600 mt-1 mb-6">Use any of the fields below to filter your results. You can use a single field or combine multiple.</p>
+        <div id="quick-search-container" class="bg-white p-4 rounded-lg shadow-sm border border-gray-200"> <!-- Reduced p-6 to p-4 -->
+            <h2 class="text-lg font-semibold text-brand-text">Quick Multi-Search Fields</h2> <!-- Reduced text-xl to text-lg -->
+            <p class="text-xs text-gray-600 mt-1 mb-4">Use any of the fields below to filter your results.</p> <!-- Reduced text-sm to text-xs, mb-6 to mb-4 -->
             
             <!-- 2x2 Filter Grid (Quick Search) -->
-            <div id="quick-search-filters" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div id="quick-search-filters" class="grid grid-cols-1 md:grid-cols-2 gap-4"> <!-- Reduced gap-6 to gap-4 -->
                 
                 <!-- Region Filter -->
-                <div class="bg-gray-50 p-6 rounded-lg border border-gray-200">
-                    <h3 class="text-lg font-semibold text-brand-text">Region</h3>
-                    <p class="text-sm text-gray-600 mt-1 mb-4">Find businesses across the US to include in attraction campaigns.</p>
+                <div class="bg-gray-50 p-4 rounded-lg border border-gray-200"> <!-- Reduced p-6 to p-4 -->
+                    <h3 class="text-base font-semibold text-brand-text">Region</h3> <!-- Reduced text-lg to text-base -->
+                    <p class="text-xs text-gray-600 mt-1 mb-2">Find businesses across the US to include in attraction campaigns.</p> <!-- Reduced text-sm to text-xs, mb-4 to mb-2 -->
                     <div class="relative">
-                        <input type="text" id="filter-region" placeholder="Enter city, state, or county..." class="block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-DEFAULT focus:ring-brand-DEFAULT sm:text-sm p-3">
+                        <input type="text" id="filter-region" placeholder="Enter city, state, or county..." class="block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-DEFAULT focus:ring-brand-DEFAULT sm:text-sm p-2"> <!-- Reduced p-3 to p-2 -->
                         <div id="region-suggestions" class="autocomplete-list w-full hidden"></div>
                     </div>
                 </div>
 
                 <!-- Industry Filter -->
-                <div class="bg-gray-50 p-6 rounded-lg border border-gray-200">
-                    <h3 class="text-lg font-semibold text-brand-text">Industry</h3>
-                    <p class="text-sm text-gray-600 mt-1 mb-4">Target specific industries that support your regional economy!</p>
+                <div class="bg-gray-50 p-4 rounded-lg border border-gray-200"> <!-- Reduced p-6 to p-4 -->
+                    <h3 class="text-base font-semibold text-brand-text">Industry</h3> <!-- Reduced text-lg to text-base -->
+                    <p class="text-xs text-gray-600 mt-1 mb-2">Target specific industries that support your regional economy!</p> <!-- Reduced text-sm to text-xs, mb-4 to mb-2 -->
                     <div class="relative">
-                        <input type="text" id="filter-industry" placeholder="e.g. 'Manufacturing' or 'Data Centers'" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-DEFAULT focus:ring-brand-DEFAULT sm:text-sm p-3">
+                        <input type="text" id="filter-industry" placeholder="e.g. 'Manufacturing' or 'Data Centers'" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-DEFAULT focus:ring-brand-DEFAULT sm:text-sm p-2"> <!-- Reduced p-3 to p-2 -->
                         <div id="industry-suggestions" class="autocomplete-list w-full hidden"></div>
                     </div>
                 </div>
 
                 <!-- Size Filter -->
-                <div class="bg-gray-50 p-6 rounded-lg border border-gray-200">
-                    <h3 class="text-lg font-semibold text-brand-text">Size</h3>
-                    <p class="text-sm text-gray-600 mt-1 mb-4">Filter by company size based on sales revenue or employee count.</p>
+                <div class="bg-gray-50 p-4 rounded-lg border border-gray-200"> <!-- Reduced p-6 to p-4 -->
+                    <h3 class="text-base font-semibold text-brand-text">Size</h3> <!-- Reduced text-lg to text-base -->
+                    <p class="text-xs text-gray-600 mt-1 mb-2">Filter by company size based on sales revenue or employee count.</p> <!-- Reduced text-sm to text-xs, mb-4 to mb-2 -->
                     <div class="flex flex-col md:flex-row gap-4">
                         <div class="flex-1">
-                            <label for="filter-sales" class="block text-sm font-medium text-gray-700">Sales</label>
-                            <select id="filter-sales" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-DEFAULT focus:ring-brand-DEFAULT sm:text-sm p-3">
+                            <label for="filter-sales" class="block text-xs font-medium text-gray-700">Sales</label> <!-- Reduced text-sm to text-xs -->
+                            <select id="filter-sales" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-DEFAULT focus:ring-brand-DEFAULT sm:text-sm p-2"> <!-- Reduced p-3 to p-2 -->
                                 <option value="">Any Sales</option>
                                 <option value="0-500000">$0 - $500k</option>
                                 <option value="500000-1000000">$500k - $1M</option>
@@ -774,8 +835,8 @@
                             </select>
                         </div>
                         <div class="flex-1">
-                            <label for="filter-employees" class="block text-sm font-medium text-gray-700">Employees</label>
-                            <select id="filter-employees" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-DEFAULT focus:ring-brand-DEFAULT sm:text-sm p-3">
+                            <label for="filter-employees" class="block text-xs font-medium text-gray-700">Employees</label> <!-- Reduced text-sm to text-xs -->
+                            <select id="filter-employees" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-DEFAULT focus:ring-brand-DEFAULT sm:text-sm p-2"> <!-- Reduced p-3 to p-2 -->
                                 <option value="">Any Employees</option>
                                 <option value="1-4">1-4</option>
                                 <option value="5-9">5-9</option>
@@ -794,18 +855,24 @@
                     </div>
                 </div>
 
-                <!-- Health Filter -->
-                <div class="bg-gray-50 p-6 rounded-lg border border-gray-200">
-                    <h3 class="text-lg font-semibold text-brand-text">Health</h3>
-                    <p class="text-sm text-gray-600 mt-1 mb-4">Our health score (1-100) estimates business viability. Find healthy companies to target.</p>
+                <!-- Expandability Score Filter (Replaces Health) -->
+                <div class="bg-gray-50 p-4 rounded-lg border border-gray-200"> <!-- Reduced p-6 to p-4 -->
+                    <h3 class="flex items-center text-base font-semibold text-brand-text"> <!-- Reduced text-lg to text-base -->
+                        Expandability Score
+                        <div class="tooltip">
+                            <svg class="tooltip-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            <span class="tooltiptext">CivicServe combines data from a variety of sources to assess business health and capacity for expansion. The more indicators of expansion are present, the higher the score.</span>
+                        </div>
+                    </h3>
+                    <p class="text-xs text-gray-600 mt-1 mb-2">Our score (1-100) estimates expandability. Find high-growth companies to target.</p> <!-- Reduced text-sm to text-xs, mb-4 to mb-2 -->
                     <div class="flex flex-col md:flex-row gap-4">
                         <div class="flex-1">
-                            <label for="filter-health-min" class="block text-sm font-medium text-gray-700">Min Health</label>
-                            <input type="number" id="filter-health-min" min="0" max="100" placeholder="0" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-DEFAULT focus:ring-brand-DEFAULT sm:text-sm p-3">
+                            <label for="filter-expandability-min" class="block text-xs font-medium text-gray-700">Min Score</label> <!-- Reduced text-sm to text-xs -->
+                            <input type="number" id="filter-expandability-min" min="0" max="100" placeholder="0" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-DEFAULT focus:ring-brand-DEFAULT sm:text-sm p-2"> <!-- Reduced p-3 to p-2 -->
                         </div>
                         <div class="flex-1">
-                            <label for="filter-health-max" class="block text-sm font-medium text-gray-700">Max Health</label>
-                            <input type="number" id="filter-health-max" min="0" max="100" placeholder="100" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-DEFAULT focus:ring-brand-DEFAULT sm:text-sm p-3">
+                            <label for="filter-expandability-max" class="block text-xs font-medium text-gray-700">Max Score</label> <!-- Reduced text-sm to text-xs -->
+                            <input type="number" id="filter-expandability-max" min="0" max="100" placeholder="100" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-DEFAULT focus:ring-brand-DEFAULT sm:text-sm p-2"> <!-- Reduced p-3 to p-2 -->
                         </div>
                     </div>
                 </div>
@@ -958,11 +1025,11 @@
         <!-- NEW: Data Table Container -->
         <div class="mt-8 bg-white rounded-lg shadow-sm border border-gray-200">
             <!-- Container Header -->
-            <div class="px-6 py-4 border-b border-gray-200">
+            <div class="px-6 py-3 border-b border-gray-200"> <!-- Reduced py-4 to py-3 -->
                 <h2 id="table-container-title" class="text-xl font-semibold text-brand-text">
-                    Top 25 businesses sorted by Health Score
+                    Top 10 businesses sorted by Expandability Score
                 </h2>
-                <p class="text-sm text-gray-600 mt-1">This is a list of the top 25 businesses based on your search and sort criteria. Select businesses and add them to your contacts.</p>
+                <!-- <p class="text-sm text-gray-600 mt-1">This is a list of the top 10 businesses based on your search and sort criteria. Select businesses and add them to your contacts.</p> --> <!-- Removed this line -->
             </div>
 
             <!-- Action Bar (Select Count & Button) -->
@@ -977,67 +1044,54 @@
                 </button>
             </div>
 
+            <!-- NEW: Fake Scrollbar Container -->
+            <div id="fake-scrollbar-container" class="overflow-x-auto overflow-y-hidden" style="height: 20px; background: #f9fafb;">
+                <div id="fake-scrollbar-content" style="height: 1px;"></div>
+            </div>
+
             <!-- Data Table -->
-            <div class="overflow-x-auto">
+            <div id="real-table-container" class="overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
                         <tr>
                             <th scope="col" class="px-6 py-3">
-                                <!-- This cell is for the checkbox, but the input is in the action bar -->
+                                <!-- This cell is for the checkbox -->
                             </th>
-                            <!-- 1. Health -->
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider sortable-header whitespace-nowrap" data-sort-key="health" style="min-width: 130px;">
-                                Health Score <span class="sort-indicator"></span>
-                            </th>
-                            <!-- 2. Business Name -->
+                            <!-- 1. Business Name -->
                             <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider sortable-header whitespace-nowrap" data-sort-key="name">
                                 Business Name <span class="sort-indicator"></span>
                             </th>
-                            <!-- 3. Location -->
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider sortable-header whitespace-nowrap" data-sort-key="location">
-                                Location <span class="sort-indicator"></span>
-                            </th>
-                            <!-- 4. Size (Employees) -->
+                            <!-- 2. Employees -->
                             <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider sortable-header whitespace-nowrap" data-sort-key="employees">
                                 Employees <span class="sort-indicator"></span>
                             </th>
-                            <!-- 5. Size (Sales) -->
+                            <!-- 3. Sales -->
                             <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider sortable-header whitespace-nowrap" data-sort-key="sales">
                                 Sales <span class="sort-indicator"></span>
                             </th>
-                            <!-- 6. Size (Sq. Ft.) -->
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider sortable-header whitespace-nowrap" data-sort-key="sqft">
-                                Sq. Ft. <span class="sort-indicator"></span>
+                            <!-- 4. Expandability Score -->
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider sortable-header whitespace-nowrap" data-sort-key="expandabilityScore" style="min-width: 130px;">
+                                Expandability Score <span class="sort-indicator"></span>
                             </th>
-                            <!-- 7. Industry (NAICS) -->
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider sortable-header whitespace-nowrap" data-sort-key="industry.name">
-                                Industry (NAICS) <span class="sort-indicator"></span>
-                            </th>
-                            <!-- 8. Industry (SIC) -->
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider sortable-header whitespace-nowrap" data-sort-key="sic">
-                                Industry (SIC) <span class="sort-indicator"></span>
-                            </th>
-                            <!-- 9. Region (County) -->
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider sortable-header whitespace-nowrap" data-sort-key="county">
-                                County <span class="sort-indicator"></span>
-                            </th>
-                            <!-- 10. Region (MSA) -->
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider sortable-header whitespace-nowrap" data-sort-key="msa">
-                                MSA <span class="sort-indicator"></span>
-                            </th>
-                            <!-- Other Business Data -->
+                            <!-- 5. At-Risk -->
                             <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider sortable-header whitespace-nowrap" data-sort-key="atRisk">
                                 At-Risk <span class="sort-indicator"></span>
                             </th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider sortable-header whitespace-nowrap" data-sort-key="expandability">
-                                Expandability <span class="sort-indicator"></span>
-                            </th>
+                            <!-- 6. Credit Rating -->
                             <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider sortable-header whitespace-nowrap" data-sort-key="creditRating">
                                 Credit Rating <span class="sort-indicator"></span>
                             </th>
-                            <!-- Contact -->
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
-                                Contact
+                            <!-- 7. Sq. Ft. -->
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider sortable-header whitespace-nowrap" data-sort-key="sqft">
+                                Sq. Ft. <span class="sort-indicator"></span>
+                            </th>
+                            <!-- 8. Industry (NAICS) -->
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider sortable-header whitespace-nowrap" data-sort-key="industry.name">
+                                Industry (NAICS) <span class="sort-indicator"></span>
+                            </th>
+                            <!-- 9. Location -->
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider sortable-header whitespace-nowrap" data-sort-key="location">
+                                Location <span class="sort-indicator"></span>
                             </th>
                         </tr>
                     </thead>
@@ -1050,13 +1104,13 @@
             <!-- Pagination -->
             <div id="pagination-controls" class="flex flex-col md:flex-row justify-between items-center px-4 py-3 border-t border-gray-200">
                 <span id="pagination-summary" class="text-sm text-gray-700 mb-2 md:mb-0">
-                    Showing 1-25 of 12,345 results
+                    Showing 1-10 of 12,345 results
                 </span>
                 <div class="flex gap-2">
                     <button id="page-first" class="px-3 py-1 text-sm font-medium rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 disabled:opacity-50">First</button>
                     <button id="page-prev" class="px-3 py-1 text-sm font-medium rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 disabled:opacity-50">Previous</button>
                     <span class="px-3 py-1 text-sm font-medium text-gray-900">
-                        Page <span id="current-page">1</span> of <span id="total-pages">494</span>
+                        Page <span id="current-page">1</span> of <span id="total-pages">1235</span>
                     </span>
                     <button id="page-next" class="px-3 py-1 text-sm font-medium rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 disabled:opacity-50">Next</button>
                     <button id="page-last" class="px-3 py-1 text-sm font-medium rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 disabled:opacity-50">Last</button>
@@ -1256,9 +1310,10 @@
                         employees: employees,
                         sales: sales,
                         health: Math.floor(Math.random() * 100) + 1,
+                        expandabilityScore: Math.floor(Math.random() * 100) + 1, // NEW: Add expandability score for quick filter
                         sqft: Math.floor(Math.random() * 100000) + 1000,
                         atRisk: generatedAtRisk,
-                        expandability: generatedExpandability,
+                        expandability: generatedExpandability, // This is the 'High/Medium/Low' value for advanced search
                         creditRating: mockCreditRatings[i % mockCreditRatings.length],
                         website: name.toLowerCase().replace(/[^a-z0-9]/g, '') + '.com',
                         email: 'contact@' + name.toLowerCase().replace(/[^a-z0-9]/g, '') + '.com',
@@ -1273,82 +1328,109 @@
             // Springfield (ID 20000+)
             allBusinesses.push({
                 id: 20001, name: 'Capital City Futures Lab', location: 'Springfield, IL', city: 'Springfield', state: 'IL', county: 'Sangamon County', msa: 'Springfield, IL',
-                industry: mockIndustries.find(i => i.code === '5417'), sic: '8731', employees: 850, sales: 150000000, health: 98, sqft: 120000,
+                industry: mockIndustries.find(i => i.code === '5417'), sic: '8731', employees: 850, sales: 150000000, health: 98, expandabilityScore: 95, sqft: 120000,
                 atRisk: 'Low', expandability: 'High', creditRating: 'Excellent', website: 'ccfl.com', email: 'info@ccfl.com', phone: '(555) 100-1000'
             });
             allBusinesses.push({
                 id: 20002, name: 'Tomorrow Tower Industries', location: 'Springfield, IL', city: 'Springfield', state: 'IL', county: 'Sangamon County', msa: 'Springfield, IL',
-                industry: mockIndustries.find(i => i.code === '3341'), sic: '3571', employees: 2200, sales: 450000000, health: 92, sqft: 500000,
+                industry: mockIndustries.find(i => i.code === '3341'), sic: '3571', employees: 2200, sales: 450000000, health: 92, expandabilityScore: 88, sqft: 500000,
                 atRisk: 'Low', expandability: 'Medium', creditRating: 'Excellent', website: 'tomorrowtower.com', email: 'contact@tomorrowtower.com', phone: '(555) 100-2000'
             });
             allBusinesses.push({
                 id: 20003, name: 'Old Capitol Magic Shoppe', location: 'Springfield, IL', city: 'Springfield', state: 'IL', county: 'Sangamon County', msa: 'Springfield, IL',
-                industry: mockIndustries.find(i => i.code === '44-45'), sic: '52', employees: 12, sales: 850000, health: 65, sqft: 2000,
+                industry: mockIndustries.find(i => i.code === '44-45'), sic: '52', employees: 12, sales: 850000, health: 65, expandabilityScore: 30, sqft: 2000,
                 atRisk: 'Medium', expandability: 'Low', creditRating: 'Good', website: 'oldcapitolmagic.com', email: 'magic@oldcapitolmagic.com', phone: '(555) 100-3000'
             });
 
             // Scranton (ID 30000+)
             allBusinesses.push({
                 id: 30001, name: 'Dunder Mifflin Paper Company', location: 'Scranton, PA', city: 'Scranton', state: 'PA', county: 'Lackawanna County', msa: 'Scranton–Wilkes-Barre, PA',
-                industry: mockIndustries.find(i => i.code === '42'), sic: '50', employees: 15, sales: 2500000, health: 42, sqft: 5000,
+                industry: mockIndustries.find(i => i.code === '42'), sic: '50', employees: 15, sales: 2500000, health: 42, expandabilityScore: 15, sqft: 5000,
                 atRisk: 'High', expandability: 'Low', creditRating: 'Fair', website: 'dundermifflin.com', email: 'info@dundermifflin.com', phone: '(555) 200-1000'
             });
             allBusinesses.push({
                 id: 30002, name: 'Scranton White Pages', location: 'Scranton, PA', city: 'Scranton', state: 'PA', county: 'Lackawanna County', msa: 'Scranton–Wilkes-Barre, PA',
-                industry: mockIndustries.find(i => i.code === '5112'), sic: '7372', employees: 5, sales: 500000, health: 25, sqft: 1200,
+                industry: mockIndustries.find(i => i.code === '5112'), sic: '7372', employees: 5, sales: 500000, health: 25, expandabilityScore: 5, sqft: 1200,
                 atRisk: 'High', expandability: 'Low', creditRating: 'Poor', website: 'scrantonwhitepages.com', email: 'info@scrantonwhitepages.com', phone: '(555) 200-2000'
             });
             allBusinesses.push({
                 id: 30003, name: 'Lackawanna Coal Mining Co.', location: 'Scranton, PA', city: 'Scranton', state: 'PA', county: 'Lackawanna County', msa: 'Scranton–Wilkes-Barre, PA',
-                industry: mockIndustries.find(i => i.code === '2121'), sic: '122', employees: 120, sales: 18000000, health: 55, sqft: 20000,
+                industry: mockIndustries.find(i => i.code === '2121'), sic: '122', employees: 120, sales: 18000000, health: 55, expandabilityScore: 40, sqft: 20000,
                 atRisk: 'Medium', expandability: 'Medium', creditRating: 'Good', website: 'lackawannacoal.com', email: 'info@lackawannacoal.com', phone: '(555) 200-3000'
             });
             
             // Pawnee (ID 40000+)
             allBusinesses.push({
                 id: 40001, name: 'Pawnee Parks and Recreation', location: 'Pawnee, IN', city: 'Pawnee', state: 'IN', county: 'Wamapoke County', msa: 'Indianapolis-Carmel-Muncie, IN',
-                industry: mockIndustries.find(i => i.code === '92'), sic: '91', employees: 8, sales: 0, health: 70, sqft: 6000,
+                industry: mockIndustries.find(i => i.code === '92'), sic: '91', employees: 8, sales: 0, health: 70, expandabilityScore: 20, sqft: 6000,
                 atRisk: 'Low', expandability: 'Low', creditRating: 'Excellent', website: 'pawnee.gov/parks', email: 'parks@pawnee.gov', phone: '(555) 300-1000'
             });
             allBusinesses.push({
                 id: 40002, name: 'Sweetums Corp.', location: 'Pawnee, IN', city: 'Pawnee', state: 'IN', county: 'Wamapoke County', msa: 'Indianapolis-Carmel-Muncie, IN',
-                industry: mockIndustries.find(i => i.code === '31-33'), sic: '30', employees: 3500, sales: 300000000, health: 80, sqft: 800000,
+                industry: mockIndustries.find(i => i.code === '31-33'), sic: '30', employees: 3500, sales: 300000000, health: 80, expandabilityScore: 65, sqft: 800000,
                 atRisk: 'Low', expandability: 'Medium', creditRating: 'Good', website: 'sweetums.com', email: 'info@sweetums.com', phone: '(555) 300-2000'
             });
             allBusinesses.push({
                 id: 40003, name: 'Food and Stuff', location: 'Pawnee, IN', city: 'Pawnee', state: 'IN', county: 'Wamapoke County', msa: 'Indianapolis-Carmel-Muncie,. IN',
-                industry: mockIndustries.find(i => i.code === '4451'), sic: '5411', employees: 25, sales: 4000000, health: 88, sqft: 15000,
+                industry: mockIndustries.find(i => i.code === '4451'), sic: '5411', employees: 25, sales: 4000000, health: 88, expandabilityScore: 35, sqft: 15000,
                 atRisk: 'Low', expandability: 'Low', creditRating: 'Excellent', website: 'foodandstuff.com', email: 'info@foodandstuff.com', phone: '(555) 300-3000'
             });
             allBusinesses.push({
                 id: 40004, name: 'Entertainment 720', location: 'Pawnee, IN', city: 'Pawnee', state: 'IN', county: 'Wamapoke County', msa: 'Indianapolis-Carmel-Muncie, IN',
-                industry: mockIndustries.find(i => i.code === '56'), sic: '73', employees: 3, sales: 10000, health: 5, sqft: 10000,
+                industry: mockIndustries.find(i => i.code === '56'), sic: '73', employees: 3, sales: 10000, health: 5, expandabilityScore: 50, sqft: 10000,
                 atRisk: 'High', expandability: 'High', creditRating: 'Poor', website: 'e720.com', email: 'tom@e720.com', phone: '(555) 300-4000'
             });
+            
+            // Add a few more 'Data Centers' for the default search
+            for (let i = 50000; i < 50020; i++) {
+                allBusinesses.push({
+                    id: i,
+                    name: `DataLoom ${i-49999}`,
+                    location: mockLocations[i % mockLocations.length],
+                    city: mockLocations[i % mockLocations.length].split(', ')[0] || null,
+                    state: mockLocations[i % mockLocations.length].split(', ')[1] || null,
+                    county: mockCounties[i % mockCounties.length],
+                    msa: mockMSAs[i % mockMSAs.length],
+                    industry: mockIndustries.find(ind => ind.code === '5182'), // Data Centers
+                    sic: '7374',
+                    employees: Math.floor(Math.random() * 500) + 50,
+                    sales: Math.floor(Math.random() * 100000000) + 20000000,
+                    health: Math.floor(Math.random() * 60) + 40,
+                    expandabilityScore: Math.floor(Math.random() * 60) + 40,
+                    sqft: Math.floor(Math.random() * 200000) + 50000,
+                    atRisk: mockRiskLevels[i % mockRiskLevels.length],
+                    expandability: mockRiskLevels[(i+1) % mockRiskLevels.length],
+                    creditRating: mockCreditRatings[i % mockCreditRatings.length],
+                    website: `dataloom${i-49999}.com`,
+                    email: `contact@dataloom${i-49999}.com`,
+                    phone: `(555) ${Math.floor(Math.random() * 900) + 100}-${Math.floor(Math.random() * 9000) + 1000}`
+                });
+            }
 
             // --- STATE ---
             let currentPage = 1;
-            const rowsPerPage = 25;
+            const rowsPerPage = 10;
             let filteredBusinesses = [...allBusinesses];
             let selectedBusinessIds = new Set();
             let currentSort = {
-                key: 'health',
+                key: 'expandabilityScore', // Changed default sort
                 direction: 'desc'
             };
             // Map keys to human-readable names
             const sortKeyNames = {
                 'health': 'Health Score',
+                'expandabilityScore': 'Expandability Score',
                 'name': 'Business Name',
                 'location': 'Location',
                 'employees': 'Employees',
                 'sales': 'Sales',
                 'sqft': 'Sq. Ft.',
                 'industry.name': 'Industry (NAICS)',
-                'sic': 'Industry (SIC)',
-                'county': 'County',
-                'msa': 'MSA',
+                //'sic': 'Industry (SIC)', // Removed
+                //'county': 'County', // Removed
+                //'msa': 'MSA', // Removed
                 'atRisk': 'At-Risk',
-                'expandability': 'Expandability',
+                //'expandability': 'Expandability', // Removed
                 'creditRating': 'Credit Rating'
             };
 
@@ -1374,9 +1456,9 @@
             const industryFilter = document.getElementById('filter-industry');
             const salesFilter = document.getElementById('filter-sales');
             const employeesFilter = document.getElementById('filter-employees');
-            const healthMinFilter = document.getElementById('filter-health-min');
-            const healthMaxFilter = document.getElementById('filter-health-max');
-            
+            const expandabilityMinFilter = document.getElementById('filter-expandability-min');
+            const expandabilityMaxFilter = document.getElementById('filter-expandability-max');
+
             // Advanced Filter Inputs
             const quickSearchContainer = document.getElementById('quick-search-container');
             const advancedSearchFiltersEl = document.getElementById('advanced-search-filters');
@@ -1415,6 +1497,12 @@
             // Toast
             const toast = document.getElementById('toast-notification');
 
+            // --- NEW Scrollbar Sync Elements ---
+            const fakeScrollbarContainer = document.getElementById('fake-scrollbar-container');
+            const fakeScrollbarContent = document.getElementById('fake-scrollbar-content');
+            const realTableContainer = document.getElementById('real-table-container');
+            const table = realTableContainer.querySelector('table');
+
 
             // --- STATE NAME/ABBREVIATION MAP ---
             const stateMap = {
@@ -1444,8 +1532,8 @@
 
             // --- UTILITY FUNCTIONS ---
             
-            // Get color class for health score
-            function getHealthColor(score) {
+            // Get color class for score (re-used for expandability)
+            function getScoreColor(score) {
                 if (score > 80) return 'text-green-600';
                 if (score >= 60) return 'text-green-500';
                 if (score >= 40) return 'text-orange-500';
@@ -1458,16 +1546,6 @@
                     case 'High': return 'text-red-600';
                     case 'Medium': return 'text-orange-500';
                     case 'Low': return 'text-green-600';
-                    default: return 'text-gray-700';
-                }
-            }
-
-            // Get color class for Expandability
-            function getExpandabilityColor(level) {
-                switch (level) {
-                    case 'High': return 'text-green-600';
-                    case 'Medium': return 'text-orange-500';
-                    case 'Low': return 'text-red-600';
                     default: return 'text-gray-700';
                 }
             }
@@ -1510,7 +1588,10 @@
                 const paginatedBusinesses = filteredBusinesses.slice(start, end);
                 
                 if (paginatedBusinesses.length === 0) {
-                    tableBody.innerHTML = `<tr><td colspan="15" class="text-center py-10 text-gray-500">No businesses found matching your criteria.</td></tr>`;
+                    tableBody.innerHTML = `<tr><td colspan="10" class="text-center py-10 text-gray-500">No businesses found matching your criteria.</td></tr>`; // Updated colspan
+                    // --- NEW Scrollbar Sync Logic ---
+                    fakeScrollbarContent.style.width = `100%`; // Reset on no results
+                    // --- End Scrollbar Sync Logic ---
                     return;
                 }
 
@@ -1518,63 +1599,52 @@
                     const row = document.createElement('tr');
                     row.className = selectedBusinessIds.has(biz.id) ? 'bg-brand-light' : 'hover:bg-gray-50';
                     
-                    const healthColor = getHealthColor(biz.health);
+                    const expandabilityColor = getScoreColor(biz.expandabilityScore);
                     const atRiskColor = getAtRiskColor(biz.atRisk);
-                    const expandabilityColor = getExpandabilityColor(biz.expandability);
                     
                     // Helper to check for null/undefined before toLocaleString
                     const formatNum = (num) => num ? num.toLocaleString() : 'N/A';
                     
+                    // --- NEW COLUMN ORDER ---
                     row.innerHTML = `
                         <td class="px-6 py-4 whitespace-nowrap">
                             <input type="checkbox" class="row-checkbox h-4 w-4 rounded text-brand-DEFAULT focus:ring-brand-DEFAULT" data-id="${biz.id}" ${selectedBusinessIds.has(biz.id) ? 'checked' : ''}>
                         </td>
-                        <!-- 1. Health -->
-                        <td class="px-6 py-4 whitespace-nowrap text-lg font-bold ${healthColor}" style="min-width: 130px;">${biz.health}</td>
-                        <!-- 2. Business Name -->
+                        <!-- 1. Business Name -->
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="text-sm font-medium text-gray-900">${biz.name}</div>
                             <div class="text-xs text-gray-500">${biz.website}</div>
                         </td>
-                        <!-- 3. Location -->
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">${biz.location}</td>
-                        
-                        <!-- 4. Size (Employees) -->
+                        <!-- 2. Employees -->
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">${formatNum(biz.employees)}</td>
-                        <!-- 5. Size (Sales) -->
+                        <!-- 3. Sales -->
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">${formatSales(biz.sales)}</td>
-                        <!-- 6. Size (Sq. Ft.) -->
+                        <!-- 4. Expandability Score -->
+                        <td class="px-6 py-4 whitespace-nowrap text-lg font-bold ${expandabilityColor}" style="min-width: 130px;">${biz.expandabilityScore}</td>
+                        <!-- 5. At-Risk -->
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium ${atRiskColor}">${biz.atRisk}</td>
+                        <!-- 6. Credit Rating -->
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">${biz.creditRating}</td>
+                        <!-- 7. Sq. Ft. -->
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">${formatNum(biz.sqft)}</td>
-
-                        <!-- 7. Industry (NAICS) -->
+                        <!-- 8. Industry (NAICS) -->
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="text-sm text-gray-900">${biz.industry.name}</div>
                             <div class="text-xs text-gray-500">NAICS: ${biz.industry.code}</div>
                         </td>
-                        <!-- 8. Industry (SIC) -->
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-900">${biz.industry.name.split(' ')[0]}</div>
-                            <div class="text-xs text-gray-500">SIC: ${biz.sic}</div>
-                        </td>
-
-                        <!-- 9. Region (County) -->
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">${biz.county || 'N/A'}</td>
-                        <!-- 10. Region (MSA) -->
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">${biz.msa || 'N/A'}</td>
-
-                        <!-- Other Business Data -->
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium ${atRiskColor}">${biz.atRisk}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium ${expandabilityColor}">${biz.expandability}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">${biz.creditRating}</td>
-                        
-                        <!-- Contact -->
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-900">${biz.email}</div>
-                            <div class="text-xs text-gray-500">${biz.phone}</div>
-                        </td>
+                        <!-- 9. Location -->
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">${biz.location}</td>
                     `;
                     tableBody.appendChild(row);
                 });
+
+                // --- NEW Scrollbar Sync Logic ---
+                // Update fake scrollbar width to match table width
+                if (table) {
+                    // Use scrollWidth to get the full width of the table content
+                    fakeScrollbarContent.style.width = `${table.scrollWidth}px`;
+                }
+                // --- End Scrollbar Sync Logic ---
             }
 
             // Update pagination controls and summary
@@ -1660,21 +1730,59 @@
                 });
             }
 
-            function updateSortIndicators() {
-                // --- NEW DYNAMIC TITLE LOGIC ---
-                const sortName = sortKeyNames[currentSort.key] || 'Health Score';
-                let regionName = '';
-                
-                // Only check regionFilter if in quick search mode
-                if (quickSearchToggle.checked) {
-                    const regionValue = regionFilter.value.trim();
-                    if (regionValue) {
-                        regionName = ` in ${regionValue}`;
-                    }
+            // --- NEW DYNAMIC TITLE LOGIC ---
+            function updateDynamicTitle(filterValues) {
+                const sortName = sortKeyNames[currentSort.key] || 'Expandability Score';
+                let titleParts = ['Top 10'];
+
+                // 1. Industry
+                if (filterValues.industry) {
+                    titleParts.push(filterValues.industry);
+                }
+                titleParts.push('businesses'); // Always add 'businesses'
+
+                // 2. Region
+                if (filterValues.region) {
+                    titleParts.push(`in ${filterValues.region}`);
+                }
+
+                // 3. Employees
+                if (filterValues.employeesText) {
+                    titleParts.push(`with ${filterValues.employeesText} employees`);
                 }
                 
-                tableContainerTitle.textContent = `Top 25 businesses${regionName} sorted by ${sortName}`;
-                // --- END NEW DYNAMIC TITLE LOGIC ---
+                // 4. Sales
+                if (filterValues.salesText) {
+                    titleParts.push(`with ${filterValues.salesText} in sales`);
+                }
+                
+                // 5. Expandability
+                if (filterValues.expandabilityMin > 0 || filterValues.expandabilityMax < 100) {
+                    if (filterValues.expandabilityMin > 0 && filterValues.expandabilityMax < 100) {
+                        titleParts.push(`with an Expandability Score between ${filterValues.expandabilityMin} and ${filterValues.expandabilityMax}`);
+                    } else if (filterValues.expandabilityMin > 0) {
+                        titleParts.push(`with an Expandability Score above ${filterValues.expandabilityMin}`);
+                    } else { // max < 100
+                        titleParts.push(`with an Expandability Score below ${filterValues.expandabilityMax}`);
+                    }
+                }
+
+                // Add sorting
+                titleParts.push(`sorted by ${sortName}`);
+                
+                // Join all parts
+                tableContainerTitle.textContent = titleParts.join(' ');
+            }
+
+            function updateSortIndicators(filterValues) {
+                // Update dynamic title
+                if (quickSearchToggle.checked) {
+                    updateDynamicTitle(filterValues);
+                } else {
+                    // Default title for Advanced Search
+                    const sortName = sortKeyNames[currentSort.key] || 'Expandability Score';
+                    tableContainerTitle.textContent = `Top 10 businesses (Advanced Search) sorted by ${sortName}`;
+                }
 
                 // Update header indicators
                 tableHeaders.forEach(header => {
@@ -1697,18 +1805,37 @@
                 const name = nameFilter.value.toLowerCase();
                 
                 // Declare filter vars
-                let region, industry, salesMin, salesMax, empMin, empMax, healthMin, healthMax;
+                let region, industry, salesMin, salesMax, empMin, empMax, expandabilityMin, expandabilityMax;
+                let salesText, employeesText; // For dynamic title
                 
                 // Advanced filter vars
-                let city, state, county, msa, naics, sic, sqftMin, sqftMax, atRisk, expandability, credit;
+                let city, state, county, msa, naics, sic, advHealthMin, advHealthMax, sqftMin, sqftMax, atRisk, expandability, credit;
+
+                const filterValuesForTitle = {};
 
                 if (mode === 'quick') {
-                    region = regionFilter.value.toLowerCase().trim(); // trim whitespace
-                    industry = industryFilter.value.toLowerCase();
+                    region = regionFilter.value.trim(); // Capitalize for title, lowercase for search
+                    industry = industryFilter.value.trim(); // Capitalize for title, lowercase for search
                     [salesMin, salesMax] = parseRange(salesFilter.value);
                     [empMin, empMax] = parseRange(employeesFilter.value);
-                    healthMin = Number(healthMinFilter.value) || 0;
-                    healthMax = Number(healthMaxFilter.value) || 100;
+                    salesText = salesFilter.value ? salesFilter.options[salesFilter.selectedIndex].text : '';
+                    employeesText = employeesFilter.value ? employeesFilter.options[employeesFilter.selectedIndex].text : '';
+
+                    expandabilityMin = Number(expandabilityMinFilter.value) || 0;
+                    expandabilityMax = Number(expandabilityMaxFilter.value) || 100;
+                    
+                    // Store values for title
+                    filterValuesForTitle.region = region;
+                    filterValuesForTitle.industry = industry;
+                    filterValuesForTitle.salesText = salesText;
+                    filterValuesForTitle.employeesText = employeesText;
+                    filterValuesForTitle.expandabilityMin = expandabilityMin;
+                    filterValuesForTitle.expandabilityMax = expandabilityMax;
+                    
+                    // Lowercase for filtering
+                    region = region.toLowerCase();
+                    industry = industry.toLowerCase();
+
                 } else {
                     // Get values from advanced filters
                     city = advCity.value.toLowerCase();
@@ -1721,8 +1848,8 @@
                     empMax = Number(advEmpMax.value) || null;
                     salesMin = Number(advSalesMin.value) || null;
                     salesMax = Number(advSalesMax.value) || null;
-                    healthMin = Number(advHealthMin.value) || 0;
-                    healthMax = Number(advHealthMax.value) || 100;
+                    advHealthMin = Number(advHealthMin.value) || 0;
+                    advHealthMax = Number(advHealthMax.value) || 100;
                     sqftMin = Number(advSqftMin.value) || null;
                     sqftMax = Number(advSqftMax.value) || null;
                     atRisk = advAtRisk.value;
@@ -1758,7 +1885,7 @@
                         if (empMax !== null && empMax !== Infinity && biz.employees > empMax) return false;
                         if (empMax === Infinity && empMin !== null && biz.employees < empMin) return false;
                         
-                        if (biz.health < healthMin || biz.health > healthMax) return false;
+                        if (biz.expandabilityScore < expandabilityMin || biz.expandabilityScore > expandabilityMax) return false;
                         
                     } else {
                         // --- ADVANCED FILTER LOGIC ---
@@ -1779,7 +1906,7 @@
                         if (salesMin !== null && biz.sales < salesMin) return false;
                         if (salesMax !== null && biz.sales > salesMax) return false;
                         
-                        if (biz.health < healthMin || biz.health > healthMax) return false;
+                        if (biz.health < advHealthMin || biz.health > advHealthMax) return false;
 
                         if (sqftMin !== null && biz.sqft < sqftMin) return false;
                         if (sqftMax !== null && biz.sqft > sqftMax) return false;
@@ -1802,7 +1929,7 @@
                 renderTable();
                 renderPagination();
                 updateSelection(); // To update select-all checkbox state and counts
-                updateSortIndicators(); // To show default sort AND UPDATE TITLE
+                updateSortIndicators(filterValuesForTitle); // To show default sort AND UPDATE TITLE
             }
             
             // --- AUTOCOMPLETE LOGIC ---
@@ -1919,7 +2046,7 @@
             setupAutocomplete(advSic, document.getElementById('filter-adv-sic-suggestions'), mockSICs, false);
 
             // Modal Tag Autocomplete
-            setupTagAutocomplete(modalTagInput, modalTagSuggestions, mockTags);
+            setupTagAutocomplete(modalTagInput, document.getElementById('modal-tag-suggestions'), mockTags);
             
             // --- EVENT LISTENERS ---
             
@@ -1931,7 +2058,7 @@
             });
 
             // Quick Filter listeners
-            [regionFilter, industryFilter, salesFilter, employeesFilter, healthMinFilter, healthMaxFilter].forEach(el => {
+            [regionFilter, industryFilter, salesFilter, employeesFilter, expandabilityMinFilter, expandabilityMaxFilter].forEach(el => {
                 if (el.tagName === 'SELECT') {
                     el.addEventListener('change', () => applyFilters());
                 } else {
@@ -2001,7 +2128,8 @@
                         currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
                     } else {
                         currentSort.key = key;
-                        currentSort.direction = 'asc';
+                        // Default to 'desc' for scores, 'asc' for names/text
+                        currentSort.direction = (key === 'expandabilityScore' || key === 'employees' || key === 'sales' || key === 'sqft') ? 'desc' : 'asc';
                     }
                     
                     // Re-apply filters which will also sort and render
@@ -2122,9 +2250,38 @@
                 applyFilters(true); // true = keep current page
             });
 
+            // --- NEW Scrollbar Sync Listeners ---
+            let isSyncingScroll = false; // Flag to prevent infinite loop
+
+            fakeScrollbarContainer.addEventListener('scroll', () => {
+                if (isSyncingScroll) {
+                    isSyncingScroll = false;
+                    return;
+                }
+                isSyncingScroll = true;
+                realTableContainer.scrollLeft = fakeScrollbarContainer.scrollLeft;
+            });
+
+            realTableContainer.addEventListener('scroll', () => {
+                if (isSyncingScroll) {
+                    isSyncingScroll = false;
+                    return;
+                }
+                isSyncingScroll = true;
+                fakeScrollbarContainer.scrollLeft = realTableContainer.scrollLeft;
+            });
+
+            // Re-sync on window resize
+            window.addEventListener('resize', () => {
+                if (table) {
+                    fakeScrollbarContent.style.width = `${table.scrollWidth}px`;
+                }
+            });
+
 
             // --- INITIALIZATION ---
-            regionFilter.value = 'Illinois'; // Set default region
+            regionFilter.value = ''; // Set default region to blank
+            industryFilter.value = 'Data Centers'; // Set default industry
             applyFilters();
 
             // --- SIDE NAVIGATION TOGGLE ---
